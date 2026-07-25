@@ -1,0 +1,30 @@
+/* Terminal type — vault used Glass TTY VT220 + Arcade Interlaced + Mx437.
+   Those are local/commercial; we approximate with free CRT stack + optional local @font-face. */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&family=Share+Tech+Mono&family=Sixtyfour&display=swap');
+
+/* Drop real vault fonts here if you install them under m/decor/terminal/fonts/ */
+/*
+@font-face {
+  font-family: "Glass TTY VT220";
+  src: url("/m/decor/terminal/fonts/GlassTTYVT220.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Arcade Interlaced";
+  src: url("/m/decor/terminal/fonts/ArcadeInterlaced.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Mx437 IBM BIOS";
+  src: url("/m/decor/terminal/fonts/Mx437_IBM_BIOS.ttf") format("truetype");
+  font-display: swap;
+}
+*/
+
+:root {
+  /* Prefer vault names when present; fall back to CRT web fonts */
+  --tm-font-glass: "Glass TTY VT220", "VT323", "Share Tech Mono", ui-monospace, monospace;
+  --tm-font-arcade: "Arcade Interlaced", "Press Start 2P", "VT323", monospace;
+  --tm-font-bios: "Mx437 IBM BIOS", "Mx437 IBM DOS ISO9", "VT323", monospace;
+}

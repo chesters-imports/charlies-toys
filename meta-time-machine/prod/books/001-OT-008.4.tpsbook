@@ -1,0 +1,21 @@
+{
+  "schema": "tpsbook.v0",
+  "export_id": "001-OT-008.4",
+  "title": "Journal Prompts for Inner Child",
+  "testament": "OT",
+  "source_file": "001-OT-008.4.glassbox",
+  "created_at": 1784992690.8165267,
+  "updated_at": 1784992690.8175228,
+  "entries": [
+    {
+      "message_id": "1852e6fd-3adf-4566-83fb-bf960ac851b9",
+      "chip_id": "001-OT-008.4.0",
+      "bag_seq": 0,
+      "glass_seq": 43,
+      "role": "user",
+      "event_unix": 1739717869.327487,
+      "event_iso": "2025-02-16T14:57:49+00:00",
+      "mats": []
+    }
+  ]
+}

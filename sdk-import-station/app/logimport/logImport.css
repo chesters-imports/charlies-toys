@@ -1,0 +1,873 @@
+/**
+ * logImport — Terminal I/O protopass desk. Sparse; machine room, not yard tour.
+ */
+
+.logimport {
+  --li-border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  --li-rail-w: clamp(16rem, 22vw, 20rem);
+  max-width: none;
+  width: 100%;
+}
+
+/* Desk fills host: one form column, no outer page scroll */
+.logimport-desk {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.logimport-desk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--li-rail-w);
+  gap: 0.5rem 0.85rem;
+  align-items: stretch;
+  width: 100%;
+  max-width: none;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.logimport-doc {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.logimport-rail {
+  position: relative;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
+}
+
+.logimport-rail-inner {
+  height: 100%;
+  max-height: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0 0.1rem 0.35rem 0;
+  border-left: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  padding-left: 0.55rem;
+  scrollbar-width: thin;
+  box-sizing: border-box;
+}
+
+.logimport-rail-apply {
+  margin: 0 0 0.65rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+}
+
+.logimport-rail-label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+  margin-bottom: 0.35rem;
+}
+
+.logimport-rail .logimport-apply-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.logimport-rail .logimport-apply-row button {
+  width: 100%;
+  text-align: left;
+}
+
+.logimport-rail .logimport-panel {
+  margin-bottom: 0.65rem;
+}
+
+.logimport-enc-form-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.3rem;
+}
+
+/* Compact single-line fields — do not flex-grow (shell + flex:1 made them huge) */
+.logimport-rail input[type="text"],
+.logimport-enc-form-stack input[type="text"],
+.logimport-enc-form-stack input.logimport-code,
+.logimport-enc-form-stack input.logimport-also,
+.logimport-rail .logimport-also-inline {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  line-height: 1.25 !important;
+  font-size: 0.85rem !important;
+  padding: 0.28rem 0.4rem !important;
+  box-sizing: border-box;
+}
+
+.logimport-rail .logimport-enc-form button,
+.logimport-enc-form-stack button {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  width: auto;
+  padding: 0.28rem 0.5rem;
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.logimport-rail .logimport-apply-row button {
+  flex: 0 0 auto;
+  width: 100%;
+  padding: 0.3rem 0.45rem;
+  line-height: 1.2;
+  min-height: 0;
+}
+
+@media (max-width: 900px) {
+  .logimport-desk-grid {
+    grid-template-columns: 1fr;
+  }
+  .logimport-rail {
+    position: relative;
+    top: 0;
+    max-height: none;
+    order: -1;
+  }
+  .logimport-rail-inner {
+    border-left: none;
+    padding-left: 0;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+.logimport-lede {
+  opacity: 0.65;
+  font-size: 0.95rem;
+  margin: 0 0 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+/* One tight strip: load + core meta */
+.logimport-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+  margin: 0 0 0.45rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  font-size: 0.8rem;
+  line-height: 1.25;
+}
+
+.logimport-load {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.3rem;
+  align-items: center;
+  margin: 0;
+}
+
+.logimport-load label {
+  font-size: 0.7rem;
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.logimport-load input[type="text"] {
+  width: 3.5rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.35);
+  border: var(--li-border);
+  padding: 0.2rem 0.35rem;
+  line-height: 1.2;
+}
+
+.logimport-load button,
+.logimport-actions button {
+  font: inherit;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.22rem 0.5rem;
+  border: var(--li-border);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.logimport-load button:hover,
+.logimport-actions button:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.logimport-top-meta {
+  font-size: 0.78rem;
+  opacity: 0.72;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1 1 12rem;
+}
+
+.logimport-top-core strong {
+  opacity: 1;
+  color: inherit;
+}
+
+.logimport-meta {
+  font-size: 0.78rem;
+  opacity: 0.7;
+  margin: 0 0 0.4rem;
+}
+
+.logimport-meta code {
+  font-size: 0.85em;
+}
+
+/* title: label + field on one row */
+.logimport-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.4rem;
+}
+
+.logimport-title-lab {
+  flex: 0 0 auto;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  opacity: 0.55;
+}
+
+.logimport-title {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.95rem;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-radius: 0;
+  padding: 0.2rem 0.25rem;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.logimport-thread {
+  border: var(--li-border);
+  background: rgba(0, 0, 0, 0.2);
+  /* flex child takes remaining height; only this pane scrolls */
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.logimport-msg {
+  margin: 0.2rem 0;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.logimport-msg .li-role {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.5rem;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.68;
+  margin-bottom: 0.06rem;
+  line-height: 1.15;
+}
+
+.logimport-msg .li-time {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, currentColor 70%, #6a9);
+}
+
+.logimport-msg.role-user .li-role {
+  color: color-mix(in srgb, currentColor 90%, #8af);
+}
+
+.logimport-msg.role-user .li-time {
+  color: color-mix(in srgb, currentColor 55%, #8af);
+}
+
+/* encode hits · bright green chip (inline-block so padding shows inside <pre>) */
+mark.li-enc-hit,
+.li-enc-hit {
+  display: inline-block;
+  padding: 0.08em 0.32em;
+  margin: 0 0.12em;
+  border-radius: 0.2em;
+  background: #39ff14;
+  color: #0a1408;
+  font-weight: 700;
+  font-style: normal;
+  font-size: inherit;
+  line-height: 1.25;
+  vertical-align: baseline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  box-shadow: 0 0 0 1px #1a4a12;
+}
+.li-enc-count {
+  margin-left: 0.4rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #39ff14;
+  opacity: 0.9;
+}
+.logimport-msg.has-enc .li-role {
+  border-left: 2px solid #39ff14;
+  padding-left: 0.35rem;
+}
+
+.logimport-msg .li-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  /* match chrome scale — not body VT 18px reader mode */
+  font-family: "Cascadia Mono", "Consolas", "Share Tech Mono", ui-monospace, monospace !important;
+  font-size: 11px !important;
+  line-height: 1.32 !important;
+  letter-spacing: 0 !important;
+  margin: 0;
+  opacity: 0.9;
+  padding: 0;
+}
+
+.logimport-notes {
+  width: 100%;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  min-height: 2.2rem;
+  max-height: 4.5rem;
+  height: 2.6rem;
+  resize: vertical;
+  font: inherit;
+  font-size: 0.8rem;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.3);
+  border: var(--li-border);
+  padding: 0.25rem 0.4rem;
+  margin: 0 0 0.3rem;
+  line-height: 1.25;
+}
+
+.logimport-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  flex: 0 0 auto;
+  margin: 0;
+  padding-bottom: 0.15rem;
+}
+
+.logimport-doc > .logimport-meta {
+  flex: 0 0 auto;
+  margin: 0 0 0.2rem;
+}
+
+.logimport-status {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin: 0.5rem 0 0;
+}
+
+.logimport-warn {
+  opacity: 0.8;
+  border: var(--li-border);
+  padding: 0.65rem;
+  margin: 0.5rem 0;
+}
+
+.logimport-catalog-hint {
+  font-size: 0.75rem;
+  opacity: 0.5;
+  margin-top: 1rem;
+}
+
+.logimport-hidden {
+  display: none;
+}
+
+/* Scissors bar + part title — not sticky (stacking made titles unreadable) */
+.logimport-seg-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.55rem;
+  margin: 0.85rem 0 0.35rem;
+  padding: 0.4rem 0.5rem;
+  border-left: 2px solid currentColor;
+  /* solid-ish fill so text stays crisp in the thread */
+  background: #0c140c;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-left-width: 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.logimport-seg-scissors {
+  flex: 0 0 auto;
+  font-size: 0.95rem;
+  opacity: 0.9;
+  line-height: 1;
+}
+
+.logimport-seg-title {
+  flex: 1 1 8rem;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  color: inherit;
+  background: #060a06;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  padding: 0.3rem 0.45rem;
+}
+
+.logimport-subh {
+  margin: 1rem 0 0.35rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  font-weight: 400;
+}
+
+.logimport-wips {
+  margin: 0.75rem 0 1rem;
+  padding: 0.45rem 0.55rem 0.55rem;
+  border: var(--li-border);
+  background: #0a100a;
+}
+
+.logimport-wip-ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.logimport-wip-ul li {
+  margin: 0.35rem 0;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.logimport-wip-ul li:last-child {
+  border-bottom: none;
+}
+
+.logimport-wip-ul a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.logimport-wip-ul a:hover {
+  text-decoration: underline;
+}
+
+.logimport-wip-ul li.is-on {
+  border-left: 2px solid currentColor;
+  padding-left: 0.4rem;
+}
+
+.logimport-wip-when {
+  margin-left: 0.35rem;
+}
+
+.logimport-wip-note {
+  margin-top: 0.15rem;
+  opacity: 0.5;
+  font-size: 0.75rem;
+}
+
+/* Exports bay · parent group + nested parts */
+.logimport-export-groups {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+
+.logimport-export-group {
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.65rem 0.45rem;
+  border: var(--li-border);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.logimport-export-group.is-on {
+  border-left: 2px solid currentColor;
+}
+
+.logimport-export-group.is-complete {
+  opacity: 0.88;
+}
+
+.logimport-export-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.45rem 0.75rem;
+}
+
+.logimport-export-head-main {
+  flex: 1 1 12rem;
+  min-width: 0;
+  line-height: 1.45;
+}
+
+.logimport-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  flex: 0 0 auto;
+}
+
+.logimport-export-status-form {
+  display: inline;
+  margin: 0;
+}
+
+.logimport-export-reopen {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: inherit;
+  text-decoration: none;
+  border: var(--li-border);
+  padding: 0.3rem 0.55rem;
+}
+
+.logimport-export-reopen:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  text-decoration: none;
+}
+
+.logimport-export-badge {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  padding: 0.08rem 0.35rem;
+  vertical-align: middle;
+}
+
+.logimport-export-badge.is-complete {
+  opacity: 0.9;
+  border-color: color-mix(in srgb, #6f6 45%, currentColor);
+  color: color-mix(in srgb, #8f8 70%, currentColor);
+}
+
+.logimport-export-yard {
+  margin: 0.25rem 0 0.35rem;
+}
+
+.logimport-export-parts {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0 0 0 0.65rem;
+  border-left: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.logimport-export-parts li {
+  margin: 0.28rem 0;
+  padding: 0.15rem 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.logimport-export-actions button {
+  font: inherit;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.55rem;
+  border: var(--li-border);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.logimport-export-actions button:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.logimport-export-actions button.logimport-export {
+  border-color: color-mix(in srgb, currentColor 50%, transparent);
+}
+
+/* Desk gate when export already complete */
+.logimport-already {
+  margin: 0.75rem 0 1rem;
+  padding: 0.75rem 0.85rem;
+  border: var(--li-border);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.logimport-already-h {
+  margin: 0 0 0.45rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.logimport-already .logimport-export-groups {
+  margin-top: 0.55rem;
+}
+
+.logimport-reopen-banner a {
+  color: inherit;
+}
+
+/* terminal-io skin can override if needed */
+body.terminal-skin-io .logimport-seg-head {
+  background: #0a160a;
+}
+body.terminal-skin-io .logimport-seg-title {
+  background: #050c05;
+}
+body.terminal-skin-base .logimport-seg-head {
+  background: #12141a;
+}
+body.terminal-skin-base .logimport-seg-title {
+  background: #0a0c10;
+}
+
+.logimport-seg-range {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.logimport-cut-row {
+  margin-top: 0.35rem;
+}
+
+.logimport-cut {
+  font: inherit;
+  font-size: 0.65rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.45rem !important;
+  border: 1px dashed color-mix(in srgb, currentColor 40%, transparent) !important;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.logimport-cut:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.logimport-cut.is-cut {
+  opacity: 0.9;
+  border-style: solid !important;
+  border-color: color-mix(in srgb, currentColor 55%, transparent) !important;
+}
+
+/* Phase 2 — encode / redact panels */
+.logimport-panel {
+  border: var(--li-border);
+  background: rgba(0, 0, 0, 0.28);
+  padding: 0.5rem 0.6rem 0.65rem;
+  margin: 0 0 0.75rem;
+}
+
+.logimport-enc-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin: 0.35rem 0 0.5rem;
+}
+
+.logimport-enc-form input[type="text"] {
+  flex: 1 1 7rem;
+  min-width: 5rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.35);
+  border: var(--li-border);
+  padding: 0.3rem 0.4rem;
+}
+
+.logimport-enc-form input.logimport-code {
+  flex: 0 1 6.5rem;
+}
+
+.logimport-enc-form input.logimport-also {
+  flex: 1 1 12rem;
+  min-width: 10rem;
+}
+
+.logimport-enc-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.45rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px dotted rgba(128, 128, 128, 0.25);
+}
+.logimport-enc-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.4rem;
+}
+.logimport-enc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+.logimport-enc-actions .logimport-also-inline {
+  flex: 1 1 8rem;
+  min-width: 6rem;
+  font: inherit;
+  font-size: 0.8rem;
+  color: inherit;
+  background: rgba(0, 0, 0, 0.35);
+  border: var(--li-border);
+  padding: 0.25rem 0.35rem;
+}
+.logimport-enc-actions button {
+  font: inherit;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.45rem;
+  border: var(--li-border);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.logimport-enc-form button {
+  font: inherit;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.55rem;
+  border: var(--li-border);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.logimport-enc-form button:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.logimport-book {
+  list-style: none;
+  margin: 0.25rem 0 0.45rem;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.logimport-book li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.45rem;
+  padding: 0.28rem 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.logimport-book .li-code {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.logimport-book .li-alias {
+  font-weight: 600;
+}
+
+.logimport-book .li-arrow {
+  opacity: 0.4;
+  font-size: 0.75rem;
+}
+
+.logimport-book .li-orig {
+  opacity: 0.75;
+}
+
+.logimport-book .muted {
+  opacity: 0.5;
+  font-size: 0.8em;
+}
+
+.logimport-apply-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.logimport-apply-row button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.logimport-msg.is-redacted .li-body {
+  opacity: 0.85;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, currentColor 70%, #000);
+}
+
+.logimport-status.logimport-err {
+  opacity: 1;
+  border: var(--li-border);
+  padding: 0.4rem 0.5rem;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.logimport-cut-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}

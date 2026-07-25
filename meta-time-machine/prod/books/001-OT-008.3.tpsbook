@@ -1,0 +1,109 @@
+{
+  "schema": "tpsbook.v0",
+  "export_id": "001-OT-008.3",
+  "title": "Hekate Says Hello",
+  "testament": "OT",
+  "source_file": "001-OT-008.3.glassbox",
+  "created_at": 1784991520.240663,
+  "updated_at": 1784994658.70037,
+  "entries": [
+    {
+      "message_id": "1e0ac382-7221-4773-8000-e95ad9aa0d7a",
+      "chip_id": "001-OT-008.3.0",
+      "bag_seq": 0,
+      "glass_seq": 34,
+      "role": "user",
+      "event_unix": 1739669660.682172,
+      "event_iso": "2025-02-16T01:34:20+00:00",
+      "mats": []
+    },
+    {
+      "message_id": "5cdc7a02-460e-4685-9920-abb11088d57a",
+      "chip_id": "001-OT-008.3.1",
+      "bag_seq": 1,
+      "glass_seq": 35,
+      "role": "assistant",
+      "event_unix": 1739669662.202279,
+      "event_iso": "2025-02-16T01:34:22+00:00",
+      "mats": [
+        {
+          "mat": "H-005.frag",
+          "stem": "H",
+          "unit_code": "H-005.frag",
+          "rom": "loreBOX",
+          "at": 1784993646.1677904
+        }
+      ]
+    },
+    {
+      "message_id": "39f24288-37b5-42e3-93ad-3dd8df73854f",
+      "chip_id": "001-OT-008.3.2",
+      "bag_seq": 2,
+      "glass_seq": 36,
+      "role": "user",
+      "event_unix": 1739669698.972371,
+      "event_iso": "2025-02-16T01:34:58+00:00",
+      "mats": []
+    },
+    {
+      "message_id": "e670380d-12e4-4952-a9ff-25cf61ff1531",
+      "chip_id": "001-OT-008.3.3",
+      "bag_seq": 3,
+      "glass_seq": 37,
+      "role": "assistant",
+      "event_unix": 1739669701.691969,
+      "event_iso": "2025-02-16T01:35:01+00:00",
+      "mats": []
+    },
+    {
+      "message_id": "24fd318d-e95c-47e5-bb94-5c9c852dd5b0",
+      "chip_id": "001-OT-008.3.4",
+      "bag_seq": 4,
+      "glass_seq": 38,
+      "role": "user",
+      "event_unix": 1739669731.137822,
+      "event_iso": "2025-02-16T01:35:31+00:00",
+      "mats": []
+    },
+    {
+      "message_id": "fa836921-dee0-4623-8bfc-2435a298373e",
+      "chip_id": "001-OT-008.3.5",
+      "bag_seq": 5,
+      "glass_seq": 39,
+      "role": "assistant",
+      "event_unix": 1739669734.689928,
+      "event_iso": "2025-02-16T01:35:34+00:00",
+      "mats": []
+    },
+    {
+      "message_id": "519e83d4-87dd-4360-b2a1-df66870961c0",
+      "chip_id": "001-OT-008.3.6",
+      "bag_seq": 6,
+      "glass_seq": 40,
+      "role": "user",
+      "event_unix": 1739669768.984056,
+      "event_iso": "2025-02-16T01:36:08+00:00",
+      "mats": []
+    },
+    {
+      "message_id": "e03ddc99-e150-4b1d-a014-1b934166a82e",
+      "chip_id": "001-OT-008.3.7",
+      "bag_seq": 7,
+      "glass_seq": 41,
+      "role": "assistant",
+      "event_unix": 1739669779.284993,
+      "event_iso": "2025-02-16T01:36:19+00:00",
+      "mats": []
+    },
+    {
+      "message_id": "c6006325-820c-4444-b769-167abe91fa1f",
+      "chip_id": "001-OT-008.3.8",
+      "bag_seq": 8,
+      "glass_seq": 42,
+      "role": "assistant",
+      "event_unix": 1739669779.285257,
+      "event_iso": "2025-02-16T01:36:19+00:00",
+      "mats": []
+    }
+  ]
+}

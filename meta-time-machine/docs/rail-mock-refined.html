@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Time Machina · rail mock (refined)</title>
+  <style>
+    :root {
+      --bg: #0b0d11;
+      --panel: #12161c;
+      --panel-2: #181d26;
+      --line: #2a3340;
+      --line-soft: #1e2630;
+      --text: #d8dee8;
+      --muted: #7a8698;
+      --chip: #5a8ab0;
+      --hot: #8ec4e8;
+      --ok: #6bcf8e;
+      --bar: #0a0c10;
+      --redact: #555a63;
+      --role-user: #9ec8e8;
+      --role-assistant: #a8c4a0;
+      --font: "Segoe UI", system-ui, sans-serif;
+      --mono: "Cascadia Mono", "Consolas", ui-monospace, monospace;
+      --rail-w: 340px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      font-size: 12px;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 70% 45% at 65% 15%, #1a2230 0%, transparent 55%),
+        var(--bg);
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-end;
+      padding: 28px;
+      gap: 28px;
+    }
+    .desk-hint {
+      flex: 1;
+      max-width: 30rem;
+      align-self: center;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .desk-hint h1 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--hot);
+      letter-spacing: 0.05em;
+    }
+    .desk-hint code {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--chip);
+    }
+    .desk-hint ul { padding-left: 1.1rem; margin: 8px 0; }
+    .desk-hint li { margin: 4px 0; }
+    .desk-hint .tag {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ok);
+    }
+
+    /* ── the rail ── */
+    .rail {
+      width: var(--rail-w);
+      max-height: calc(100vh - 56px);
+      display: flex;
+      flex-direction: column;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 18px 52px rgba(0,0,0,.5);
+      overflow: hidden;
+    }
+    .rail-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      background: var(--bar);
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .rail-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .rail-brand .mark {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--hot);
+    }
+    .rail-brand .sub {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .pocket {
+      font-size: 10px;
+      color: var(--ok);
+      border: 1px solid color-mix(in srgb, var(--ok) 38%, transparent);
+      padding: 2px 9px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+    .pocket.off {
+      color: var(--muted);
+      border-color: var(--line);
+    }
+
+    .load {
+      margin: 12px 12px 0;
+      flex-shrink: 0;
+    }
+    .load button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--muted);
+      font: inherit;
+      cursor: pointer;
+      text-align: left;
+    }
+    .load button:hover {
+      border-color: var(--chip);
+      color: var(--text);
+    }
+    .load .ico {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid currentColor;
+      border-radius: 3px;
+      opacity: .7;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .load .ico::after {
+      content: "";
+      position: absolute;
+      left: 2px; right: 2px; bottom: 2px;
+      height: 4px;
+      border: 1.5px solid currentColor;
+      border-top: 0;
+      border-radius: 0 0 1px 1px;
+    }
+    .load .file {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .load .file strong {
+      color: var(--hot);
+      font-weight: 600;
+    }
+
+    .meta {
+      margin: 10px 12px 0;
+      padding: 4px 2px;
+      flex-shrink: 0;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      padding: 5px 6px;
+      border-radius: 4px;
+    }
+    .meta-row:hover { background: var(--line-soft); }
+    .meta-row .k {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .meta-row .v {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text);
+      text-align: right;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .meta-row .v.chip { color: var(--hot); }
+    .meta-row .v.dim { color: var(--muted); }
+
+    .msg-chrome {
+      margin: 8px 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+      padding: 0 4px;
+    }
+    .msg-chrome .lab {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .msg-chrome .idx {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--chip);
+    }
+    .msg-chrome .toggle {
+      font: inherit;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+    .msg-chrome .toggle:hover,
+    .msg-chrome .toggle.on {
+      color: var(--hot);
+      border-color: var(--line);
+    }
+
+    .msg {
+      margin: 6px 12px 0;
+      flex: 1 1 auto;
+      min-height: 160px;
+      overflow: auto;
+      padding: 12px;
+      background: var(--bar);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .msg-pretty .who {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line-soft);
+      font-size: 10px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .msg-pretty .who .role {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .msg-pretty .who .role.user { color: var(--role-user); }
+    .msg-pretty .who .role.assistant { color: var(--role-assistant); }
+    .msg-pretty .who .id { color: var(--chip); }
+    .msg-pretty .body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .msg-pretty .body .red {
+      color: var(--redact);
+      letter-spacing: 0.04em;
+      user-select: none;
+    }
+    .msg-raw {
+      display: none;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: var(--muted);
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+    .msg.raw-on .msg-pretty { display: none; }
+    .msg.raw-on .msg-raw { display: block; }
+    .msg-raw .key { color: var(--chip); }
+    .msg-raw .str { color: #b8c4a8; }
+    .msg-raw .num { color: #c9a86c; }
+
+    .foot {
+      display: flex;
+      gap: 6px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--line);
+      background: var(--bar);
+      flex-shrink: 0;
+      margin-top: 10px;
+    }
+    .foot button {
+      font: inherit;
+      cursor: pointer;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--text);
+      height: 36px;
+    }
+    .foot .nav {
+      width: 40px;
+      font-size: 15px;
+      color: var(--hot);
+    }
+    .foot .nav:hover { background: #222a36; }
+    .foot .nav:disabled {
+      opacity: .35;
+      cursor: default;
+    }
+    .foot .mats {
+      flex: 1;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .foot .mats:hover {
+      color: var(--text);
+      border-color: var(--chip);
+    }
+    .foot .mats em {
+      font-style: normal;
+      color: var(--ok);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .note {
+      margin: 0 14px 10px;
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.4;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="desk-hint">
+    <h1>Time Machina · refined rail</h1>
+    <p>Honors your rough Figma (LOG VIEWER / Load / CHIP·TITLE·MSG / MESSAGE) — cleaned into a pocket rail, not a full ROM window.</p>
+    <ul>
+      <li><strong>Default:</strong> pretty message (role · chip_id · time · body)</li>
+      <li><strong>Optional:</strong> raw JSON toggle (debug only)</li>
+      <li><strong>Foot:</strong> ← · mats on chip · →</li>
+      <li>Wood only: <code>sdk-import-station/work/exports/*.glassbox</code></li>
+    </ul>
+    <p>Hands rough: <code>early-rail-mockup.png</code><br>
+    This wire: open in browser · Slice A target.</p>
+    <span class="tag">mock · not built</span>
+  </div>
+
+  <aside class="rail" aria-label="Time Machina rail mock">
+    <header class="rail-head">
+      <div class="rail-brand">
+        <span class="mark">TPS</span>
+        <span class="sub">machina</span>
+      </div>
+      <div class="pocket" title="Pocket / world clock on">pocket on</div>
+    </header>
+
+    <div class="load">
+      <button type="button" title="Load .glassbox from exports">
+        <span class="ico" aria-hidden="true"></span>
+        <span class="file">Load · <strong>001-OT-008.1.glassbox</strong></span>
+      </button>
+    </div>
+
+    <div class="meta" aria-label="Lot meta">
+      <div class="meta-row">
+        <span class="k">chip</span>
+        <span class="v chip">001-OT-008.1</span>
+      </div>
+      <div class="meta-row">
+        <span class="k">title</span>
+        <span class="v">Banter</span>
+      </div>
+      <div class="meta-row">
+        <span class="k">msg</span>
+        <span class="v">4</span>
+      </div>
+      <div class="meta-row">
+        <span class="k">testament</span>
+        <span class="v dim">OT · part 1/4</span>
+      </div>
+    </div>
+
+    <div class="msg-chrome">
+      <span class="lab">message</span>
+      <button type="button" class="toggle" id="rawToggle" title="Show raw glass message JSON">raw</button>
+      <span class="idx" id="idx">1 / 4</span>
+    </div>
+
+    <div class="msg" id="msgPane" aria-label="Current message">
+      <div class="msg-pretty">
+        <div class="who">
+          <span class="role user">user</span>
+          <span class="id">001-OT-008.1.0</span>
+          <span>2025-02-15 23:52</span>
+        </div>
+        <div class="body">Hi <span class="red">████████</span> who also appears to hold the wisdom of the universe inside</div>
+      </div>
+      <pre class="msg-raw" id="rawBlock">{
+  <span class="key">"glass_seq"</span>: <span class="num">0</span>,
+  <span class="key">"message_id"</span>: <span class="str">"a43fb9c6-…"</span>,
+  <span class="key">"role"</span>: <span class="str">"user"</span>,
+  <span class="key">"create_time"</span>: <span class="num">1739663544.737</span>,
+  <span class="key">"create_time_iso"</span>: <span class="str">"2025-02-15T23:52:24+00:00"</span>,
+  <span class="key">"text"</span>: <span class="str">"Hi ████████ who also…"</span>,
+  <span class="key">"bag_seq"</span>: <span class="num">0</span>,
+  <span class="key">"chip_id"</span>: <span class="str">"001-OT-008.1.0"</span>
+}</pre>
+    </div>
+
+    <p class="note">Book keys on <code style="font-family:var(--mono);color:var(--chip)">export_id</code>. Mats filters rows for current <code style="font-family:var(--mono);color:var(--chip)">chip_id</code>. Not stuffed into DATBOX cards.</p>
+
+    <footer class="foot">
+      <button type="button" class="nav" title="Previous message" disabled>←</button>
+      <button type="button" class="mats" title="Datmats born while this chip was current">
+        mats on chip · <em>0</em>
+      </button>
+      <button type="button" class="nav" title="Next message">→</button>
+    </footer>
+  </aside>
+
+  <script>
+    const pane = document.getElementById("msgPane");
+    const btn = document.getElementById("rawToggle");
+    btn.addEventListener("click", () => {
+      const on = pane.classList.toggle("raw-on");
+      btn.classList.toggle("on", on);
+      btn.textContent = on ? "pretty" : "raw";
+    });
+  </script>
+</body>
+</html>

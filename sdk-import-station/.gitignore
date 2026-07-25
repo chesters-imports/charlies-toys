@@ -1,0 +1,7 @@
+work/wip/
+work/exports/
+work/glass/
+work/catalog.json
+work/catalog.md
+__pycache__/
+*.pyc

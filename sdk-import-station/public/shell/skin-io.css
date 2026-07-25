@@ -1,0 +1,167 @@
+/* IO — archive madman green + vault phosphor. Not product green. */
+
+body.terminal-skin-io {
+  --iox-bright: #38b433;
+  --iox-ultrabright: #00ff00;
+  --iox-midlight: #237220;
+  --iox-standard: #21701f;
+  --iox-highlighter: #243520;
+  --iox-background: #142710;
+  --iox-dark: #225a16;
+  --iox-tint: #294b21;
+
+  --tm-bg: var(--iox-background);
+  --tm-tree-bg: #0f1c0c;
+  --tm-fg: #7dff6a;
+  --tm-fg-dim: #3cb83a;
+  --tm-accent: var(--iox-bright);
+  --tm-hot: var(--iox-ultrabright);
+  --tm-line: var(--iox-dark);
+
+  --tm-scan: linear-gradient(rgba(0, 0, 0, 0.4) 2px, transparent 1px);
+  --tm-scan-size: 100% 3px;
+
+  --pocket-scroll-track: #0f1c0c;
+  --pocket-scroll-thumb: #2a6a28;
+  --pocket-scroll-thumb-hover: #38b433;
+
+  color: var(--tm-fg);
+  background-color: var(--iox-background);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  box-shadow: inset 0 0 40vh rgba(0, 0, 0, 0.65);
+}
+
+body.terminal-skin-io .tm-rail {
+  background: #0a1408;
+  border-right-color: var(--iox-bright);
+  box-shadow:
+    inset -6px 0 18px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(56, 180, 51, 0.12);
+}
+
+body.terminal-skin-io .tm-rail-x {
+  box-shadow: 0 0 10px rgba(56, 180, 51, 0.2);
+}
+
+body.terminal-skin-io .tm-rail-x:hover {
+  box-shadow: 0 0 16px rgba(255, 40, 40, 0.45);
+}
+
+body.terminal-skin-io .tm-sidebar {
+  background-color: #0f1c0c;
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border-right: 1px solid var(--iox-dark);
+}
+
+body.terminal-skin-io .tm-page-title {
+  color: var(--iox-ultrabright);
+  text-shadow: 0 0 12px rgba(0, 255, 0, 0.35);
+}
+
+body.terminal-skin-io .tm-broken-top {
+  border-bottom-color: var(--iox-bright);
+}
+
+body.terminal-skin-io .tm-center {
+  position: relative;
+  background-color: var(--iox-background);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+/* ghost watermark — archive broken_header energy */
+body.terminal-skin-io .tm-center::before {
+  content: "CHESTER'S IMPORTS";
+  position: absolute;
+  top: 18%;
+  left: 6%;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.1rem, 3.5vw, 2.6rem);
+  color: var(--iox-bright);
+  opacity: 0.055;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  z-index: 0;
+  white-space: nowrap;
+}
+
+body.terminal-skin-io .tm-main {
+  position: relative;
+  z-index: 1;
+}
+
+body.terminal-skin-io .tm-tab.is-on {
+  color: var(--iox-ultrabright);
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.25);
+}
+
+body.terminal-skin-io .tm-reading h1 {
+  color: var(--iox-ultrabright);
+  text-shadow: 0 0 14px rgba(0, 255, 0, 0.35);
+}
+
+body.terminal-skin-io .tm-reading p,
+body.terminal-skin-io .tm-reading .tm-lede {
+  color: #8fef7a;
+}
+
+body.terminal-skin-io .tm-statusbar {
+  background: var(--iox-bright);
+  color: #0a1608;
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+body.terminal-skin-io .tm-station-card {
+  border-color: var(--iox-dark);
+  background: #0a1608;
+  color: #9ef08a;
+}
+
+body.terminal-skin-io .tm-station-card:hover {
+  border-color: var(--iox-ultrabright);
+  color: var(--iox-ultrabright);
+  box-shadow: 0 0 16px rgba(0, 255, 0, 0.2);
+}
+
+body.terminal-skin-io ::selection {
+  background: rgba(23, 48, 77, 0.95);
+  color: #fff;
+}
+
+body.terminal-skin-io .tm-nav-arch a:hover {
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+}
+
+/* file input + task checkboxes inherit phosphor currentColor */
+body.terminal-skin-io .fk-attach-row input[type="file"]::file-selector-button,
+body.terminal-skin-io .fk-attach-row input[type="file"]::-webkit-file-upload-button {
+  color: var(--iox-ultrabright);
+  border-color: var(--iox-bright);
+  background: rgba(56, 180, 51, 0.18);
+  text-shadow: 0 0 6px rgba(0, 255, 0, 0.25);
+}
+
+body.terminal-skin-io .fk-attach-row input[type="file"]:hover::file-selector-button,
+body.terminal-skin-io .fk-attach-row input[type="file"]:hover::-webkit-file-upload-button {
+  background: rgba(56, 180, 51, 0.32);
+  box-shadow: 0 0 14px rgba(0, 255, 0, 0.28);
+}
+
+body.terminal-skin-io .fk-view-body input.md-task-checkbox {
+  border-color: var(--iox-bright);
+  background: rgba(10, 22, 8, 0.85);
+  box-shadow: 0 0 8px rgba(56, 180, 51, 0.25);
+}
+
+body.terminal-skin-io .fk-view-body input.md-task-checkbox:checked {
+  background: rgba(56, 180, 51, 0.28);
+  border-color: var(--iox-ultrabright);
+  box-shadow: 0 0 12px rgba(0, 255, 0, 0.35);
+}
+
+body.terminal-skin-io .fk-view-body input.md-task-checkbox:checked::after {
+  border-color: var(--iox-ultrabright);
+}

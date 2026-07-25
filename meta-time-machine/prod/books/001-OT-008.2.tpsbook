@@ -1,0 +1,21 @@
+{
+  "schema": "tpsbook.v0",
+  "export_id": "001-OT-008.2",
+  "title": "Conversation with Inner Child",
+  "testament": "OT",
+  "source_file": "001-OT-008.2.glassbox",
+  "created_at": 1784992353.5326645,
+  "updated_at": 1784992353.5326645,
+  "entries": [
+    {
+      "message_id": "f672e8c4-401b-455d-998f-eaef3b6ff254",
+      "chip_id": "001-OT-008.2.0",
+      "bag_seq": 0,
+      "glass_seq": 4,
+      "role": "user",
+      "event_unix": 1739663648.065585,
+      "event_iso": "2025-02-15T23:54:08+00:00",
+      "mats": []
+    }
+  ]
+}

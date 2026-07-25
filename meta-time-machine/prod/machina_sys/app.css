@@ -1,0 +1,687 @@
+:root {
+  --bg: #0b0d11;
+  --panel: #12161c;
+  --panel-2: #181d26;
+  --line: #2a3340;
+  --line-soft: #1e2630;
+  --text: #d8dee8;
+  --muted: #7a8698;
+  --chip: #5a8ab0;
+  --hot: #8ec4e8;
+  --ok: #6bcf8e;
+  --bar: #0a0c10;
+  --redact: #555a63;
+  --role-user: #9ec8e8;
+  --role-assistant: #a8c4a0;
+  --font: "Segoe UI", system-ui, sans-serif;
+  --mono: "Cascadia Mono", "Consolas", ui-monospace, monospace;
+  --chrome-h: 36px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12px;
+}
+
+.rail-shell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+}
+
+/* ── chrome: whole bar is drag; controls opt out ── */
+.app-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--chrome-h);
+  min-height: var(--chrome-h);
+  padding: 0 4px 0 10px;
+  background: var(--bar);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+  user-select: none;
+  /* Win / Edge WebView drag */
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+.app-chrome .chip,
+.app-chrome .pocket,
+.app-chrome .deck-win,
+.app-chrome button,
+.app-chrome [data-deck-window-controls],
+.app-chrome [data-deck-menu] {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.app-chrome .chip {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hot);
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.app-chrome .chip strong {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Big grab zone between logo and pocket */
+.chrome-grip {
+  flex: 1;
+  min-width: 48px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  cursor: grab;
+  overflow: hidden;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+.chrome-grip:active {
+  cursor: grabbing;
+}
+
+.grip-dots {
+  width: 10px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.35;
+  background-image: radial-gradient(circle, var(--muted) 1px, transparent 1.5px);
+  background-size: 4px 4px;
+  background-position: 0 0;
+}
+
+.chrome-meta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 10px;
+  font-family: var(--mono);
+}
+
+.pocket {
+  font: inherit;
+  font-size: 9px;
+  color: var(--ok);
+  border: 1px solid color-mix(in srgb, var(--ok) 38%, transparent);
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.pocket.off {
+  color: var(--muted);
+  border-color: var(--line);
+}
+
+.deck-win {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: 2px;
+  flex-shrink: 0;
+}
+
+/* ── walk rail ── */
+.rail {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+}
+
+.rail-shell.loading .rail {
+  display: none;
+}
+
+.load {
+  margin: 10px 10px 0;
+  flex-shrink: 0;
+}
+
+.load button,
+.nav,
+.mats,
+.linkish,
+.toggle,
+.loader-list button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.load button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--muted);
+  text-align: left;
+}
+
+.load button:hover {
+  border-color: var(--chip);
+  color: var(--text);
+}
+
+.load .ico {
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  opacity: 0.7;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.load .ico::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  height: 3px;
+  border: 1.5px solid currentColor;
+  border-top: 0;
+  border-radius: 0 0 1px 1px;
+}
+
+.load .file {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.load .file strong {
+  color: var(--hot);
+  font-weight: 600;
+}
+
+.meta {
+  margin: 8px 10px 0;
+  padding: 2px 0;
+  flex-shrink: 0;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.meta-row .k {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.meta-row .v {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+  text-align: right;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-row .v.chip {
+  color: var(--hot);
+}
+
+.meta-row .v.dim {
+  color: var(--muted);
+}
+
+.msg-chrome {
+  margin: 6px 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 4px;
+  gap: 8px;
+}
+
+.msg-chrome .lab {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.msg-chrome .idx {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--chip);
+  margin-left: auto;
+}
+
+.toggle {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.toggle:hover,
+.toggle.on {
+  color: var(--hot);
+  border-color: var(--line);
+}
+
+.msg {
+  margin: 6px 10px 0;
+  flex: 1 1 auto;
+  min-height: 80px;
+  overflow: auto;
+  padding: 10px;
+  background: var(--bar);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.msg-pretty .who {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: 10px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.msg-pretty .who .role {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--role-user);
+}
+
+.msg-pretty .who .role.assistant {
+  color: var(--role-assistant);
+}
+
+.msg-pretty .who .id {
+  color: var(--chip);
+}
+
+.msg-pretty .body {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.msg-pretty .body .red {
+  color: var(--redact);
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
+.msg-raw {
+  display: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.msg.raw-on .msg-pretty {
+  display: none;
+}
+
+.msg.raw-on .msg-raw {
+  display: block;
+}
+
+.note {
+  margin: 6px 12px 0;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.35;
+  flex-shrink: 0;
+}
+
+.note code {
+  font-family: var(--mono);
+  color: var(--chip);
+}
+
+.foot {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--line);
+  background: var(--bar);
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.foot .nav,
+.foot .mats {
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  height: 34px;
+}
+
+.foot .nav {
+  width: 38px;
+  font-size: 15px;
+  color: var(--hot);
+}
+
+.foot .nav:hover:not(:disabled) {
+  background: #222a36;
+}
+
+.foot .nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.foot .mats {
+  flex: 1;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.foot .mats:hover {
+  color: var(--text);
+  border-color: var(--chip);
+}
+
+.foot .mats em {
+  font-style: normal;
+  color: var(--ok);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.foot .mats.mats-pulse {
+  border-color: var(--ok);
+  color: var(--text);
+  animation: mats-flash 0.85s ease;
+}
+
+@keyframes mats-flash {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 50%, transparent);
+  }
+  40% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--ok) 0%, transparent);
+    border-color: var(--ok);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+/* ── full-rail loader ── */
+.loader {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--panel);
+}
+
+.loader:not([hidden]) {
+  display: flex;
+}
+
+.loader[hidden] {
+  display: none !important;
+}
+
+.rail-shell.loading .loader {
+  display: flex;
+}
+
+.loader-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bar);
+  flex-shrink: 0;
+}
+
+.loader-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hot);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.loader-path {
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 9px;
+  color: var(--muted);
+  font-family: var(--mono);
+  border-bottom: 1px solid var(--line-soft);
+  word-break: break-all;
+  flex-shrink: 0;
+}
+
+.loader-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 6px;
+}
+
+.loader-list button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  padding: 10px 10px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.loader-list button:hover {
+  background: var(--panel-2);
+  border-color: var(--line);
+}
+
+/* Currently loaded lot / segment */
+.loader-list button.is-current {
+  background: color-mix(in srgb, var(--hot) 12%, var(--panel-2));
+  border-color: color-mix(in srgb, var(--hot) 45%, var(--line));
+  box-shadow: inset 3px 0 0 var(--hot);
+}
+
+.loader-list button.is-current-parent:not(.is-current) {
+  /* parent lot of current segment when viewing lot list */
+  background: color-mix(in srgb, var(--hot) 10%, transparent);
+  border-color: color-mix(in srgb, var(--hot) 35%, var(--line));
+  box-shadow: inset 3px 0 0 var(--hot);
+}
+
+.loader-list .here {
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ok);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.loader-list .eid {
+  display: block;
+  color: var(--hot);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.loader-list .sub {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 3px;
+  line-height: 1.35;
+}
+
+.loader-list .badge {
+  display: inline-block;
+  margin-top: 5px;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--chip);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.loader-list .empty {
+  padding: 16px 10px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.loader-hint {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 10px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  background: var(--bar);
+  flex-shrink: 0;
+}
+
+.linkish {
+  border: 0;
+  background: transparent;
+  color: var(--chip);
+  padding: 2px 4px;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+/* mats dialog */
+#mats-dialog {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 0;
+  max-width: 320px;
+  width: calc(100% - 24px);
+}
+
+#mats-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.mats-panel {
+  margin: 0;
+  padding: 12px 14px 14px;
+}
+
+.mats-panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mats-hint {
+  margin: 0 0 8px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+#mats-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+#mats-list li {
+  padding: 6px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+#mats-list .empty {
+  color: var(--muted);
+  border: 0;
+}
+
+html.deck-host-integrated .app-chrome {
+  padding-right: 4px;
+}

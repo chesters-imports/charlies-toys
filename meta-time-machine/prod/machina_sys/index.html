@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Time Machina</title>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body class="companion">
+    <!--
+      One chrome only. Deck Host integrates into [data-deck-chrome].
+      Entire chrome is drag except interactive controls (menu, pocket, window btns).
+    -->
+    <div id="app" class="rail-shell">
+      <header
+        class="app-chrome"
+        data-deck-chrome
+        data-deck-drag-root
+        data-deck-controls="min,step,close"
+      >
+        <span class="chip" data-deck-menu title="Menu">TPS <strong>machina</strong></span>
+        <span class="chrome-grip" data-deck-drag title="Drag to move window" aria-label="Drag">
+          <span class="grip-dots" aria-hidden="true"></span>
+          <span class="chrome-meta" id="chrome-meta">companion rail</span>
+        </span>
+        <button type="button" class="pocket" id="btn-pocket" title="Toggle pocket clock">
+          pocket on
+        </button>
+        <div class="deck-win" data-deck-window-controls aria-label="Window"></div>
+      </header>
+
+      <!-- Walk surface -->
+      <main class="rail" id="rail-main" aria-label="Time Machina rail">
+        <div class="load">
+          <button type="button" id="btn-load" title="Load .glassbox from sdk-import exports">
+            <span class="ico" aria-hidden="true"></span>
+            <span class="file" id="load-label">Load · pick glass log</span>
+          </button>
+        </div>
+
+        <div class="meta" id="meta" aria-label="Lot meta">
+          <div class="meta-row">
+            <span class="k">chip</span>
+            <span class="v chip" id="m-chip">—</span>
+          </div>
+          <div class="meta-row">
+            <span class="k">title</span>
+            <span class="v" id="m-title">—</span>
+          </div>
+          <div class="meta-row">
+            <span class="k">msg</span>
+            <span class="v" id="m-count">—</span>
+          </div>
+          <div class="meta-row">
+            <span class="k">testament</span>
+            <span class="v dim" id="m-test">—</span>
+          </div>
+        </div>
+
+        <div class="msg-chrome">
+          <span class="lab">message</span>
+          <button type="button" class="toggle" id="btn-raw" title="Toggle raw JSON">raw</button>
+          <span class="idx" id="m-idx">—</span>
+        </div>
+
+        <div class="msg" id="msg-pane" aria-label="Current message">
+          <div class="msg-pretty" id="msg-pretty">
+            <div class="who">
+              <span class="role" id="m-role">—</span>
+              <span class="id" id="m-chipid">—</span>
+              <span id="m-time">—</span>
+            </div>
+            <div class="body" id="m-body">Load a sealed glassbox to walk time.</div>
+          </div>
+          <pre class="msg-raw" id="msg-raw"></pre>
+        </div>
+
+        <p class="note">
+          Book <code id="book-name">—</code> · mats filter current chip.
+        </p>
+
+        <footer class="foot">
+          <button type="button" class="nav" id="btn-prev" title="Previous" disabled>←</button>
+          <button type="button" class="mats" id="btn-mats" title="Datmats on this chip">
+            mats on chip · <em id="mats-n">0</em>
+          </button>
+          <button type="button" class="nav" id="btn-next" title="Next" disabled>→</button>
+        </footer>
+      </main>
+
+      <!-- Full-rail loader (overtakes walk UI) -->
+      <section class="loader" id="loader" hidden aria-label="Load glass log">
+        <div class="loader-head">
+          <button type="button" class="linkish" id="btn-loader-back" hidden>← back</button>
+          <span class="loader-title" id="loader-title">Glass logs</span>
+          <button type="button" class="linkish" id="btn-loader-close">close</button>
+        </div>
+        <p class="loader-path" id="loader-path"></p>
+        <div class="loader-list" id="loader-list"></div>
+        <p class="loader-hint" id="loader-hint">
+          Step 1 · pick a main log · then a sealed segment.
+        </p>
+      </section>
+
+      <dialog id="mats-dialog">
+        <form method="dialog" class="mats-panel">
+          <header>
+            <strong>mats on chip</strong>
+            <button type="submit" value="close" class="linkish">close</button>
+          </header>
+          <p class="mats-hint" id="mats-hint">Book rows exist; mats empty until register / whisper.</p>
+          <ul id="mats-list"></ul>
+        </form>
+      </dialog>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

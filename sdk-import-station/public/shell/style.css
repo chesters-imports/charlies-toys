@@ -1,0 +1,1012 @@
+/* TERMINAL chassis — archive madman station, not polished vault SaaS.
+   Rail (logout) · nav tree · reading field · status.
+   Shoddy / slightly unhinged on purpose. */
+
+@import url('fonts.css');
+
+:root {
+  --pocket-caption-h: 0px;
+  --tm-rail-w: 3.1rem;
+  --tm-sidebar-w: 14rem;
+  --tm-status-h: 1.75rem;
+  --tm-tab-h: 1.7rem;
+  /* reading column grows with window; still capped so lines don't go infinite */
+  --tm-reading-max: min(52rem, 100%);
+  --tm-prose-max: min(46rem, 100%);
+
+  --tm-bg: #0a0a0a;
+  --tm-tree-bg: #1a1a1a;
+  --tm-fg: #b0b0b0;
+  --tm-fg-dim: #707070;
+  --tm-accent: #909090;
+  --tm-hot: #e8e8e8;
+  --tm-line: #2a2a2a;
+
+  --tm-scan: linear-gradient(rgba(0, 0, 0, 0.35) 1px, transparent 1px);
+  --tm-scan-size: 100% 3px;
+
+  --tm-font: var(--tm-font-glass);
+  --tm-font-ui: var(--tm-font-arcade);
+  --tm-font-mono: var(--tm-font-bios);
+
+  --pocket-scroll-size: 10px;
+  --pocket-scroll-track: #0a0a0a;
+  --pocket-scroll-thumb: #333;
+  --pocket-scroll-thumb-hover: #555;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
+  --pocket-caption-h: 0px;
+}
+
+body.terminal-station {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: var(--tm-font);
+  font-size: 18px; /* vault-ish, not 14px product UI */
+  line-height: 1.4;
+  color: var(--tm-fg);
+  background: var(--tm-bg);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+/* full app under pocket caption */
+.tm-app {
+  position: fixed;
+  top: var(--pocket-caption-h, 0px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+}
+
+/* ── far-left SESSION rail (not a dup of nav) ────────────── */
+
+.tm-rail {
+  flex: 0 0 var(--tm-rail-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #0a0a0a;
+  border-right: 0.15rem solid var(--tm-accent);
+  z-index: 60;
+  padding: 0.35rem 0 0.25rem;
+  box-shadow: inset -8px 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.tm-rail-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.35rem 0 0.55rem;
+  border-bottom: 1px solid var(--tm-line);
+  width: 100%;
+  /* pywebview-drag-region — moves frameless window (esp. when deep hides caption) */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tm-rail-brand:active {
+  cursor: grabbing;
+}
+
+/* deep mode: flush to top + brand grabber (no dark strip above IOX) */
+html.mypi-pocket-deep body.terminal-station,
+html.mypi-pocket-deep body.terminal-station .tm-app {
+  --pocket-caption-h: 0px !important;
+}
+
+html.mypi-pocket-deep body.terminal-station .tm-app {
+  top: 0 !important;
+}
+
+html.mypi-pocket-deep body.terminal-station .tm-rail {
+  padding-top: 0;
+}
+
+html.mypi-pocket-deep body.terminal-station .tm-rail-brand {
+  padding: 0.45rem 0 0.55rem;
+  margin: 0;
+  background: color-mix(in srgb, var(--tm-accent) 12%, transparent);
+  box-shadow: inset 0 0 12px color-mix(in srgb, var(--tm-accent) 18%, transparent);
+}
+
+html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
+  opacity: 1;
+  text-shadow: 0 0 12px var(--tm-accent);
+}
+
+.tm-rail-gt {
+  font-family: "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.42rem;
+  color: var(--tm-accent);
+  opacity: 0.85;
+}
+
+.tm-rail-iox {
+  font-family: "Sixtyfour", "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--tm-hot);
+  transform: rotate(-2deg);
+  text-shadow: 0 0 10px var(--tm-accent);
+}
+
+.tm-rail-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0.65rem;
+  gap: 0.15rem;
+  width: 100%;
+}
+
+.tm-rail-face-l {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.45rem;
+  color: var(--tm-fg-dim);
+}
+
+.tm-rail-face-n {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--tm-font);
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  color: var(--tm-hot);
+  max-height: 5rem;
+  overflow: hidden;
+}
+
+/* ! important: tools must not restyle shell rail (chatBOX used bare form {}) */
+.tm-rail form.tm-rail-out,
+aside.tm-rail form.tm-rail-out {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 0.2rem !important;
+  margin: 0.85rem 0 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.tm-rail form.tm-rail-out span,
+.tm-rail form.tm-rail-out .tm-rail-out-l {
+  display: block !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+
+.tm-rail form.tm-rail-out button.tm-rail-x,
+.tm-rail-x {
+  display: block !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem !important;
+  max-width: 2rem !important;
+  font-family: "Press Start 2P", monospace !important;
+  font-size: 0.7rem !important;
+  border: 1px solid var(--tm-accent) !important;
+  background: transparent !important;
+  color: var(--tm-hot) !important;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.15);
+}
+
+.tm-rail-x:hover {
+  background: #c42b1c;
+  border-color: #ff4a3a;
+  color: #fff;
+  content: "X";
+}
+
+.tm-rail-out-l {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.08em;
+  color: var(--tm-fg-dim);
+}
+
+.tm-rail-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
+  text-decoration: none;
+  color: var(--tm-accent);
+}
+
+.tm-rail-in-l {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  border: 1px solid var(--tm-accent);
+  padding: 0.45rem 0.25rem;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.tm-rail-in:hover .tm-rail-in-l {
+  color: var(--tm-hot);
+  box-shadow: 0 0 10px var(--tm-accent);
+}
+
+.tm-rail-ghost {
+  margin-top: 1.25rem;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--tm-font);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--tm-accent);
+  opacity: 0.12;
+  pointer-events: none;
+  max-height: 8rem;
+  overflow: hidden;
+  user-select: none;
+}
+
+.tm-rail-fill {
+  flex: 1;
+}
+
+.tm-rail-foot {
+  font-family: "Sixtyfour", "Press Start 2P", monospace;
+  font-size: 0.45rem;
+  color: var(--tm-fg-dim);
+  opacity: 0.5;
+  padding: 0.35rem 0;
+  letter-spacing: 0.15em;
+}
+
+/* ── workspace ───────────────────────────────────────────── */
+
+.tm-workspace {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+  min-height: 0;
+  padding-bottom: var(--tm-status-h);
+}
+
+/* tree = mod-left solid color + scanlines */
+.tm-sidebar {
+  flex: 0 0 var(--tm-sidebar-w);
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background: var(--tm-tree-bg);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border-right: none;
+  padding: 0.35rem 0 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pocket-scroll-thumb) transparent;
+}
+
+.tm-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+.tm-sidebar::-webkit-scrollbar-thumb {
+  background: var(--pocket-scroll-thumb);
+}
+
+.tm-center {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--tm-bg);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+/* broken top — archive >|TERMINAL whisper */
+.tm-broken-top {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.35rem 0.75rem 0.15rem;
+  border-bottom: 0.15rem dashed var(--tm-accent);
+  transform: rotate(-0.4deg);
+  transform-origin: left center;
+}
+
+.tm-broken-label {
+  font-family: "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.55rem;
+  color: var(--tm-hot);
+  text-shadow: 0 0 8px var(--tm-accent);
+  white-space: nowrap;
+}
+
+.tm-broken-whisper {
+  font-family: var(--tm-font);
+  font-size: 0.7rem;
+  color: var(--tm-accent);
+  opacity: 0.18;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  user-select: none;
+}
+
+.tm-tabline {
+  flex: 0 0 var(--tm-tab-h);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.65rem;
+  background: rgba(0, 0, 0, 0.45);
+  border-bottom: 1px solid var(--tm-line);
+  font-family: var(--tm-font);
+  font-size: 0.95rem;
+}
+
+.tm-tab.is-on {
+  color: var(--tm-hot);
+  padding: 0.1rem 0.45rem;
+  text-transform: lowercase;
+}
+
+.tm-tab-path {
+  color: var(--tm-fg-dim);
+  font-size: 0.85rem;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tm-tab-agent {
+  margin-left: auto;
+  color: var(--tm-accent);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* reading pane — NO card-in-card; fills center column height */
+.tm-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.85rem clamp(0.85rem, 2vw, 1.75rem) 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pocket-scroll-thumb) transparent;
+}
+
+.tm-main::-webkit-scrollbar {
+  width: 10px;
+}
+.tm-main::-webkit-scrollbar-thumb {
+  background: var(--pocket-scroll-thumb);
+}
+
+.tm-reading {
+  /* grow with window (1024 vs 1600) without becoming a newspaper */
+  width: 100%;
+  max-width: var(--tm-reading-max);
+  min-height: min-content;
+}
+
+.tm-reading h1 {
+  font-family: var(--tm-font);
+  font-size: 1.85rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none; /* vault titles aren't product uppercase slabs */
+  color: var(--tm-hot);
+  border: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  line-height: 1.15;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+}
+
+.tm-reading h2 {
+  font-family: var(--tm-font);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--tm-hot);
+  margin: 1.1rem 0 0.4rem;
+}
+
+.tm-reading p,
+.tm-reading .tm-lede {
+  font-size: 1.05rem;
+  color: var(--tm-fg);
+  max-width: var(--tm-prose-max);
+  margin: 0.55rem 0;
+}
+
+/* tools installed in main (logImport, fileKeeper, …) use the width */
+.tm-reading .logimport {
+  max-width: none;
+  width: 100%;
+}
+
+/* fileKeeper / inventOry desks: fill reading pane top→bottom */
+.tm-main:has(.filekeeper),
+.tm-main:has(.inventury),
+.tm-main:has(.ddesk) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* scroll lives inside tree / panel */
+  padding-top: 0.45rem;
+  padding-bottom: 0.55rem;
+}
+
+.tm-reading:has(.filekeeper),
+.tm-reading:has(.inventury),
+.tm-reading:has(.ddesk) {
+  max-width: none;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tm-reading:has(.filekeeper) .filekeeper,
+.tm-reading:has(.inventury) .inventury,
+.tm-reading:has(.ddesk) .ddesk {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: none;
+  width: 100%;
+  height: 100%;
+}
+
+/* sparse machine voice — almost not there */
+.tm-reading .tm-lede-quiet {
+  font-size: 0.95rem;
+  opacity: 0.55;
+  letter-spacing: 0.04em;
+}
+
+.tm-reading a {
+  color: var(--tm-accent);
+  text-decoration: underline;
+  /* theme-aware — was hard green; AB (and future skins) inherit accent */
+  text-decoration-color: color-mix(in srgb, var(--tm-accent) 40%, transparent);
+  text-transform: none;
+}
+.tm-reading a::before {
+  content: none;
+}
+.tm-reading a:hover {
+  color: var(--tm-hot);
+  text-decoration-color: color-mix(in srgb, var(--tm-hot) 55%, transparent);
+}
+
+/* tool chrome buttons are not “links in prose” */
+.tm-reading a.fk-btn,
+.tm-reading a.inv-btn {
+  text-decoration: none;
+  text-decoration-color: transparent;
+}
+.tm-reading a.fk-btn:hover,
+.tm-reading a.inv-btn:hover {
+  text-decoration: none;
+}
+
+.tm-reading code {
+  font-family: var(--tm-font-mono);
+  font-size: 0.9em;
+  color: var(--tm-hot);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--tm-line);
+  padding: 0.05em 0.3em;
+}
+
+.tm-reading hr {
+  border: none;
+  border-top: 1px dotted var(--tm-line);
+  margin: 1.1rem 0;
+}
+
+/* kill legacy MAIN card look if tools inject it */
+.tm-reading .MAIN,
+.tm-main .MAIN {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  max-width: none !important;
+}
+
+/* ── archive-style nav (not vault explorer) ──────────────── */
+
+.tm-page-title {
+  margin: 0.35rem 0.55rem 0.25rem;
+  padding: 0.15vh;
+  font-size: 0.95rem;
+  font-family: "Sixtyfour", "Press Start 2P", var(--tm-font-ui), monospace;
+  font-weight: 200;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tm-hot);
+  line-height: 1.35;
+  border: none;
+}
+
+.tm-page-title::after {
+  content: "  ----";
+  opacity: 0.45;
+}
+
+.flicker {
+  animation: tm-flicker 4.5s infinite;
+}
+
+@keyframes tm-flicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.55; }
+  94% { opacity: 1; }
+  96% { opacity: 0.7; }
+  97% { opacity: 1; }
+}
+
+.tm-logged {
+  margin: 0 0.55rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--tm-fg-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tm-logged strong {
+  color: var(--tm-hot);
+  font-weight: 400;
+}
+
+.tm-nav-arch {
+  padding: 0 0.35rem;
+}
+
+.tm-navSec {
+  display: block;
+  font-family: "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.08em;
+  color: var(--tm-accent);
+  margin: 0.5rem 0.35rem 0.35rem;
+  opacity: 0.9;
+}
+
+.tm-nav-arch ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tm-nav-arch li {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: block;
+}
+
+.tm-nav-arch a {
+  display: block;
+  padding: 0.28rem 0.45rem 0.28rem 0.35rem;
+  color: var(--tm-fg);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}
+
+.tm-nav-arch a::before {
+  content: ">| ";
+  opacity: 0.45;
+  font-size: 0.85em;
+}
+
+.tm-nav-arch a:hover {
+  color: var(--tm-hot);
+  text-decoration: none;
+}
+
+.tm-nav-arch a:hover::after {
+  content: " >|";
+  opacity: 0.7;
+}
+
+.tm-nav-arch li.is-active a {
+  color: var(--tm-hot);
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.tm-nav-arch li.is-active a::before {
+  opacity: 1;
+}
+
+/* IMPORTS drawer · submenu */
+.tm-nav-arch li.tm-nav-parent > a {
+  font-weight: 600;
+}
+.tm-nav-arch ul.tm-nav-sub {
+  list-style: none;
+  margin: 0 0 0.15rem 0.55rem;
+  padding: 0 0 0.15rem 0.35rem;
+  border-left: 1px dotted var(--tm-line);
+  display: none;
+}
+.tm-nav-arch li.tm-nav-parent.is-open > ul.tm-nav-sub,
+.tm-nav-arch li.tm-nav-parent.is-active > ul.tm-nav-sub {
+  display: block;
+}
+.tm-nav-arch ul.tm-nav-sub a {
+  font-size: 0.82rem;
+  padding: 0.18rem 0.35rem;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
+.tm-nav-arch ul.tm-nav-sub a::before {
+  content: "· ";
+  opacity: 0.5;
+}
+.tm-nav-arch ul.tm-nav-sub li.is-active a {
+  color: var(--tm-hot);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.tm-nav-whisper {
+  margin: 1rem 0.45rem 0;
+  font-size: 0.72rem;
+  color: var(--tm-fg-dim);
+  opacity: 0.55;
+  line-height: 1.35;
+  max-width: 12rem;
+}
+
+/* station cards on login */
+.tm-station-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.tm-station-card {
+  display: block;
+  padding: 0.75rem 0.65rem;
+  border: 1px solid var(--tm-line);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--tm-fg);
+  text-decoration: none;
+  font-family: var(--tm-font);
+}
+
+.tm-station-card:hover {
+  border-color: var(--tm-accent);
+  color: var(--tm-hot);
+  box-shadow: 0 0 12px rgba(0, 255, 0, 0.12);
+  text-decoration: none;
+}
+
+.tm-station-card strong {
+  display: block;
+  font-weight: 400;
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.tm-station-card span {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--tm-fg-dim);
+}
+
+.tm-placeholder {
+  border: 1px dashed var(--tm-line);
+  padding: 0.75rem 0.9rem;
+  margin: 0.85rem 0;
+  color: var(--tm-fg-dim);
+  font-size: 0.95rem;
+}
+
+/* ── status bar (vault bright bar) ───────────────────────── */
+
+.tm-statusbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--tm-status-h);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 0.65rem;
+  font-family: var(--tm-font-ui);
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tm-bg);
+  background: var(--tm-accent);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  max-width: none;
+  width: auto;
+}
+
+.tm-status-brand {
+  font-weight: 700;
+}
+
+.tm-status-sep {
+  opacity: 0.45;
+}
+
+.tm-status-flex {
+  flex: 1;
+}
+
+.tm-status-hint {
+  opacity: 0.75;
+  font-size: 0.48rem;
+}
+
+/* forms / tools on phosphor field */
+.tm-reading input,
+.tm-reading textarea,
+.tm-main input,
+.tm-main textarea {
+  font-family: var(--tm-font);
+  font-size: 1rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--tm-line);
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--tm-hot);
+  border-radius: 0;
+  width: 100%;
+  max-width: 40rem;
+}
+
+.tm-reading button,
+.tm-main button {
+  font-family: var(--tm-font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--tm-accent);
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--tm-hot);
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.tm-reading button:hover,
+.tm-main button:hover {
+  background: var(--tm-accent);
+  color: var(--tm-bg);
+}
+
+/* hide old header/footer includes if any */
+.tm-header,
+header.tm-header {
+  display: none !important;
+}
+
+/* wide portal (e.g. 1600×1200) — more tree, more reading field */
+@media (min-width: 1400px) {
+  :root {
+    --tm-sidebar-w: 16rem;
+    --tm-reading-max: min(58rem, 100%);
+    --tm-prose-max: min(52rem, 100%);
+  }
+  .tm-main {
+    padding-left: clamp(1rem, 2.5vw, 2.25rem);
+    padding-right: clamp(1rem, 2.5vw, 2.25rem);
+  }
+}
+
+@media (min-width: 1700px) {
+  :root {
+    --tm-sidebar-w: 17rem;
+    --tm-reading-max: min(64rem, 100%);
+    --tm-prose-max: min(56rem, 100%);
+  }
+}
+
+@media (max-width: 720px) {
+  .tm-rail {
+    flex: 0 0 2.5rem;
+  }
+  .tm-rail-ghost,
+  .tm-broken-whisper {
+    display: none;
+  }
+  .tm-workspace {
+    flex-direction: column;
+  }
+  .tm-sidebar {
+    flex: 0 0 28vh;
+    border-bottom: 1px solid var(--tm-line);
+  }
+}
+
+/* -- pocket caption (PB inject default ? terminal surface theme) --
+   caption.js injects #mypi-pocket-caption into the page.
+   Default product chrome is purple-blue; terminal overrides when
+   html.mypi-pocket-frameless + body.terminal-station.
+   Skins (base / io) retint via --tm-* tokens.
+   Do not change height / drag region / z-index.
+*/
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption {
+  font-family: var(--tm-font-mono), "VT323", ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tm-fg);
+  background: var(--tm-bg);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border-bottom: 1px solid var(--tm-line);
+  box-shadow: none;
+  /* full bar height — do not let skin crush controls */
+  align-items: stretch;
+}
+
+/* mark = doors button (full hit area); gem = tiny accent inside */
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-mark {
+  flex-shrink: 0;
+  width: 36px;
+  min-width: 36px;
+  height: auto;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: inherit;
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-mark:hover,
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-mark.is-open {
+  background: color-mix(in srgb, var(--tm-accent) 18%, transparent);
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-mark-gem {
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  background: var(--tm-accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--tm-accent) 55%, transparent);
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-title {
+  opacity: 0.9;
+  letter-spacing: 0.08em;
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-zoom {
+  color: inherit;
+  opacity: 0.72;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-btns {
+  display: flex;
+  flex-shrink: 0;
+  align-items: stretch;
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-btn {
+  color: var(--tm-fg-dim);
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-width: 36px;
+  height: auto;
+  min-height: 100%;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-btn svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-btn:hover {
+  background: color-mix(in srgb, var(--tm-accent) 18%, transparent);
+  color: var(--tm-hot);
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-caption .mypi-cap-btn.close:hover {
+  background: #5a2020;
+  color: #ffb0b0;
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-menu {
+  font-family: var(--tm-font-mono), "VT323", ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  color: var(--tm-fg);
+  background: var(--tm-tree-bg);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border: 1px solid var(--tm-line);
+  border-top: none;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-menu button {
+  color: var(--tm-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.85rem;
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-menu button:hover,
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-menu button:focus {
+  background: color-mix(in srgb, var(--tm-accent) 22%, transparent);
+  color: var(--tm-hot);
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-menu .mypi-menu-sep {
+  background: var(--tm-line);
+}
+
+html.mypi-pocket-frameless body.terminal-station #mypi-pocket-menu .mypi-menu-hint {
+  color: var(--tm-fg-dim);
+  letter-spacing: 0.1em;
+}

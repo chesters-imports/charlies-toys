@@ -1,0 +1,376 @@
+/**
+ * Desk cognition + Deck Host caption strip.
+ * Shell fonts/scale from style.css + skin-io (18px base).
+ */
+
+/* ── horizontal Deck Host chrome (NOT on .tm-app) ───────── */
+.tm-deck-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 34px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: #0a1408;
+  border-bottom: 1px solid var(--tm-accent, #38b433);
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.45);
+}
+
+/* Left: house title = menu chip. No room spray. */
+.tm-deck-chip {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-family: "Press Start 2P", "Sixtyfour", var(--tm-font-ui), monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  color: var(--tm-hot, #00ff00);
+  text-shadow: 0 0 10px var(--tm-accent, #38b433);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.tm-deck-chip:hover {
+  background: rgba(56, 180, 51, 0.12);
+}
+
+/* Middle: empty drag field only (no text) */
+.tm-deck-drag {
+  flex: 1 1 auto;
+  min-width: 2rem;
+  align-self: stretch;
+  cursor: grab;
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
+.tm-deck-drag:active {
+  cursor: grabbing;
+}
+
+/* Host fills this — must stay a row slot on the right, not a column flex child of .tm-app */
+.tm-deck-win {
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  align-self: stretch;
+  align-items: stretch;
+  margin-left: auto;
+}
+
+.tm-deck-win:empty {
+  display: none;
+}
+
+/* App body under the deck bar */
+body.terminal-station {
+  --tm-deck-bar-h: 34px;
+}
+
+body.terminal-station .tm-app {
+  top: var(--tm-deck-bar-h, 34px);
+}
+
+/* deep mode: host hides [data-deck-chrome]; reclaim full height */
+html.deck-host-deep body.terminal-station .tm-app {
+  top: 0;
+}
+
+/* browser without host: keep thin bar for brand consistency */
+html:not(.deck-host-integrated) .tm-deck-win {
+  display: none;
+}
+
+
+/* ── land / welcome ─────────────────────────────────────── */
+.land-page h1 {
+  font-family: var(--tm-font-glass, "VT323", monospace);
+  font-size: 1.85rem;
+  font-weight: 400;
+  color: var(--tm-hot, #00ff00);
+  text-shadow: 0 0 12px rgba(0, 255, 0, 0.25);
+  margin: 0 0 0.75rem;
+}
+.land-page .land-lede {
+  opacity: 0.75;
+  max-width: 36rem;
+  margin: 0 0 1rem;
+}
+.land-page .land-hr {
+  border: none;
+  border-top: 1px dotted color-mix(in srgb, var(--tm-accent, #38b433) 45%, transparent);
+  margin: 1.1rem 0;
+}
+.land-page .land-note {
+  max-width: 38rem;
+  border-left: 3px solid color-mix(in srgb, var(--tm-hot, #00ff00) 45%, transparent);
+  padding: 0.15rem 0 0.15rem 0.85rem;
+  margin: 0.5rem 0 1rem;
+}
+.land-page .land-note p {
+  margin: 0.45rem 0;
+  max-width: 36rem;
+}
+.land-page .land-sig {
+  opacity: 0.55;
+  font-size: 0.9rem;
+  margin-top: 0.85rem !important;
+}
+.land-page .land-meta {
+  font-size: 0.85rem;
+  opacity: 0.55;
+}
+.land-page .land-meta code {
+  font-size: 0.9em;
+}
+
+/* ── flatten logImport nesting ─────────────────────────── */
+
+/* Fill Deck Host width — no newspaper column cap on the desk */
+.tm-main:has(.logimport),
+.tm-main:has(.land-page) {
+  max-width: none;
+}
+.tm-reading:has(.logimport),
+.tm-reading:has(.land-page) {
+  max-width: none !important;
+  width: 100%;
+}
+.tm-reading .logimport {
+  max-width: none;
+  width: 100%;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/*
+ * Fill center pane: outer tm-main does NOT scroll for desk.
+ * Thread + rail scroll inside; notes/seal stay on screen.
+ */
+.tm-workspace:has(.logimport-desk) {
+  min-height: 0;
+}
+.tm-center:has(.logimport-desk) {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.tm-main:has(.logimport-desk) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden !important;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding-top: 0.4rem;
+  padding-bottom: 0.35rem;
+}
+.tm-reading:has(.logimport-desk) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: none !important;
+  width: 100%;
+  height: 100%;
+}
+.tm-reading .logimport:has(.logimport-desk),
+.tm-reading .logimport-tight:has(.logimport-desk) {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+.tm-reading .logimport-topbar {
+  flex: 0 0 auto;
+}
+.tm-reading .logimport-desk {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.tm-reading .logimport-msg .li-body {
+  font-size: 11px !important;
+  line-height: 1.32 !important;
+}
+
+/* Kill shell form bulk on rail only (style.css .tm-reading input is 1rem + fat pad) */
+.tm-reading .logimport-rail input[type="text"],
+.tm-main .logimport-rail input[type="text"] {
+  font-size: 0.85rem !important;
+  line-height: 1.25 !important;
+  padding: 0.28rem 0.4rem !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+}
+.tm-reading .logimport-rail button,
+.tm-main .logimport-rail button {
+  font-size: 0.7rem !important;
+  padding: 0.28rem 0.5rem !important;
+  line-height: 1.2 !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+/* lede = whisper, not another card */
+.tm-reading .logimport-lede {
+  opacity: 0.55;
+  margin: 0 0 0.65rem;
+  border: none;
+  padding: 0;
+}
+
+/* meta lines: open air, not boxed */
+.tm-reading .logimport-meta {
+  opacity: 0.65;
+  margin: 0.35rem 0 0.55rem;
+}
+
+/* load bar: one strip, not a framed form island */
+.tm-reading .logimport-load {
+  margin: 0 0 0.85rem;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/* kill nested “card in card” on panels — left rail accent only */
+.tm-reading .logimport-panel {
+  border: none !important;
+  border-left: 2px solid color-mix(in srgb, var(--tm-accent) 55%, transparent) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.35rem 0 0.35rem 0.75rem !important;
+  margin: 0.85rem 0 !important;
+}
+
+.tm-reading .logimport-subh,
+.tm-reading .logimport h3 {
+  margin: 0 0 0.4rem;
+  padding: 0;
+  border: none;
+  /* keep shell font family — only slightly brighter */
+  color: var(--tm-hot);
+}
+
+/* working title: bottom line, not a full box if we can help it */
+.tm-reading .logimport-title {
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  background: transparent;
+  border-radius: 0;
+  padding: 0.35rem 0.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.tm-reading .logimport-notes {
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* ONE real frame: the message thread */
+.tm-reading .logimport-thread {
+  border: 1px solid color-mix(in srgb, var(--tm-accent) 30%, transparent);
+  background: rgba(0, 0, 0, 0.22);
+  max-height: min(58vh, 44rem);
+  min-height: 14rem;
+  padding: 0.45rem 0.55rem;
+  margin: 0.5rem 0 0.85rem;
+}
+
+/* segment heads inside thread: bar, not another boxed card */
+.tm-reading .logimport-seg-head {
+  background: transparent !important;
+  border: none !important;
+  border-left: 3px solid var(--tm-hot) !important;
+  border-radius: 0 !important;
+  padding: 0.25rem 0.35rem !important;
+  margin: 0.65rem 0 0.3rem !important;
+  box-shadow: none !important;
+}
+
+/* messages: divider only */
+.tm-reading .logimport-msg {
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+  margin: 0.4rem 0;
+  padding-bottom: 0.35rem;
+}
+
+/* body text slightly roomier for long glass — still shell mono stack */
+.tm-reading .logimport-topbar {
+  margin-bottom: 0.3rem;
+}
+
+.tm-reading .logimport-title-row {
+  margin-bottom: 0.3rem;
+  flex: 0 0 auto;
+}
+
+.tm-reading .logimport-title {
+  font-size: 0.9rem !important;
+  padding: 0.15rem 0.2rem !important;
+  max-width: none !important;
+  line-height: 1.2 !important;
+}
+
+/* Kill shell VT bulk on message pre */
+.tm-reading .logimport-msg pre.li-body,
+.tm-main .logimport-msg pre.li-body {
+  font-family: "Cascadia Mono", "Consolas", "Share Tech Mono", ui-monospace, monospace !important;
+  font-size: 11px !important;
+  line-height: 1.32 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+.tm-reading .logimport-msg mark.li-enc-hit,
+.tm-main .logimport-msg mark.li-enc-hit {
+  display: inline-block !important;
+  padding: 0.08em 0.32em !important;
+  margin: 0 0.12em !important;
+  background: #39ff14 !important;
+  color: #0a1408 !important;
+  font-size: inherit !important;
+  line-height: 1.25 !important;
+}
+
+/* warn / gate: soft strip not heavy box */
+.tm-reading .logimport-warn,
+.tm-reading .logimport-already {
+  border: none;
+  border-left: 3px solid color-mix(in srgb, var(--tm-hot) 50%, transparent);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.55rem 0.65rem;
+}
+
+.tm-reading .logimport-book,
+.tm-reading .logimport-wip-ul,
+.tm-reading .logimport-export-groups {
+  border: none;
+  background: transparent;
+  padding-left: 0;
+}
+
+.tm-reading .logimport-enc-row,
+.tm-reading .logimport-export-group {
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: transparent;
+  padding: 0.4rem 0;
+  margin: 0;
+}
+
+/* status toasts: plain text */
+.tm-reading .logimport-status {
+  border: none;
+  background: none;
+  padding: 0.25rem 0;
+}

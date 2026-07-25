@@ -1,0 +1,24 @@
+# Runtime / agent noise
+**/__pycache__/
+*.py[cod]
+*.log
+desk-server.log
+.webview_profiles/
+
+# Local work product (regenerable; huge / personal)
+sdk-import-station/work/glass/
+sdk-import-station/work/wip/
+sdk-import-station/work/catalog.json
+sdk-import-station/work/catalog.md
+
+# Live cord session (ephemeral)
+meta-time-machine/prod/cords/session.now
+meta-time-machine/prod/cords/session.now.json
+
+# OS
+Thumbs.db
+.DS_Store
+
+sdk-import-station/desk-server.err
+*.err
+
