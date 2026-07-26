@@ -59,6 +59,17 @@ When operator mints a card/mat in loreBOX **and** wants time-binding:
 - lore: mat = `lore_code` (`.lore` unit in a `.lore` bag; legacy `.frag` may exist), rom `loreBOX`  
 - shot: mat = `shot_code` (`.shot`), rom `shotBOX`
 
+### Path S — sopr Documenter (Big Box) ← peeks Machina
+
+Product docs, not narrative mats:
+
+1. On **Store fragment** (or Document → Stamp current TPS chip), sopr peeks `GET /api/cord/now`.
+2. If `pocket_on` + `current.chip_id` → append to **document** `tps_chips[]` (dedupe by `chip_id`).  
+3. **No** per-frag chip · **no** vencodes · **no** mat POST to Machina book (unless we later want reverse awareness).  
+4. Knowledge UI: **Document → About this document…** — not on compose/print surface.
+
+Port: sopr `42950` · Machina `43111`.
+
 ### Path reverse — Machina → loreBOX (awareness only)
 
 loreBOX does **not** need a live subscription. On mint, it peeks once. That is enough for v1.
