@@ -2062,25 +2062,15 @@ if (!function_exists('logimport_paths')) {
         if ($needle === '' || $haystack === '') {
             return 0;
         }
+        // Fast ASCII-ish path — glass is huge; avoid per-offset mb_* loops
         if (!$wholeWord) {
-            if (function_exists('mb_stripos') && function_exists('mb_strlen')) {
-                $n = 0;
-                $offset = 0;
-                $len = mb_strlen($needle);
-                $hlen = mb_strlen($haystack);
-                while ($offset < $hlen) {
-                    $pos = mb_stripos($haystack, $needle, $offset);
-                    if ($pos === false) {
-                        break;
-                    }
-                    $n++;
-                    $offset = $pos + max(1, $len);
-                }
-                return $n;
-            }
             return substr_count(strtolower($haystack), strtolower($needle));
         }
-        // Unicode-friendly "word" edges: not letter/number/_ adjacent
+        // Cheap reject before regex
+        if (stripos($haystack, $needle) === false) {
+            return 0;
+        }
+        // Word edges: not letter/number/_ adjacent (keeps "elon" out of "belong")
         $pat = '/(?<![\p{L}\p{N}_])' . preg_quote($needle, '/') . '(?![\p{L}\p{N}_])/iu';
         $m = preg_match_all($pat, $haystack);
         return $m === false ? 0 : (int) $m;
@@ -2092,29 +2082,50 @@ if (!function_exists('logimport_paths')) {
         if ($needle === '' || $haystack === '') {
             return '';
         }
-        $pos = function_exists('mb_stripos')
-            ? mb_stripos($haystack, $needle)
-            : stripos($haystack, $needle);
+        $pos = stripos($haystack, $needle);
         if ($pos === false) {
             return '';
         }
+        $nlen = strlen($needle);
         $start = max(0, $pos - $radius);
-        $len = (function_exists('mb_strlen') ? mb_strlen($needle) : strlen($needle)) + $radius * 2;
-        $snip = function_exists('mb_substr')
-            ? mb_substr($haystack, $start, $len)
-            : substr($haystack, $start, $len);
-        $snip = preg_replace('/\s+/u', ' ', trim((string) $snip)) ?? '';
+        $len = $nlen + $radius * 2;
+        $snip = substr($haystack, $start, $len);
+        $snip = preg_replace('/\s+/', ' ', trim((string) $snip)) ?? '';
         if ($start > 0) {
             $snip = '…' . $snip;
         }
-        if ($start + $len < (function_exists('mb_strlen') ? mb_strlen($haystack) : strlen($haystack))) {
+        if ($start + $len < strlen($haystack)) {
             $snip .= '…';
         }
         return $snip;
     }
 
     /**
-     * Search work/glass cores for a keyword.
+     * Resolve work/glass path for a catalog core (no full JSON load).
+     */
+    function logimport_glass_path_for_core(array $core): ?string {
+        $paths = logimport_paths();
+        $glassDir = rtrim(str_replace('\\', '/', (string) $paths['glass']), '/');
+        $cid = (string) ($core['conversation_id'] ?? '');
+        $candidates = [];
+        if (!empty($core['glass_basename'])) {
+            $candidates[] = $glassDir . '/' . $core['glass_basename'];
+        }
+        if ($cid !== '') {
+            $candidates[] = $glassDir . '/' . logimport_safe_glass_name($cid) . '.json';
+        }
+        foreach ($candidates as $gp) {
+            if (is_file($gp)) {
+                return $gp;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Search work/glass cores for a keyword (fast path: raw file scan, no full decode).
+     * Counts are approximate on JSON text (good enough for hunt); still open desk for truth.
+     *
      * @return list<array{face_id,title,testament_tag,hits,snip,message_count,create_date_utc}>
      */
     function logimport_search_cores(string $q, bool $wholeWord = false, int $limit = 200): array {
@@ -2122,7 +2133,7 @@ if (!function_exists('logimport_paths')) {
         if ($q === '') {
             return [];
         }
-        @set_time_limit(180);
+        @set_time_limit(120);
         $cat = logimport_load_catalog();
         if (!is_array($cat) || empty($cat['cores']) || !is_array($cat['cores'])) {
             return [];
@@ -2136,15 +2147,17 @@ if (!function_exists('logimport_paths')) {
             if ($face === '') {
                 continue;
             }
-            $conv = logimport_load_conversation($core);
-            if (!$conv) {
+            $gp = logimport_glass_path_for_core($core);
+            if ($gp === null) {
                 continue;
             }
-            $msgs = logimport_extract_messages($conv);
-            $blob = (string) ($core['title'] ?? '') . "\n";
-            foreach ($msgs as $m) {
-                $blob .= (string) ($m['text'] ?? '') . "\n";
+            // Raw read — decode-all mapping is too slow for 893 cores on a web request
+            $blob = @file_get_contents($gp);
+            if ($blob === false || $blob === '') {
+                continue;
             }
+            // Include catalog title so title-only hits still score
+            $blob = (string) ($core['title'] ?? '') . "\n" . $blob;
             $hits = logimport_count_keyword($blob, $q, $wholeWord);
             if ($hits <= 0) {
                 continue;
@@ -2155,7 +2168,7 @@ if (!function_exists('logimport_paths')) {
                 'testament_tag' => (string) ($core['testament_tag'] ?? ''),
                 'hits' => $hits,
                 'snip' => logimport_keyword_snip($blob, $q),
-                'message_count' => (int) ($core['message_count'] ?? count($msgs)),
+                'message_count' => (int) ($core['message_count'] ?? 0),
                 'create_date_utc' => (string) ($core['create_date_utc'] ?? ''),
             ];
         }

@@ -36,7 +36,8 @@ $deskHref = static function (string $face) use ($h): string {
 ?>
 <div class="logimport logimport-search">
   <p class="logimport-meta">
-    Hunt glass extracts for a keyword. Results show <strong>hit count</strong> per core.
+    Hunt glass extracts for a keyword. Results show <strong>hit count</strong> per core
+    (raw glass scan — may take a few seconds over ~900 cores).
     Open → Start an import (you still cut / seal for TPS).
   </p>
 
@@ -57,11 +58,11 @@ $deskHref = static function (string $face) use ($h): string {
       <legend class="logimport-meta">Match</legend>
       <label>
         <input type="radio" name="mode" value="partial" <?= $mode === 'partial' ? 'checked' : '' ?>>
-        Partial <span class="logimport-meta">(elon matches belong)</span>
+        Partial <span class="logimport-meta">— match inside longer words too</span>
       </label>
       <label>
         <input type="radio" name="mode" value="whole" <?= $mode === 'whole' ? 'checked' : '' ?>>
-        Whole word <span class="logimport-meta">(elon ≠ belong)</span>
+        Whole word <span class="logimport-meta">— only the word by itself</span>
       </label>
     </fieldset>
     <button type="submit" class="logimport-btn">Search glass</button>
@@ -115,8 +116,9 @@ $deskHref = static function (string $face) use ($h): string {
     <?php endif; ?>
   <?php elseif (!$ran): ?>
     <p class="logimport-meta">
-      Tip: use <strong>whole word</strong> for short names (elon, ven, ot).
-      Use <strong>partial</strong> for stems (import, sopr).
+      Tip: <strong>whole word</strong> when a short name hides inside other words
+      (you want Elon, not every “belong”). <strong>Partial</strong> when you want
+      stems and pieces (import, sopr).
     </p>
   <?php endif; ?>
 </div>
