@@ -43,6 +43,7 @@ function sdk_href(string $room, array $q = []): string {
         'import', 'desk' => '/?room=desk',
         'active', 'imports-active' => '/?room=active',
         'exports' => '/?room=exports',
+        'search', 'find', 'hunt' => '/?room=search',
         default => '/?room=welcome',
     };
     if ($q) {

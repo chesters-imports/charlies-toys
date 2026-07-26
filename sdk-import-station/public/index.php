@@ -24,11 +24,14 @@ if ($room === '' || in_array($room, ['land', 'home'], true)) {
     }
     $room = $wantsDesk ? 'desk' : ($room === '' || $room === 'land' || $room === 'home' ? 'welcome' : $room);
 }
-if (!in_array($room, ['welcome', 'desk', 'active', 'exports', 'import'], true)) {
+if (!in_array($room, ['welcome', 'desk', 'active', 'exports', 'import', 'search', 'find', 'hunt'], true)) {
     $room = 'welcome';
 }
 if ($room === 'import') {
     $room = 'desk';
+}
+if (in_array($room, ['find', 'hunt'], true)) {
+    $room = 'search';
 }
 
 $li = dirname(__DIR__) . '/app/logimport';
@@ -52,6 +55,8 @@ if ($room === 'welcome') {
     require $li . '/pageActive.php';
 } elseif ($room === 'exports') {
     require $li . '/pageExports.php';
+} elseif ($room === 'search') {
+    require $li . '/pageSearch.php';
 } else {
     require $li . '/pageDesk.php';
 }
@@ -63,12 +68,14 @@ $roomDisplay = match ($room) {
     'welcome' => 'Welcome',
     'active' => 'Active imports',
     'exports' => 'Exports',
+    'search' => 'Search glass',
     default => 'Start an import',
 };
 $roomSlug = match ($room) {
     'welcome' => 'welcome',
     'active' => 'imports-active',
     'exports' => 'exports',
+    'search' => 'search',
     default => 'import',
 };
 $pageTitle = 'TERMINAL · IO · ' . strtoupper($roomSlug);
@@ -148,6 +155,9 @@ $importsOpen = ($room === 'desk' || $room === 'active');
               </li>
               <li class="<?= $room === 'active' ? 'is-active' : '' ?>">
                 <a href="<?= $h(sdk_href('active')) ?>">ACTIVE IMPORTS</a>
+              </li>
+              <li class="<?= $room === 'search' ? 'is-active' : '' ?>">
+                <a href="<?= $h(sdk_href('search')) ?>">SEARCH GLASS</a>
               </li>
             </ul>
           </li>

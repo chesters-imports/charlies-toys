@@ -2051,4 +2051,123 @@ if (!function_exists('logimport_paths')) {
         $n = max(4, min($max, (int) (strlen($s) * 0.85)));
         return str_repeat('█', $n);
     }
+
+    /**
+     * Count keyword hits in text.
+     * partial: substring (case-insensitive) — "elon" matches "belong"
+     * whole: word-ish boundary — "elon" does not match "belong"
+     */
+    function logimport_count_keyword(string $haystack, string $needle, bool $wholeWord): int {
+        $needle = trim($needle);
+        if ($needle === '' || $haystack === '') {
+            return 0;
+        }
+        if (!$wholeWord) {
+            if (function_exists('mb_stripos') && function_exists('mb_strlen')) {
+                $n = 0;
+                $offset = 0;
+                $len = mb_strlen($needle);
+                $hlen = mb_strlen($haystack);
+                while ($offset < $hlen) {
+                    $pos = mb_stripos($haystack, $needle, $offset);
+                    if ($pos === false) {
+                        break;
+                    }
+                    $n++;
+                    $offset = $pos + max(1, $len);
+                }
+                return $n;
+            }
+            return substr_count(strtolower($haystack), strtolower($needle));
+        }
+        // Unicode-friendly "word" edges: not letter/number/_ adjacent
+        $pat = '/(?<![\p{L}\p{N}_])' . preg_quote($needle, '/') . '(?![\p{L}\p{N}_])/iu';
+        $m = preg_match_all($pat, $haystack);
+        return $m === false ? 0 : (int) $m;
+    }
+
+    /** First snippet around first match (case-insensitive). */
+    function logimport_keyword_snip(string $haystack, string $needle, int $radius = 56): string {
+        $needle = trim($needle);
+        if ($needle === '' || $haystack === '') {
+            return '';
+        }
+        $pos = function_exists('mb_stripos')
+            ? mb_stripos($haystack, $needle)
+            : stripos($haystack, $needle);
+        if ($pos === false) {
+            return '';
+        }
+        $start = max(0, $pos - $radius);
+        $len = (function_exists('mb_strlen') ? mb_strlen($needle) : strlen($needle)) + $radius * 2;
+        $snip = function_exists('mb_substr')
+            ? mb_substr($haystack, $start, $len)
+            : substr($haystack, $start, $len);
+        $snip = preg_replace('/\s+/u', ' ', trim((string) $snip)) ?? '';
+        if ($start > 0) {
+            $snip = '…' . $snip;
+        }
+        if ($start + $len < (function_exists('mb_strlen') ? mb_strlen($haystack) : strlen($haystack))) {
+            $snip .= '…';
+        }
+        return $snip;
+    }
+
+    /**
+     * Search work/glass cores for a keyword.
+     * @return list<array{face_id,title,testament_tag,hits,snip,message_count,create_date_utc}>
+     */
+    function logimport_search_cores(string $q, bool $wholeWord = false, int $limit = 200): array {
+        $q = trim($q);
+        if ($q === '') {
+            return [];
+        }
+        @set_time_limit(180);
+        $cat = logimport_load_catalog();
+        if (!is_array($cat) || empty($cat['cores']) || !is_array($cat['cores'])) {
+            return [];
+        }
+        $out = [];
+        foreach ($cat['cores'] as $core) {
+            if (!is_array($core)) {
+                continue;
+            }
+            $face = (string) ($core['face_id'] ?? '');
+            if ($face === '') {
+                continue;
+            }
+            $conv = logimport_load_conversation($core);
+            if (!$conv) {
+                continue;
+            }
+            $msgs = logimport_extract_messages($conv);
+            $blob = (string) ($core['title'] ?? '') . "\n";
+            foreach ($msgs as $m) {
+                $blob .= (string) ($m['text'] ?? '') . "\n";
+            }
+            $hits = logimport_count_keyword($blob, $q, $wholeWord);
+            if ($hits <= 0) {
+                continue;
+            }
+            $out[] = [
+                'face_id' => $face,
+                'title' => (string) ($core['title'] ?? ''),
+                'testament_tag' => (string) ($core['testament_tag'] ?? ''),
+                'hits' => $hits,
+                'snip' => logimport_keyword_snip($blob, $q),
+                'message_count' => (int) ($core['message_count'] ?? count($msgs)),
+                'create_date_utc' => (string) ($core['create_date_utc'] ?? ''),
+            ];
+        }
+        usort($out, static function ($a, $b) {
+            if ($a['hits'] !== $b['hits']) {
+                return $b['hits'] <=> $a['hits'];
+            }
+            return strcmp((string) $a['face_id'], (string) $b['face_id']);
+        });
+        if ($limit > 0 && count($out) > $limit) {
+            $out = array_slice($out, 0, $limit);
+        }
+        return $out;
+    }
 }

@@ -30,7 +30,10 @@ Sealed store naming discussion: [STORE.md](./STORE.md).
 |-----|-----|
 | `/?room=desk` | Load core # · WIP · split · encode · redact · seal |
 | `/?room=active` | Active WIP list |
+| `/?room=search` | Keyword hunt over glass · hit counts · open → desk |
 | `/?room=exports` | Sealed `export_*.json` |
+
+Search: **partial** (elon∈belong) or **whole word** (elon≠belong). Does not seal — you still process for TPS.
 
 ## Shell (pass B)
 
