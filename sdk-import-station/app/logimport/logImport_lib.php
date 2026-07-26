@@ -1087,7 +1087,10 @@ if (!function_exists('logimport_paths')) {
                 if ($seq > $lastSeq) {
                     $lastSeq = $seq;
                 }
-                $text = (string) ($m['text'] ?? '');
+                $rawText = (string) ($m['text'] ?? '');
+                // Hit-test VEN encodes on raw text before seal transforms
+                $vencodes = logimport_vencodes_for_text($rawText, $wip);
+                $text = $rawText;
                 if (function_exists('logimport_transform_text')) {
                     $tx = logimport_transform_text($text, $seq, $wip, $doRedact, $doEncode, false);
                     $text = is_array($tx) ? (string) ($tx['text'] ?? $text) : (string) $tx;
@@ -1102,7 +1105,7 @@ if (!function_exists('logimport_paths')) {
                         $iso = null;
                     }
                 }
-                $messagesOut[] = [
+                $row = [
                     'glass_seq' => $seq,
                     'message_id' => (string) ($m['message_id'] ?? ''),
                     'role' => (string) ($m['role'] ?? ''),
@@ -1110,6 +1113,10 @@ if (!function_exists('logimport_paths')) {
                     'create_time_iso' => $iso,
                     'text' => $text,
                 ];
+                if ($vencodes !== []) {
+                    $row['vencodes'] = $vencodes;
+                }
+                $messagesOut[] = $row;
             }
         }
 
@@ -1218,6 +1225,8 @@ if (!function_exists('logimport_paths')) {
                 'span_end' => $tMax,
                 'segments' => [],
                 'siblings' => [],
+                // chip_id → VEN codes present on that message (who-pot for Machina)
+                'ven_pot' => logimport_ven_pot_from_messages($msgs),
                 'messages' => $msgs,
             ]);
             $path = logimport_export_path($faceKey, null, $importOrder, $testament);
@@ -1272,6 +1281,7 @@ if (!function_exists('logimport_paths')) {
                 'span_end' => $tMax,
                 'segments' => $segments,
                 'siblings' => $siblings,
+                'ven_pot' => logimport_ven_pot_from_messages($msgs),
                 'messages' => $msgs,
             ]);
             $path = logimport_export_path($faceKey, $p, $importOrder, $testament);
@@ -1618,6 +1628,64 @@ if (!function_exists('logimport_paths')) {
             }
         }
         return $pairs;
+    }
+
+    /**
+     * Which VEN encodes appear in raw (pre-seal) message text.
+     * Matched on original/also forms (whole-word); ships code+alias only.
+     *
+     * @return list<array{code:string,alias:string}>
+     */
+    function logimport_vencodes_for_text(string $text, ?array $wip): array {
+        if ($text === '') {
+            return [];
+        }
+        $out = [];
+        $seen = [];
+        foreach (logimport_encodes_list($wip) as $e) {
+            $code = trim((string) ($e['code'] ?? ''));
+            $alias = trim((string) ($e['alias'] ?? ''));
+            if ($code === '' || $alias === '') {
+                continue;
+            }
+            $forms = array_merge([(string) $e['original']], $e['also'] ?? []);
+            foreach ($forms as $form) {
+                $form = trim((string) $form);
+                if ($form === '') {
+                    continue;
+                }
+                if (preg_match(logimport_replace_pattern($form), $text)) {
+                    if (empty($seen[$code])) {
+                        $out[] = ['code' => $code, 'alias' => $alias];
+                        $seen[$code] = true;
+                    }
+                    break;
+                }
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Build ven_pot: chip_id → list of {code,alias} from chipped messages.
+     *
+     * @param list<array> $msgs
+     * @return array<string, list<array{code:string,alias:string}>>
+     */
+    function logimport_ven_pot_from_messages(array $msgs): array {
+        $pot = [];
+        foreach ($msgs as $m) {
+            if (!is_array($m)) {
+                continue;
+            }
+            $chip = (string) ($m['chip_id'] ?? '');
+            $vens = $m['vencodes'] ?? [];
+            if ($chip === '' || !is_array($vens) || $vens === []) {
+                continue;
+            }
+            $pot[$chip] = array_values($vens);
+        }
+        return $pot;
     }
 
     /**

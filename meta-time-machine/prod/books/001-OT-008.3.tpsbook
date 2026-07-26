@@ -5,7 +5,7 @@
   "testament": "OT",
   "source_file": "001-OT-008.3.glassbox",
   "created_at": 1784991520.240663,
-  "updated_at": 1784994658.70037,
+  "updated_at": 1785021610.4130802,
   "entries": [
     {
       "message_id": "1e0ac382-7221-4773-8000-e95ad9aa0d7a",
@@ -15,7 +15,21 @@
       "role": "user",
       "event_unix": 1739669660.682172,
       "event_iso": "2025-02-16T01:34:20+00:00",
-      "mats": []
+      "mats": [
+        {
+          "mat": "H-009.lore",
+          "stem": "H",
+          "unit_code": "H-009.lore",
+          "rom": "loreBOX",
+          "at": 1785021610.4130802,
+          "vencodes_present": [
+            {
+              "code": "MOM-101",
+              "alias": "Hekate"
+            }
+          ]
+        }
+      ]
     },
     {
       "message_id": "5cdc7a02-460e-4685-9920-abb11088d57a",
@@ -25,15 +39,7 @@
       "role": "assistant",
       "event_unix": 1739669662.202279,
       "event_iso": "2025-02-16T01:34:22+00:00",
-      "mats": [
-        {
-          "mat": "H-005.frag",
-          "stem": "H",
-          "unit_code": "H-005.frag",
-          "rom": "loreBOX",
-          "at": 1784993646.1677904
-        }
-      ]
+      "mats": []
     },
     {
       "message_id": "39f24288-37b5-42e3-93ad-3dd8df73854f",

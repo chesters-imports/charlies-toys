@@ -17,6 +17,7 @@ Anxiety this answers: *how does loreBOX know Machina is on this message, and how
 | Surface | Path / API | Who writes | Who reads |
 |---------|------------|------------|-----------|
 | Live now | `cords/session.now` + `GET /api/cord/now` | **Machina only** | loreBOX / other ROMs |
+| VEN pot | glassbox `ven_pot` + per-msg `vencodes` | **sdk seal** | Machina exposes on cord; mats get `vencodes_present` / `tps_vencodes` |
 | Book | `books/{export_id}.tpsbook` | **Machina only** | Machina UI; later export/browse |
 | Manual mat | `POST /api/cord/mat` `{ "mat", "rom"? }` | Human or ROM | Machina appends to book |
 | Unbind mat | `POST /api/cord/mat/remove` or `DELETE /api/cord/mat` | loreBOX on card delete | Strip mat rows from `.tpsbook` |
@@ -36,8 +37,10 @@ Anxiety this answers: *how does loreBOX know Machina is on this message, and how
     "message_id": "…",
     "event_unix": 1739663544.7,
     "event_iso": "2025-02-15T23:52:24+00:00",
-    "text_preview": "…"
-  }
+    "text_preview": "…",
+    "vencodes": [{ "code": "ASH-001", "alias": "Archer" }]
+  },
+  "vencodes": [{ "code": "ASH-001", "alias": "Archer" }]
 }
 ```
 
@@ -53,7 +56,7 @@ When operator mints a card/mat in loreBOX **and** wants time-binding:
 3. Machina appends to **its** `.tpsbook` under that chip. loreBOX may keep a short `tps_chip` nick on the card; full archaeology stays in the book.
 
 **Live:** loreBOX + **shotBOX** mint whisper when Machina is up (CORS open on Machina API).  
-- lore: mat = `lore_code` (`.frag`), rom `loreBOX`  
+- lore: mat = `lore_code` (`.lore` unit in a `.lore` bag; legacy `.frag` may exist), rom `loreBOX`  
 - shot: mat = `shot_code` (`.shot`), rom `shotBOX`
 
 ### Path reverse — Machina → loreBOX (awareness only)

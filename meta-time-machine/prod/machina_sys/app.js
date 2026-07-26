@@ -154,6 +154,28 @@
     $("mats-n").textContent = String(session.mats_on_chip ?? 0);
     $("book-name").textContent = session.book_file || "—";
 
+    const vens = session.vencodes || (msg && msg.vencodes) || [];
+    const venRow = $("ven-row");
+    const venEl = $("m-ven");
+    if (venRow && venEl) {
+      if (vens.length) {
+        venRow.hidden = false;
+        // full face on the rail: CODE (alias)
+        venEl.textContent = vens
+          .map((v) => {
+            if (typeof v === "string") return v;
+            const c = (v && v.code) || "";
+            const a = (v && v.alias) || "";
+            return a ? `${c} (${a})` : c;
+          })
+          .filter(Boolean)
+          .join(" · ");
+      } else {
+        venRow.hidden = true;
+        venEl.textContent = "—";
+      }
+    }
+
     if (session.export_path) {
       const base = session.export_path.split(/[/\\]/).pop();
       $("load-label").innerHTML = `Load · <strong>${base}</strong>`;

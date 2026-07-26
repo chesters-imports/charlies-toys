@@ -5,7 +5,7 @@
   "testament": "OT",
   "source_file": "001-OT-008.1.glassbox",
   "created_at": 1784991029.256291,
-  "updated_at": 1784995271.2621176,
+  "updated_at": 1785020991.2464354,
   "entries": [
     {
       "message_id": "a43fb9c6-8064-4ae3-a8e0-a20b4106ca2c",
@@ -17,32 +17,11 @@
       "event_iso": "2025-02-15T23:52:24+00:00",
       "mats": [
         {
-          "mat": "TEST-001.frag",
+          "mat": "TEST-001.lore",
           "stem": "TEST",
           "unit_code": "",
           "rom": "loreBOX",
           "at": 1784992615.7895732
-        },
-        {
-          "mat": "TEST-001.shot",
-          "stem": "TEST",
-          "unit_code": "TEST-001.shot",
-          "rom": "shotBOX",
-          "at": 1784994928.693953
-        },
-        {
-          "mat": "TEST-004.shot",
-          "stem": "TEST",
-          "unit_code": "TEST-004.shot",
-          "rom": "shotBOX",
-          "at": 1784995188.1503196
-        },
-        {
-          "mat": "H-006.frag",
-          "stem": "H",
-          "unit_code": "H-006.frag",
-          "rom": "loreBOX",
-          "at": 1784995247.021921
         }
       ]
     },
@@ -74,7 +53,15 @@
       "role": "assistant",
       "event_unix": 1739663599.513844,
       "event_iso": "2025-02-15T23:53:19+00:00",
-      "mats": []
+      "mats": [
+        {
+          "mat": "TEST-004.shot",
+          "stem": "TEST",
+          "unit_code": "TEST-004.shot",
+          "rom": "shotBOX",
+          "at": 1785020991.2464354
+        }
+      ]
     }
   ]
 }

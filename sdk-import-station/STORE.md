@@ -26,7 +26,9 @@ DATBOX pattern today:
 
 | Product | Extension | Stem idea |
 |---------|-----------|-----------|
-| loreBOX | `.lore` | TYPE A stem from box name |
+| loreBOX | bag `.lorebox` · unit `{stem}-{###}.lore` | TYPE A stem from box name |
+| shotBOX | bag `.shotbox` · unit `{stem}-{###}.shot` | TYPE A stem from box name |
+| glassbox | `ven_pot` + per-msg `vencodes` | Seal hits encode book originals → chip→VEN map for Machina |
 | shotBOX | `.shot` | `{STEM}` / cards `{STEM}-001` |
 
 **Live seal format (2026-07-25):** **`.glassbox`** — blackbox you can look inside.

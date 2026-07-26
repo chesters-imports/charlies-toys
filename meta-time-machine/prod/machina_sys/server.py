@@ -45,6 +45,7 @@ _state: dict[str, Any] = {
     "export_id": None,
     "meta": None,
     "messages": [],
+    "ven_pot": {},
     "cursor": 0,
 }
 
@@ -266,9 +267,39 @@ def current_message() -> dict[str, Any] | None:
     return msgs[i]
 
 
+def vencodes_for_message(msg: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """VEN codes present on this chip (from glassbox ven_pot / message.vencodes)."""
+    if not msg:
+        return []
+    raw = msg.get("vencodes")
+    if isinstance(raw, list) and raw:
+        out: list[dict[str, Any]] = []
+        for v in raw:
+            if not isinstance(v, dict):
+                continue
+            code = str(v.get("code") or "").strip()
+            if not code:
+                continue
+            out.append(
+                {
+                    "code": code,
+                    "alias": str(v.get("alias") or "").strip(),
+                }
+            )
+        return out
+    pot = _state.get("ven_pot") or {}
+    chip = str(msg.get("chip_id") or "")
+    if chip and isinstance(pot, dict) and chip in pot:
+        rows = pot.get(chip) or []
+        if isinstance(rows, list):
+            return vencodes_for_message({"vencodes": rows})
+    return []
+
+
 def publish_cord_now() -> dict[str, Any]:
-    """Write cords/session.now.json — the only Slice-A 'whisper' surface."""
+    """Write cords/session.now — mat clock + vencodes on current chip."""
     msg = current_message()
+    vens = vencodes_for_message(msg)
     payload = {
         "schema": "machina.cord.now.v0",
         "rom": "meta-time-machine",
@@ -279,6 +310,7 @@ def publish_cord_now() -> dict[str, Any]:
         "msg_count": len(_state.get("messages") or []),
         "updated_at": time.time(),
         "current": None,
+        "vencodes": vens,
     }
     if msg:
         payload["current"] = {
@@ -290,6 +322,7 @@ def publish_cord_now() -> dict[str, Any]:
             "bag_seq": msg.get("bag_seq"),
             "glass_seq": msg.get("glass_seq"),
             "text_preview": (msg.get("text") or "")[:160],
+            "vencodes": vens,
         }
     save_json(SESSION_PATH, payload)
     if SESSION_PATH_LEGACY.is_file():
@@ -325,6 +358,7 @@ def session_public() -> dict[str, Any]:
         "cursor": cur,
         "msg_count": n,
         "message": msg,
+        "vencodes": vencodes_for_message(msg),
         "mats_on_chip": mats_on_current(),
         "book_file": (
             book_path(_state["export_id"]).name if _state.get("export_id") else None
@@ -357,10 +391,30 @@ def load_glassbox(path: Path) -> dict[str, Any]:
     meta.pop("messages", None)
     meta["_source_file"] = path.name
 
+    # ven_pot: chip_id → [{code, alias}]; also hydrate message.vencodes if only pot exists
+    ven_pot = data.get("ven_pot") if isinstance(data.get("ven_pot"), dict) else {}
+    if not ven_pot:
+        # rebuild from per-message vencodes when pot missing
+        for m in msgs:
+            if not isinstance(m, dict):
+                continue
+            chip = str(m.get("chip_id") or "")
+            vens = m.get("vencodes")
+            if chip and isinstance(vens, list) and vens:
+                ven_pot[chip] = vens
+    else:
+        for m in msgs:
+            if not isinstance(m, dict):
+                continue
+            chip = str(m.get("chip_id") or "")
+            if chip and chip in ven_pot and not m.get("vencodes"):
+                m["vencodes"] = ven_pot[chip]
+
     _state["export_path"] = str(path)
     _state["export_id"] = export_id
     _state["meta"] = meta
     _state["messages"] = msgs
+    _state["ven_pot"] = ven_pot
     _state["cursor"] = 0
 
     book = load_or_create_book(export_id, meta)
@@ -414,6 +468,12 @@ def register_mat(body: dict[str, Any]) -> dict[str, Any]:
         "rom": body.get("rom") or "manual",
         "at": time.time(),
     }
+    # VEN codes present on the current chip (from glass ven_pot) — who on this TPS
+    vens = body.get("vencodes")
+    if not isinstance(vens, list) or not vens:
+        vens = vencodes_for_message(msg)
+    if vens:
+        row["vencodes_present"] = vens
     mats.append(row)
     book["updated_at"] = time.time()
     save_json(book_path(_state["export_id"]), book)
@@ -566,8 +626,10 @@ class Handler(SimpleHTTPRequestHandler):
                     "ok": True,
                     "rom": "meta-time-machine",
                     "slice": "A",
+                    "build": "ven-pot-v1",
                     "port": PORT,
                     "exports_dir": str(exports_dir()),
+                    "ven_pot_size": len(_state.get("ven_pot") or {}),
                 },
             )
             return
