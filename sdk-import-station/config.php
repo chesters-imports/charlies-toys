@@ -104,22 +104,22 @@ function sdk_station_defs(): array {
             'show_imports' => '0',
             'welcome' => 'ab',
         ],
-        // Yellow is CU (not RX). RX / ICU paper stays parked until Hands names them live.
+        // CUX — was ICU (*I See You*). Chip name CUX; paper inherits ICU files.
         'cu' => [
             'id' => 'cu',
             'chip' => 'CUX',
             'skin' => 'cu',
-            'label' => 'Terminal CU',
-            'face' => 'CU',
-            'user' => 'CU-211',
+            'label' => 'Terminal CUX',
+            'face' => 'THE-000',
+            'user' => 'THE-000',
             'foot' => 'C·U',
-            'ghost' => 'see you on the island',
-            'whisper' => 'for selves · battle · proofs that still matter',
-            'brand_import' => 'CU · ISLAND DESK',
-            'brand_files' => 'CU PAPER',
+            'ghost' => 'i see you',
+            'whisper' => 'for the show · the set · amber phosphor',
+            'brand_import' => 'CUX · WATCHERS',
+            'brand_files' => 'CUX PAPER',
             'hint_files' => 'paper/cu',
-            'hint_else' => 'dossier · masks · the fight for me',
-            'deck_chip' => 'CU · YELLOW',
+            'hint_else' => 'shots · cuts · the glass as set',
+            'deck_chip' => 'CUX · I SEE YOU',
             'show_imports' => '0',
             'welcome' => 'cu',
         ],
@@ -150,10 +150,11 @@ function sdk_boot_station(): string {
     if ($fromQ === 'iox') {
         $fromQ = 'io';
     }
-    if ($fromQ === 'cux') {
+    if ($fromQ === 'cux' || $fromQ === 'icu') {
+        // live id is cu; chip label CUX; old name ICU
         $fromQ = 'cu';
     }
-    // stale chip alias if anyone bookmarked wrong color day
+    // wrong-color-day bookmarks → still yellow desk
     if ($fromQ === 'rxx' || $fromQ === 'rx') {
         $fromQ = 'cu';
     }

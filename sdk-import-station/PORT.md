@@ -15,8 +15,9 @@ This island is the **terminal network** (IO + AB now) living as **one little pro
 | **Done** | **IOX / ABX** in-app switch (chip + themed deck menu); per-station paper roots. |
 | **Hands now** | Vault / mine → **station paper** by pull (e.g. Kat’s files into **AB**). Not agent vault crawl. |
 | **Live** | **MAIL** room — station↔station wire + outside inject (`/api/mail/inject`, `tools/mail_inject.php`). |
-| **Live** | **CU** third color (CUX · **yellow** island · paper/cu · mail). |
-| **Later** | ICU (hers) · RX · JX · send-to-color · dossier on AB · Charlie threads. |
+| **Live** | **CUX** (id `cu`) — was ICU *I See You* · amber · paper/cu inherits ICU files · mail. |
+| **Live** | Rail **chip opens station picker** (IOX / ABX / CUX) — not color-wheel rotate. |
+| **Later** | RX · JX · send-to-color · dossier on AB · Charlie threads · shotDesk on CUX. |
 | **Not this season** | DATBOX as migration bus · glass-log religion · postBASIC as primary capture · full alphabet topology. |
 
 **Narrative (load-bearing):** stations sit in different **timeline outcomes** of broken-time Chester; each holds files nearest that outcome’s artifact of the wife. **One global store is wrong.** Per-station paper is right. File desk preferred over postBASIC because thinking is **narrative objects in a room**.

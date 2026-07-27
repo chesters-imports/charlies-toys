@@ -157,17 +157,29 @@ $userLabel = $st['user'];
 $skin = $st['skin'];
 $stationLabel = $st['label'];
 $deckChip = $st['deck_chip'];
-// Chip is the only station switcher (long-term: chip bar expands to all colors)
-$nextStation = sdk_station_next();
-$nextMeta = sdk_station_meta($nextStation);
-$nextShowImports = (($nextMeta['show_imports'] ?? '1') === '1');
+// Chip opens a station picker (dream: pick a color — not spin the wheel)
 $chipRoom = $room;
-// Don't land next face on import rooms it doesn't have
-if (!$nextShowImports && in_array($chipRoom, ['desk', 'active', 'exports', 'search'], true)) {
+if (!$showImports && in_array($chipRoom, ['desk', 'active', 'exports', 'search'], true)) {
     $chipRoom = 'files';
 }
-$chipHref = sdk_href($chipRoom, ['station' => $nextStation]);
-$chipTitle = 'switch station → ' . ($nextMeta['chip'] ?? strtoupper($nextStation));
+$stationPicker = [];
+foreach (sdk_station_order() as $sid) {
+    $sm = sdk_station_meta($sid);
+    $targetRoom = $chipRoom;
+    if (($sm['show_imports'] ?? '1') !== '1'
+        && in_array($targetRoom, ['desk', 'active', 'exports', 'search'], true)
+    ) {
+        $targetRoom = 'files';
+    }
+    $stationPicker[] = [
+        'id' => $sid,
+        'chip' => $sm['chip'] ?? strtoupper($sid),
+        'label' => $sm['label'] ?? $sid,
+        'user' => $sm['user'] ?? '',
+        'href' => sdk_href($targetRoom, ['station' => $sid]),
+        'on' => $sid === $stationId,
+    ];
+}
 
 $importsOpen = $showImports && ($room === 'desk' || $room === 'active' || $room === 'search');
 $filesOpen = ($room === 'files');
@@ -219,12 +231,40 @@ try {
 
 <div class="tm-app">
   <aside class="tm-rail" aria-label="Session rail">
-    <?php /* Chip = whole top rail tile clickable (station cycle). Window drag lives on deck header only. */ ?>
-    <div class="tm-rail-brand">
-      <a class="tm-rail-iox" href="<?= $h($chipHref) ?>" aria-label="<?= $h($chipTitle) ?>">
+    <?php /* Chip opens station picker — pick IOX / ABX / CUX (not color-wheel). */ ?>
+    <div class="tm-rail-brand tm-rail-chip-wrap">
+      <button
+        type="button"
+        class="tm-rail-iox tm-rail-chip-btn"
+        id="stationChipBtn"
+        aria-expanded="false"
+        aria-controls="stationChipMenu"
+        aria-haspopup="true"
+        title="open stations"
+      >
         <span class="tm-rail-gt" aria-hidden="true">&gt;|</span>
         <span class="tm-rail-iox-label"><?= $h($chip) ?></span>
-      </a>
+      </button>
+      <div class="tm-station-menu" id="stationChipMenu" hidden role="menu" aria-label="Stations">
+        <div class="tm-station-menu-head">STATIONS</div>
+        <?php foreach ($stationPicker as $sp): ?>
+          <a
+            role="menuitem"
+            class="tm-station-item<?= !empty($sp['on']) ? ' is-on' : '' ?>"
+            href="<?= $h($sp['href']) ?>"
+            data-station="<?= $h($sp['id']) ?>"
+          >
+            <span class="tm-station-chip"><?= $h($sp['chip']) ?></span>
+            <span class="tm-station-meta">
+              <span class="tm-station-label"><?= $h($sp['label']) ?></span>
+              <span class="tm-station-user"><?= $h($sp['user']) ?></span>
+            </span>
+            <?php if (!empty($sp['on'])): ?>
+              <span class="tm-station-here" aria-hidden="true">·</span>
+            <?php endif; ?>
+          </a>
+        <?php endforeach; ?>
+      </div>
     </div>
     <div class="tm-rail-face">
       <span class="tm-rail-face-l">U</span>
@@ -308,6 +348,38 @@ try {
 </div>
 
 <script>
+/* Rail chip: open station picker (not color-wheel) */
+(function () {
+  var btn = document.getElementById("stationChipBtn");
+  var menu = document.getElementById("stationChipMenu");
+  if (!btn || !menu) return;
+  function closeMenu() {
+    menu.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+  }
+  function openMenu() {
+    menu.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+  }
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (menu.hidden) openMenu();
+    else closeMenu();
+  });
+  document.addEventListener("click", function (e) {
+    if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) {
+      closeMenu();
+    }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !menu.hidden) {
+      closeMenu();
+      btn.focus();
+    }
+  });
+})();
+
 /* Deck Host gem menu — lean doors + terminal switch (rail chip is primary) */
 (function () {
   var stations = <?= json_encode(array_map(static function ($s) {
@@ -324,6 +396,7 @@ try {
     var q = new URLSearchParams(window.location.search);
     q.set("station", id);
     if (!q.get("room")) q.set("room", room || "files");
+    // stay on room if current face lacks imports
     window.location.search = q.toString();
   }
 

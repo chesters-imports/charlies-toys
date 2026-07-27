@@ -130,8 +130,14 @@ html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
   margin-bottom: 0.2rem;
 }
 
-/* Full square of the rail top = clickable station cycle */
-.tm-rail-iox {
+/* Full square of the rail top = open station picker */
+.tm-rail-chip-wrap {
+  position: relative;
+  z-index: 40;
+}
+
+.tm-rail-iox,
+button.tm-rail-iox {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -152,6 +158,83 @@ html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
   background: transparent;
 }
 
+/* Station picker flies out of the rail chip */
+.tm-station-menu {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: 2px;
+  min-width: 12.5rem;
+  background: var(--tm-tree-bg);
+  border: 1px solid var(--tm-accent);
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
+  padding: 0.35rem 0;
+  z-index: 50;
+}
+
+.tm-station-menu-head {
+  font-family: var(--tm-font-ui), monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  color: var(--tm-fg-dim);
+  padding: 0.25rem 0.65rem 0.45rem;
+  border-bottom: 1px solid var(--tm-line);
+  margin-bottom: 0.2rem;
+}
+
+a.tm-station-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  text-decoration: none;
+  color: var(--tm-fg);
+  font-family: var(--tm-font), sans-serif;
+  font-size: 0.78rem;
+  border-left: 2px solid transparent;
+}
+
+a.tm-station-item:hover {
+  background: color-mix(in srgb, var(--tm-accent) 16%, transparent);
+  color: var(--tm-hot);
+}
+
+a.tm-station-item.is-on {
+  border-left-color: var(--tm-hot);
+  color: var(--tm-hot);
+}
+
+.tm-station-chip {
+  font-family: "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.08em;
+  min-width: 2.4rem;
+  color: var(--tm-accent);
+}
+
+.tm-station-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.tm-station-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tm-station-user {
+  font-size: 0.68rem;
+  opacity: 0.65;
+}
+
+.tm-station-here {
+  margin-left: auto;
+  color: var(--tm-hot);
+}
+
 .tm-rail-iox-label {
   display: block;
   transform: rotate(-2deg);
@@ -162,13 +245,16 @@ html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
   pointer-events: none;
 }
 
-a.tm-rail-iox:hover {
+a.tm-rail-iox:hover,
+button.tm-rail-iox:hover {
   filter: brightness(1.12);
   background: color-mix(in srgb, var(--tm-accent) 14%, transparent);
   text-shadow: 0 0 16px var(--tm-hot);
 }
 
-a.tm-rail-iox:active {
+a.tm-rail-iox:active,
+button.tm-rail-iox:active,
+button.tm-rail-iox[aria-expanded="true"] {
   filter: brightness(1.05);
   background: color-mix(in srgb, var(--tm-accent) 20%, transparent);
 }
