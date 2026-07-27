@@ -192,6 +192,7 @@ function sdk_href(string $room, array $q = []): string {
     $base = match ($room) {
         'welcome', 'land', 'home' => '/?room=welcome',
         'files', 'file', 'filekeeper', 'fk' => '/?room=files',
+        'mail', 'email', 'inbox' => '/?room=mail',
         'import', 'desk' => '/?room=desk',
         'active', 'imports-active' => '/?room=active',
         'exports' => '/?room=exports',

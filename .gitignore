@@ -26,3 +26,7 @@ Thumbs.db
 sdk-import-station/desk-server.err
 *.err
 
+
+# Station mail payloads (local narrative)
+sdk-import-station/mail/messages/*.json
+

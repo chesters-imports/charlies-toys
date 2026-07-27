@@ -14,7 +14,8 @@ This island is the **terminal network** (IO + AB now) living as **one little pro
 | **Done** | **fileKeeper** on FS paper; date parser; quiet editor; media **print** (`media:m.HEX`). |
 | **Done** | **IOX / ABX** in-app switch (chip + themed deck menu); per-station paper roots. |
 | **Hands now** | Vault / mine → **station paper** by pull (e.g. Kat’s files into **AB**). Not agent vault crawl. |
-| **Later** | RX / ICU skins · send-to-color · dossier on AB · mail · Charlie threads. |
+| **Live** | **MAIL** room — station↔station wire + outside inject (`/api/mail/inject`, `tools/mail_inject.php`). |
+| **Later** | RX / ICU skins · send-to-color · dossier on AB · Charlie threads. |
 | **Not this season** | DATBOX as migration bus · glass-log religion · postBASIC as primary capture · full alphabet topology. |
 
 **Narrative (load-bearing):** stations sit in different **timeline outcomes** of broken-time Chester; each holds files nearest that outcome’s artifact of the wife. **One global store is wrong.** Per-station paper is right. File desk preferred over postBASIC because thinking is **narrative objects in a room**.
@@ -61,9 +62,9 @@ This island is the **terminal network** (IO + AB now) living as **one little pro
 4. AB: FILES + K welcome · **no** glass import/export. Face **KDE**.  
 5. **Send to color** (later) — move `.fk.json` between `paper/{from}` → `paper/{to}`.  
 6. Later: RX / ICU skins (paper already holds icu/rx welcome files from rehome).
-### Phase 3 — Network dream (much later)
+### Phase 3 — Network dream
 
-- Station-to-station **email**.  
+- ~~Station-to-station **email**~~ **bootstrap live** (`/?room=mail`) · store `mail/messages/*.json` · inject token `wire-whisper` (env `SDK_MAIL_INJECT_TOKEN`).  
 - **Charlie threads**: AI reads station files, mails connections into a station.  
 - Voice capture into files (mic ordered; optional).
 

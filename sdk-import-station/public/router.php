@@ -11,10 +11,50 @@ if ($path === '/api/health' || $path === '/health') {
         'ok' => true,
         'rom' => 'sdk-import-station',
         'service' => 'iox',
-        'rooms' => ['welcome', 'files', 'desk', 'active', 'search', 'exports'],
+        'rooms' => ['welcome', 'files', 'mail', 'desk', 'active', 'search', 'exports'],
         'paper' => defined('SDK_PAPER_ROOT') ? SDK_PAPER_ROOT : null,
         'media' => defined('SDK_MEDIA_ROOT') ? SDK_MEDIA_ROOT : null,
+        'mail' => true,
     ], JSON_UNESCAPED_SLASHES);
+    return true;
+}
+
+// Outside / narrative mail inject (local desk only — token gate)
+if ($path === '/api/mail/inject') {
+    require_once dirname(__DIR__) . '/config.php';
+    require_once dirname(__DIR__) . '/app/mail/mail_lib.php';
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+        http_response_code(405);
+        echo json_encode(['ok' => false, 'error' => 'POST only']);
+        return true;
+    }
+    $raw = file_get_contents('php://input') ?: '';
+    $body = json_decode($raw, true);
+    if (!is_array($body)) {
+        $body = $_POST;
+    }
+    $token = (string) ($body['token'] ?? $_SERVER['HTTP_X_MAIL_TOKEN'] ?? '');
+    if (!hash_equals(sdk_mail_inject_token(), $token)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'bad token']);
+        return true;
+    }
+    $r = sdk_mail_inject(
+        (string) ($body['to'] ?? ''),
+        (string) ($body['from'] ?? $body['from_label'] ?? 'unknown@outside.wire'),
+        (string) ($body['subject'] ?? '(no subject)'),
+        (string) ($body['body'] ?? ''),
+        isset($body['from_key']) ? (string) $body['from_key'] : null
+    );
+    if (!$r['ok']) {
+        http_response_code(400);
+        echo json_encode($r);
+        return true;
+    }
+    http_response_code(201);
+    echo json_encode($r, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     return true;
 }
 

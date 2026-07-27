@@ -1,7 +1,7 @@
 <?php
 /**
  * sdk-import-station — IOX shell (green station look, not pocket internet).
- * Rooms: welcome | files (fileKeeper) | desk | active | search | exports
+ * Rooms: welcome | files | mail | desk | active | search | exports
  */
 declare(strict_types=1);
 
@@ -54,7 +54,10 @@ if ($room === '' || in_array($room, ['land', 'home'], true)) {
 if (in_array($room, ['file', 'filekeeper', 'fk'], true)) {
     $room = 'files';
 }
-if (!in_array($room, ['welcome', 'files', 'desk', 'active', 'exports', 'import', 'search', 'find', 'hunt'], true)) {
+if (in_array($room, ['email', 'inbox'], true)) {
+    $room = 'mail';
+}
+if (!in_array($room, ['welcome', 'files', 'mail', 'desk', 'active', 'exports', 'import', 'search', 'find', 'hunt'], true)) {
     $room = 'welcome';
 }
 if ($room === 'import') {
@@ -77,10 +80,15 @@ $app = dirname(__DIR__) . '/app';
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && $room !== 'welcome') {
     $isFileKeeper = isset($_POST['filekeeper_action'])
         || $room === 'files';
+    $isMail = isset($_POST['mail_action']) || $room === 'mail';
     $isExportStatus = isset($_POST['mark_complete'])
         || isset($_POST['mark_in_progress'])
         || (isset($_POST['logimport_export_action']) && (string) $_POST['logimport_export_action'] !== '');
-    if ($isFileKeeper) {
+    if ($isMail) {
+        require $app . '/mail/actorMail.php';
+        // actor redirects
+        $room = 'mail';
+    } elseif ($isFileKeeper) {
         require $fk . '/actorDesk.php';
         // if actor set error without redirect, stay on files
         $room = 'files';
@@ -99,6 +107,8 @@ if ($room === 'welcome') {
     require $app . '/pageWelcome.php';
 } elseif ($room === 'files') {
     require $fk . '/pageDesk.php';
+} elseif ($room === 'mail') {
+    require $app . '/mail/pageMail.php';
 } elseif ($room === 'active') {
     require $li . '/pageActive.php';
 } elseif ($room === 'exports') {
@@ -115,6 +125,7 @@ $h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
 $roomDisplay = match ($room) {
     'welcome' => 'Welcome',
     'files' => 'Files',
+    'mail' => 'Mail',
     'active' => 'Active imports',
     'exports' => 'Exports',
     'search' => 'Search glass',
@@ -123,6 +134,7 @@ $roomDisplay = match ($room) {
 $roomSlug = match ($room) {
     'welcome' => 'welcome',
     'files' => 'files',
+    'mail' => 'mail',
     'active' => 'imports-active',
     'exports' => 'exports',
     'search' => 'search',
@@ -135,7 +147,11 @@ $statusBrand = $room === 'files' ? $st['brand_files'] : $st['brand_import'];
 $brokenWhisper = $st['whisper'];
 $ghost = $st['ghost'];
 $foot = $st['foot'];
-$hint = $room === 'files' ? $st['hint_files'] : $st['hint_else'];
+$hint = match ($room) {
+    'files' => $st['hint_files'],
+    'mail' => 'station wire · mail/{messages}',
+    default => $st['hint_else'],
+};
 $face = $st['face'];
 $userLabel = $st['user'];
 $skin = $st['skin'];
@@ -155,6 +171,14 @@ $chipTitle = 'switch station → ' . ($nextMeta['chip'] ?? strtoupper($nextStati
 
 $importsOpen = $showImports && ($room === 'desk' || $room === 'active' || $room === 'search');
 $filesOpen = ($room === 'files');
+$mailOpen = ($room === 'mail');
+$mailUnread = 0;
+try {
+    require_once $app . '/mail/mail_lib.php';
+    $mailUnread = sdk_mail_unread_count($stationId);
+} catch (Throwable $e) {
+    $mailUnread = 0;
+}
 ?>
 <!DOCTYPE html>
 <?php /* expose station for fileKeeper open-folder memory */ ?>
@@ -223,6 +247,9 @@ $filesOpen = ($room === 'files');
           </li>
           <li class="<?= $filesOpen ? 'is-active' : '' ?>">
             <a href="<?= $h(sdk_href('files')) ?>">FILES</a>
+          </li>
+          <li class="<?= $mailOpen ? 'is-active' : '' ?>">
+            <a href="<?= $h(sdk_href('mail')) ?>">MAIL<?= $mailUnread > 0 ? ' · ' . (int) $mailUnread : '' ?></a>
           </li>
           <?php if ($showImports): ?>
           <li class="tm-nav-parent <?= $importsOpen ? 'is-open is-active' : '' ?>">
