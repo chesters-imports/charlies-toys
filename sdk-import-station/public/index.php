@@ -193,7 +193,7 @@ try {
   <link rel="stylesheet" href="/shell/style.css">
   <link rel="stylesheet" href="/shell/skin-io.css">
   <link rel="stylesheet" href="/shell/skin-ab.css">
-  <link rel="stylesheet" href="/shell/skin-rx.css">
+  <link rel="stylesheet" href="/shell/skin-cu.css">
   <!-- Tool layout + flatten nested boxes only -->
   <link rel="stylesheet" href="/logImport.css">
   <link rel="stylesheet" href="/shell/sdk-cognition.css">

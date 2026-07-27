@@ -49,6 +49,8 @@ foreach ([
     SDK_PAPER_BASE . '/io/_root',
     SDK_PAPER_BASE . '/ab',
     SDK_PAPER_BASE . '/ab/_root',
+    SDK_PAPER_BASE . '/cu',
+    SDK_PAPER_BASE . '/cu/_root',
     SDK_PAPER_BASE . '/rx',
     SDK_PAPER_BASE . '/rx/_root',
     SDK_PAPER_BASE . '/icu',
@@ -102,24 +104,24 @@ function sdk_station_defs(): array {
             'show_imports' => '0',
             'welcome' => 'ab',
         ],
-        'rx' => [
-            'id' => 'rx',
-            'chip' => 'RXX',
-            'skin' => 'rx',
-            'label' => 'Terminal RX',
-            'face' => 'RX',
-            'user' => 'RX-404',
-            'foot' => 'R·X',
-            'ghost' => 'prescription pending',
-            'whisper' => 'for recovery · repair · the long convalescence',
-            'brand_import' => 'RX · RECOVERY DESK',
-            'brand_files' => 'RX PAPER',
-            'hint_files' => 'paper/rx',
-            'hint_else' => 'dose · rest · wire mending',
-            'deck_chip' => 'RX · RECOVERY',
-            // files + mail only — not Sam's glass import
+        // Yellow is CU (not RX). RX / ICU paper stays parked until Hands names them live.
+        'cu' => [
+            'id' => 'cu',
+            'chip' => 'CUX',
+            'skin' => 'cu',
+            'label' => 'Terminal CU',
+            'face' => 'CU',
+            'user' => 'CU-211',
+            'foot' => 'C·U',
+            'ghost' => 'see you on the island',
+            'whisper' => 'for selves · battle · proofs that still matter',
+            'brand_import' => 'CU · ISLAND DESK',
+            'brand_files' => 'CU PAPER',
+            'hint_files' => 'paper/cu',
+            'hint_else' => 'dossier · masks · the fight for me',
+            'deck_chip' => 'CU · YELLOW',
             'show_imports' => '0',
-            'welcome' => 'rx',
+            'welcome' => 'cu',
         ],
     ];
 }
@@ -148,8 +150,12 @@ function sdk_boot_station(): string {
     if ($fromQ === 'iox') {
         $fromQ = 'io';
     }
-    if ($fromQ === 'rxx') {
-        $fromQ = 'rx';
+    if ($fromQ === 'cux') {
+        $fromQ = 'cu';
+    }
+    // stale chip alias if anyone bookmarked wrong color day
+    if ($fromQ === 'rxx' || $fromQ === 'rx') {
+        $fromQ = 'cu';
     }
     if ($fromQ !== '' && sdk_station_valid($fromQ)) {
         $_SESSION['sdk_station'] = $fromQ;
