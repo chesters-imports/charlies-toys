@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ineffable-box</title>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body class="ib face-omens" data-service="omens">
+  <div class="ib-atmosphere" aria-hidden="true">
+    <div class="ib-atm-a"></div>
+    <div class="ib-atm-b"></div>
+    <div class="ib-atm-c"></div>
+  </div>
+
+  <header class="ib-bar" data-deck-chrome>
+    <span class="ib-chip" data-deck-menu title="Menu">ineffable<strong>BOX</strong></span>
+    <span class="ib-drag" data-deck-drag aria-hidden="true"></span>
+    <div class="ib-win" data-deck-window-controls></div>
+  </header>
+
+  <main class="ib-main">
+    <p class="ib-kicker" id="kicker">the field is watching · ship the sign</p>
+
+    <nav class="ib-faces" aria-label="Report to">
+      <button type="button" class="ib-face is-on" data-service="omens">OMAN</button>
+      <button type="button" class="ib-face" data-service="hymns">JASMINE</button>
+      <button type="button" class="ib-face" data-service="secrets">TEEHEE</button>
+    </nav>
+
+    <div class="ib-whom">
+      <span class="ib-whom-name" id="whomName">Oman O’mente</span>
+      <span class="ib-whom-hint" id="whomHint">signs · animals · patterns</span>
+    </div>
+
+    <form class="ib-form" id="dropForm" autocomplete="off">
+      <label class="ib-lab" for="body">Notice</label>
+      <textarea id="body" name="body" rows="4" required autofocus></textarea>
+
+      <label class="ib-lab" for="tags">Tags</label>
+      <input id="tags" name="tags" type="text" spellcheck="false" />
+
+      <div class="ib-meta-row">
+        <span class="ib-clock" id="clock">—</span>
+        <button type="submit" class="ib-send" id="sendBtn">THROW IN</button>
+      </div>
+      <p class="ib-status" id="status" hidden></p>
+    </form>
+
+    <section class="ib-recent" aria-label="Recent drops">
+      <h2 class="ib-recent-h">RECENT</h2>
+      <ul class="ib-list" id="recentList"></ul>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

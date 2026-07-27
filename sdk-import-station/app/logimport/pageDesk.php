@@ -223,6 +223,11 @@ foreach ($redactions as $r) {
             <?php if (!$messages): ?>
               <p class="logimport-meta">No messages in this core.</p>
             <?php else: ?>
+              <div class="logimport-asst-toolbar" id="li_asst_toolbar">
+                <span class="logimport-meta">assistants collapsed · your words first</span>
+                <button type="button" class="logimport-cut" id="li_asst_expand_all">expand all asst</button>
+                <button type="button" class="logimport-cut" id="li_asst_collapse_all">collapse all asst</button>
+              </div>
               <?php
               $prevSeg = -1;
               foreach ($messages as $m):
@@ -266,17 +271,50 @@ foreach ($redactions as $r) {
                     $ctTitle = '';
                 }
                 ?>
-                <div class="<?= $cls ?>" id="li-msg-<?= $seq ?>">
+                <?php
+                $isAsst = ($m['role'] ?? '') === 'assistant';
+                $rawBody = (string) ($tx['text'] ?? '');
+                $peek = '';
+                if ($isAsst) {
+                    $one = preg_replace('/\s+/', ' ', trim(strip_tags($rawBody))) ?? '';
+                    if (strlen($one) > 96) {
+                        $peek = substr($one, 0, 96) . '…';
+                    } else {
+                        $peek = $one;
+                    }
+                }
+                ?>
+                <div class="<?= $cls ?><?= $isAsst ? ' is-asst-collapsed' : '' ?>" id="li-msg-<?= $seq ?>"
+                     data-role="<?= $h((string) $m['role']) ?>">
+                  <?php if ($isAsst): ?>
+                  <button type="button" class="li-role li-asst-toggle" aria-expanded="false"
+                          data-asst-toggle="1" id="li-asst-h-<?= $seq ?>">
+                    <span class="li-role-name">assistant</span>
+                    <span class="li-seq">#<?= $seq ?></span>
+                    <?php if ($ctShow !== ''): ?>
+                      <span class="li-time"><?= $h($ctShow) ?></span>
+                    <?php endif; ?>
+                    <?php if (!empty($tx['hit_count'])): ?>
+                      <span class="li-enc-count"><?= (int) $tx['hit_count'] ?> enc</span>
+                    <?php endif; ?>
+                    <span class="li-asst-chev" aria-hidden="true">▸</span>
+                    <?php if ($peek !== ''): ?>
+                      <span class="li-asst-peek"><?= $h($peek) ?></span>
+                    <?php endif; ?>
+                  </button>
+                  <div class="li-asst-panel" id="li-asst-p-<?= $seq ?>" hidden>
+                  <?php else: ?>
                   <div class="li-role">
                     <span class="li-role-name"><?= $h($m['role']) ?></span>
                     <span class="li-seq">#<?= $seq ?></span>
                     <?php if ($ctShow !== ''): ?>
-                      <span class="li-time" title="<?= $h($ctTitle) ?>"><?= $h($ctShow) ?></span>
+                      <span class="li-time"><?= $h($ctShow) ?></span>
                     <?php endif; ?>
                     <?php if (!empty($tx['hit_count'])): ?>
                       <span class="li-enc-count"><?= (int) $tx['hit_count'] ?> enc</span>
                     <?php endif; ?>
                   </div>
+                  <?php endif; ?>
                   <?php if (!empty($tx['encode_marked'])): ?>
                     <pre class="li-body li-body-enc"><?= logimport_format_marked_html((string) $tx['text']) ?></pre>
                   <?php else: ?>
@@ -304,6 +342,9 @@ foreach ($redactions as $r) {
                       <?php endif; ?>
                     <?php endif; ?>
                   </div>
+                  <?php if ($isAsst): ?>
+                  </div>
+                  <?php endif; ?>
                 </div>
               <?php endforeach; ?>
             <?php endif; ?>
@@ -420,21 +461,68 @@ foreach ($redactions as $r) {
 <?php if ($core && $messages): ?>
 <script>
 (function () {
-  if (location.hash && location.hash.indexOf('li-msg-') === 1) {
+  function setAsstOpen(wrap, open) {
+    if (!wrap) return;
+    var btn = wrap.querySelector("[data-asst-toggle]");
+    var panel = wrap.querySelector(".li-asst-panel");
+    if (!btn || !panel) return;
+    wrap.classList.toggle("is-asst-collapsed", !open);
+    wrap.classList.toggle("is-asst-open", !!open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    panel.hidden = !open;
+  }
+
+  function toggleAsst(wrap) {
+    var open = wrap.classList.contains("is-asst-open");
+    setAsstOpen(wrap, !open);
+  }
+
+  document.querySelectorAll(".logimport-msg.role-assistant").forEach(function (wrap) {
+    var btn = wrap.querySelector("[data-asst-toggle]");
+    if (!btn) return;
+    // default collapsed
+    setAsstOpen(wrap, false);
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      toggleAsst(wrap);
+    });
+  });
+
+  var ex = document.getElementById("li_asst_expand_all");
+  var col = document.getElementById("li_asst_collapse_all");
+  if (ex) {
+    ex.addEventListener("click", function () {
+      document.querySelectorAll(".logimport-msg.role-assistant").forEach(function (w) {
+        setAsstOpen(w, true);
+      });
+    });
+  }
+  if (col) {
+    col.addEventListener("click", function () {
+      document.querySelectorAll(".logimport-msg.role-assistant").forEach(function (w) {
+        setAsstOpen(w, false);
+      });
+    });
+  }
+
+  if (location.hash && location.hash.indexOf("li-msg-") === 1) {
     var el = document.getElementById(location.hash.slice(1));
     if (el) {
-      var thread = document.getElementById('li_thread');
+      if (el.classList.contains("role-assistant")) {
+        setAsstOpen(el, true);
+      }
+      var thread = document.getElementById("li_thread");
       if (thread && thread.contains(el)) {
         var top = el.offsetTop - thread.offsetTop - 24;
         thread.scrollTop = Math.max(0, top);
       } else {
-        el.scrollIntoView({ block: 'center' });
+        el.scrollIntoView({ block: "center" });
       }
     }
   }
-  if (location.hash === '#li-encode' || location.hash === '#li-redact') {
+  if (location.hash === "#li-encode" || location.hash === "#li-redact") {
     var p = document.getElementById(location.hash.slice(1));
-    if (p) p.scrollIntoView({ block: 'nearest' });
+    if (p) p.scrollIntoView({ block: "nearest" });
   }
 })();
 </script>

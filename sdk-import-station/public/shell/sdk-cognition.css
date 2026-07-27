@@ -3,7 +3,8 @@
  * Shell fonts/scale from style.css + skin-io (18px base).
  */
 
-/* ── horizontal Deck Host chrome (NOT on .tm-app) ───────── */
+/* ── horizontal Deck Host chrome (NOT on .tm-app) ─────────
+   Colors come from terminal skin vars (--tm-*) so IO/AB match. */
 .tm-deck-bar {
   position: fixed;
   top: 0;
@@ -14,9 +15,12 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  background: #0a1408;
-  border-bottom: 1px solid var(--tm-accent, #38b433);
-  box-shadow: 0 0 18px rgba(0, 0, 0, 0.45);
+  background: var(--tm-tree-bg, #0a0a0a);
+  color: var(--tm-fg, #b0b0b0);
+  border-bottom: 1px solid var(--tm-accent, #909090);
+  box-shadow:
+    0 0 18px rgba(0, 0, 0, 0.45),
+    0 0 24px color-mix(in srgb, var(--tm-accent, #909090) 12%, transparent);
 }
 
 /* Left: house title = menu chip. No room spray. */
@@ -29,15 +33,15 @@
   font-size: 0.48rem;
   letter-spacing: 0.06em;
   line-height: 1.2;
-  color: var(--tm-hot, #00ff00);
-  text-shadow: 0 0 10px var(--tm-accent, #38b433);
+  color: var(--tm-hot, #e8e8e8);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--tm-accent, #909090) 55%, transparent);
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
 }
 
 .tm-deck-chip:hover {
-  background: rgba(56, 180, 51, 0.12);
+  background: color-mix(in srgb, var(--tm-accent, #909090) 14%, transparent);
 }
 
 /* Middle: empty drag field only (no text) */
@@ -87,6 +91,78 @@ html:not(.deck-host-integrated) .tm-deck-win {
   display: none;
 }
 
+/* Window controls host injects into .tm-deck-win — pick up phosphor */
+html.deck-host-integrated body.terminal-station [data-deck-window-controls] .dh-cap-btn {
+  color: var(--tm-fg, inherit) !important;
+}
+html.deck-host-integrated body.terminal-station [data-deck-window-controls] .dh-cap-btn:hover {
+  background: color-mix(in srgb, var(--tm-accent, #909090) 18%, transparent) !important;
+  color: var(--tm-hot, #fff) !important;
+}
+html.deck-host-integrated body.terminal-station [data-deck-window-controls] .dh-cap-btn.close:hover {
+  background: #c42b1c !important;
+  color: #fff !important;
+}
+
+/*
+ * Host gem menu (#deck-host-menu) — default is blue SaaS.
+ * Override to terminal skin (must beat caption.js inject; load after shell).
+ */
+html.deck-host-frameless body.terminal-station #deck-host-menu {
+  background: var(--tm-tree-bg, #12151e) !important;
+  border: 1px solid color-mix(in srgb, var(--tm-accent, #909090) 40%, transparent) !important;
+  border-top: none !important;
+  color: var(--tm-fg, #e4e8f0) !important;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.55),
+    0 0 20px color-mix(in srgb, var(--tm-accent, #909090) 12%, transparent) !important;
+  font-family: var(--tm-font-ui, system-ui), "Segoe UI", sans-serif !important;
+  font-size: 12px !important;
+}
+html.deck-host-frameless body.terminal-station #deck-host-menu button {
+  color: inherit !important;
+  letter-spacing: 0.03em;
+}
+html.deck-host-frameless body.terminal-station #deck-host-menu button:hover,
+html.deck-host-frameless body.terminal-station #deck-host-menu button:focus {
+  background: color-mix(in srgb, var(--tm-accent, #6a8cff) 22%, transparent) !important;
+  color: var(--tm-hot, #fff) !important;
+  outline: none !important;
+}
+html.deck-host-frameless body.terminal-station #deck-host-menu .dh-menu-sep {
+  background: color-mix(in srgb, var(--tm-accent, #909090) 28%, transparent) !important;
+}
+html.deck-host-frameless body.terminal-station #deck-host-menu .dh-menu-hint {
+  color: var(--tm-fg-dim, inherit) !important;
+  opacity: 0.65 !important;
+}
+
+/* Fallback host caption (if not integrated) still picks up skin */
+html.deck-host-frameless body.terminal-station #deck-host-caption {
+  background: var(--tm-tree-bg, #0a0c12) !important;
+  color: var(--tm-fg, #d8dee8) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--tm-accent, #909090) 45%, transparent) !important;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.45),
+    0 0 18px color-mix(in srgb, var(--tm-accent, #909090) 10%, transparent) !important;
+}
+html.deck-host-frameless body.terminal-station #deck-host-caption .dh-cap-mark:hover {
+  background: color-mix(in srgb, var(--tm-accent, #fff) 14%, transparent) !important;
+}
+html.deck-host-frameless body.terminal-station #deck-host-caption .dh-cap-mark.is-open {
+  background: color-mix(in srgb, var(--tm-accent, #6a8cff) 22%, transparent) !important;
+}
+html.deck-host-frameless body.terminal-station #deck-host-caption .dh-cap-mark-gem {
+  background: linear-gradient(
+    135deg,
+    var(--tm-accent, #6a8cff),
+    var(--tm-hot, #a070ff)
+  ) !important;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--tm-accent, #6a8cff) 55%, transparent) !important;
+}
+html.deck-host-frameless body.terminal-station #deck-host-caption .dh-cap-btn:hover {
+  background: color-mix(in srgb, var(--tm-accent, #fff) 14%, transparent) !important;
+}
 
 /* ── land / welcome ─────────────────────────────────────── */
 .land-page h1 {

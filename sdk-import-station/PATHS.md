@@ -21,10 +21,38 @@ C:\ALICE_BOX\.glass-logs\
 | sealed wood | `sdk-import-station/work/exports/*.glassbox` |
 | | name: `{import_order}-{OT\|NT\|BN}-{face}[.{part}].glassbox` |
 | | msg chip: `{export_id}.{bag_seq}` e.g. `001-OT-008.1.0` |
+| **station paper (fileKeeper)** | `sdk-import-station/paper/{station}/` |
+| | stations: **io** · **ab** · **rx** · **icu** (more later) |
+| | `_root/*.fk.json` · `{folder}/*.fk.json` |
+| | each doc may have `"station"` + `legacy_stem` / `legacy_dom` |
 
 ```
 GLASS_LOGS_ROOT=C:\ALICE_BOX\.glass-logs
+SDK_PAPER_ROOT=C:\ALICE_BOX\charlies-toys\sdk-import-station\paper\io
 ```
+
+**Live FILES desk** currently mounts **IO only** (`SDK_PAPER_ROOT` = `paper/io`). Other colors sit on disk until IOX switch.
+
+**Paper ≠ glass.** Life files go under `paper/{color}`. Chat mountain stays under `.glass-logs`.
+
+### Ledger → paper port (2026-07-26)
+
+Hands’ prior fileKeeper work lived in Chester SQLite (not vaults):
+
+- `Builds/my-pocket-internet/d/_LEDGER/chesters_imports.sqlite` (primary)
+- `…/mypi.sqlite` (small extra set)
+
+1. `tools/_port_ledger_files.php` — first land (all under io, oops).  
+2. `tools/_rehome_by_station.php` — re-stamp + move by ledger **`dom`**:
+
+| station | example content |
+|---------|-----------------|
+| **io** | most life bag, MUSIC, ALEPH BET, SINE_WAVE, IO welcome |
+| **ab** | **MLK-038 LEEK FILES** (K), AGENT_TRACKER, WOLF IN THE WIRES, rEMINDERS, ABX welcome |
+| **icu** | ICU welcome |
+| **rx** | RX welcome |
+
+Safe re-run of port skips existing `legacy_stem`. Rehome is idempotent-ish (rewrites station field + path).
 
 ## Builds backup only (do not treat as live home)
 

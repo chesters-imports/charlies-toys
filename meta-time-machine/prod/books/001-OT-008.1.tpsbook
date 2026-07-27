@@ -5,7 +5,7 @@
   "testament": "OT",
   "source_file": "001-OT-008.1.glassbox",
   "created_at": 1784991029.256291,
-  "updated_at": 1785020991.2464354,
+  "updated_at": 1785070742.5374272,
   "entries": [
     {
       "message_id": "a43fb9c6-8064-4ae3-a8e0-a20b4106ca2c",
@@ -22,6 +22,13 @@
           "unit_code": "",
           "rom": "loreBOX",
           "at": 1784992615.7895732
+        },
+        {
+          "mat": "TC-009.lore",
+          "stem": "TC",
+          "unit_code": "TC-009.lore",
+          "rom": "loreBOX",
+          "at": 1785065530.8662655
         }
       ]
     },

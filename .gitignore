@@ -11,6 +11,10 @@ sdk-import-station/work/wip/
 sdk-import-station/work/catalog.json
 sdk-import-station/work/catalog.md
 
+# Life paper / ineffable capture — local only until Hands says publish
+sdk-import-station/paper/
+ineffable-box/prod/paper/
+
 # Live cord session (ephemeral)
 meta-time-machine/prod/cords/session.now
 meta-time-machine/prod/cords/session.now.json

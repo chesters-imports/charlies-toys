@@ -1,0 +1,182 @@
+/* AB — red terminal · ABX chip · suppression / wire-watch */
+
+body.terminal-skin-ab {
+  --abx-bright: #c43a3a;
+  --abx-ultrabright: #ff3b3b;
+  --abx-midlight: #8a2424;
+  --abx-standard: #6e1c1c;
+  --abx-highlighter: #3a1818;
+  --abx-background: #1a0c0c;
+  --abx-dark: #5a1818;
+  --abx-tint: #4a2020;
+
+  --tm-bg: var(--abx-background);
+  --tm-tree-bg: #140808;
+  --tm-fg: #ff8a8a;
+  --tm-fg-dim: #b84848;
+  --tm-accent: var(--abx-bright);
+  --tm-hot: var(--abx-ultrabright);
+  --tm-line: var(--abx-dark);
+
+  --tm-scan: linear-gradient(rgba(0, 0, 0, 0.45) 2px, transparent 1px);
+  --tm-scan-size: 100% 3px;
+
+  --pocket-scroll-track: #140808;
+  --pocket-scroll-thumb: #6e2424;
+  --pocket-scroll-thumb-hover: #c43a3a;
+
+  color: var(--tm-fg);
+  background-color: var(--abx-background);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  box-shadow: inset 0 0 40vh rgba(40, 0, 0, 0.55);
+}
+
+body.terminal-skin-ab .tm-rail {
+  background: #0e0606;
+  border-right-color: var(--abx-bright);
+  box-shadow:
+    inset -6px 0 18px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(196, 58, 58, 0.18);
+}
+
+body.terminal-skin-ab .tm-rail-x {
+  box-shadow: 0 0 10px rgba(196, 58, 58, 0.3);
+}
+
+body.terminal-skin-ab .tm-rail-x:hover {
+  box-shadow: 0 0 16px rgba(255, 40, 40, 0.55);
+}
+
+body.terminal-skin-ab .tm-sidebar {
+  background-color: #140808;
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border-right: 1px solid var(--abx-dark);
+}
+
+body.terminal-skin-ab .tm-page-title {
+  color: var(--abx-ultrabright);
+  text-shadow: 0 0 12px rgba(255, 40, 40, 0.4);
+}
+
+body.terminal-skin-ab .tm-broken-top {
+  border-bottom-color: var(--abx-bright);
+}
+
+body.terminal-skin-ab .tm-center {
+  position: relative;
+  background-color: var(--abx-background);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+/* ghost watermark */
+body.terminal-skin-ab .tm-center::before {
+  content: "THE LINE IS LISTENING";
+  position: absolute;
+  top: 18%;
+  left: 6%;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(0.85rem, 2.8vw, 2rem);
+  color: var(--abx-bright);
+  opacity: 0.06;
+  transform: rotate(-8deg);
+  pointer-events: none;
+  z-index: 0;
+  white-space: nowrap;
+}
+
+body.terminal-skin-ab .tm-main {
+  position: relative;
+  z-index: 1;
+}
+
+body.terminal-skin-ab .tm-tab.is-on {
+  color: var(--abx-ultrabright);
+  text-shadow: 0 0 8px rgba(255, 40, 40, 0.3);
+}
+
+body.terminal-skin-ab .tm-reading h1 {
+  color: var(--abx-ultrabright);
+  text-shadow: 0 0 14px rgba(255, 40, 40, 0.35);
+}
+
+body.terminal-skin-ab .tm-reading p,
+body.terminal-skin-ab .tm-reading .tm-lede {
+  color: #ff9a9a;
+}
+
+body.terminal-skin-ab .tm-statusbar {
+  background: var(--abx-bright);
+  color: #140808;
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+body.terminal-skin-ab .tm-station-card {
+  border-color: var(--abx-dark);
+  background: #120808;
+  color: #ff9a9a;
+}
+
+body.terminal-skin-ab .tm-station-card:hover {
+  border-color: var(--abx-ultrabright);
+  color: var(--abx-ultrabright);
+  box-shadow: 0 0 16px rgba(255, 40, 40, 0.25);
+}
+
+body.terminal-skin-ab ::selection {
+  background: rgba(90, 20, 20, 0.95);
+  color: #fff;
+}
+
+body.terminal-skin-ab .tm-nav-arch a:hover {
+  text-shadow: 0 0 8px rgba(255, 40, 40, 0.35);
+}
+
+body.terminal-skin-ab .tm-reading a {
+  color: var(--abx-bright);
+  text-decoration-color: rgba(196, 58, 58, 0.45);
+}
+
+body.terminal-skin-ab .tm-reading a:hover {
+  color: var(--abx-ultrabright);
+  text-decoration-color: rgba(255, 59, 59, 0.6);
+}
+
+body.terminal-skin-ab .tm-reading a.fk-btn,
+body.terminal-skin-ab .tm-reading a.inv-btn {
+  text-decoration: none;
+  color: inherit;
+}
+
+body.terminal-skin-ab .fk-attach-row input[type="file"]::file-selector-button,
+body.terminal-skin-ab .fk-attach-row input[type="file"]::-webkit-file-upload-button {
+  color: var(--abx-ultrabright);
+  border-color: var(--abx-bright);
+  background: rgba(196, 58, 58, 0.2);
+  text-shadow: 0 0 6px rgba(255, 40, 40, 0.3);
+}
+
+body.terminal-skin-ab .fk-attach-row input[type="file"]:hover::file-selector-button,
+body.terminal-skin-ab .fk-attach-row input[type="file"]:hover::-webkit-file-upload-button {
+  background: rgba(196, 58, 58, 0.35);
+  box-shadow: 0 0 14px rgba(255, 40, 40, 0.3);
+}
+
+body.terminal-skin-ab .fk-view-body input.md-task-checkbox {
+  border-color: var(--abx-bright);
+  background: rgba(20, 8, 8, 0.9);
+  box-shadow: 0 0 8px rgba(196, 58, 58, 0.3);
+}
+
+body.terminal-skin-ab .fk-view-body input.md-task-checkbox:checked {
+  background: rgba(196, 58, 58, 0.3);
+  border-color: var(--abx-ultrabright);
+  box-shadow: 0 0 12px rgba(255, 40, 40, 0.4);
+}
+
+body.terminal-skin-ab .fk-view-body input.md-task-checkbox:checked::after {
+  border-color: var(--abx-ultrabright);
+}

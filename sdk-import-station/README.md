@@ -1,8 +1,8 @@
 # sdk-import-station
 
-**Charlie-toy · AIDM SDK (lol)**  
-IO machine as a **ROM**: import → cut / encode / redact → **seal export**.  
-Alphabet abandoned. Glass mountain stays under `ALICE_BOX/.glass-logs`.
+**Charlie-toy · Terminal network (IO + AB)**  
+One little program: **files per color** + **glass import on IO only**.  
+Alphabet abandoned. Plan / law: **[PORT.md](./PORT.md)**.
 
 ## Run
 
@@ -19,39 +19,39 @@ run-sdk-import.bat
 run.bat
 ```
 
-→ **http://127.0.0.1:43101/** · health ` /api/health`  
+→ **http://127.0.0.1:43101/** · health `/api/health`  
 First catalog: `run-catalog.bat` (slow once).
 
-Sealed store naming discussion: [STORE.md](./STORE.md).
+## Stations
 
-## Rooms (import / export only)
+| Chip | Face | Paper | Toolkit |
+|------|------|-------|---------|
+| **IOX** | SDK-808 (Sam) | `paper/io` | FILES + glass IMPORTS / EXPORTS |
+| **ABX** | KDE-555 (K) | `paper/ab` | FILES only (no Sam import desk) |
 
-| URL | Job |
-|-----|-----|
-| `/?room=desk` | Load core # · WIP · split · encode · redact · seal |
-| `/?room=active` | Active WIP list |
-| `/?room=search` | Keyword hunt over glass · hit counts · open → desk |
-| `/?room=exports` | Sealed `export_*.json` |
+**Switch:** rail chip only (whole tile). Deck gem menu: New window · Hard refresh · station list.  
+Skin tokens theme deck bar + host menu to green/red.
 
-Search: **partial** (elon∈belong) or **whole word** (elon≠belong). Does not seal — you still process for TPS.
+## Rooms
 
-## Shell (pass B)
+| URL | Job | Who |
+|-----|-----|-----|
+| `/?room=files` | fileKeeper · station paper | IO + AB |
+| `/?room=welcome` | land page (`land/welcome.html` · `welcome-ab.html`) | each face |
+| `/?room=desk` … exports | glass import / seal | **IO only** |
 
-**Looks like the green IO station** — rail (`>|` · IOX), sidebar tree, broken-top, status bar, scanlines / phosphor (`public/shell/`).  
-**Is not the pocket internet** — no files, email, chat, multi-station login.  
-Chrome = CRT glitch; log body = cleaner mono (`sdk-cognition.css`).
+Paths: [PATHS.md](./PATHS.md) · sealed: [STORE.md](./STORE.md).
 
-## Paths
+## Hands status (2026-07-26)
 
-| | |
-|--|--|
-| Glass (read) | `C:\ALICE_BOX\.glass-logs\ot` · `nt` |
-| Work (write) | `work/catalog.json` · `glass/` · `wip/` · `exports/` |
-
-See [PATHS.md](./PATHS.md) · [PORT.md](./PORT.md).
+- fileKeeper live on FS paper (not ledger).  
+- Chester ledger fileKeeper **ported + rehomed** by `dom` (AB leeks etc. under `paper/ab`).  
+- `media:m.HEX` **prints** (sine gif); no auto-upload UI.  
+- Quiet editor (no placeholder spam).  
+- Hands may pull more vault material into AB/IO paper by hand.
 
 ## Notes
 
-- **No ledger / ven required** — encode→VEN push soft-fails without venDesk (encode book still works).  
 - Glass inputs never written.  
-- PHP: XAMPP `C:\xampp\php\php.exe`. Deck Host packaging next if you want the window frame.
+- PHP: XAMPP `C:\xampp\php\php.exe`.  
+- DATBOX / glass-log religion / alphabet OS: not this season’s center.

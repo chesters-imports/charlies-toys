@@ -83,29 +83,24 @@ body.terminal-station {
   background: #0a0a0a;
   border-right: 0.15rem solid var(--tm-accent);
   z-index: 60;
-  padding: 0.35rem 0 0.25rem;
+  /* no top pad — chip tile flush under deck caption */
+  padding: 0 0 0.25rem;
   box-shadow: inset -8px 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .tm-rail-brand {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.15rem;
-  padding: 0.35rem 0 0.55rem;
+  align-items: stretch;
+  padding: 0;
   border-bottom: 1px solid var(--tm-line);
   width: 100%;
-  /* pywebview-drag-region — moves frameless window (esp. when deep hides caption) */
-  cursor: grab;
+  /* Not a window drag target — deck header handles move. Whole tile is station chip. */
   user-select: none;
   -webkit-user-select: none;
 }
 
-.tm-rail-brand:active {
-  cursor: grabbing;
-}
-
-/* deep mode: flush to top + brand grabber (no dark strip above IOX) */
+/* deep mode still ok if host toggles it; chip stays the hit target */
 html.mypi-pocket-deep body.terminal-station,
 html.mypi-pocket-deep body.terminal-station .tm-app {
   --pocket-caption-h: 0px !important;
@@ -119,16 +114,10 @@ html.mypi-pocket-deep body.terminal-station .tm-rail {
   padding-top: 0;
 }
 
-html.mypi-pocket-deep body.terminal-station .tm-rail-brand {
-  padding: 0.45rem 0 0.55rem;
-  margin: 0;
-  background: color-mix(in srgb, var(--tm-accent) 12%, transparent);
-  box-shadow: inset 0 0 12px color-mix(in srgb, var(--tm-accent) 18%, transparent);
-}
-
 html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
   opacity: 1;
-  text-shadow: 0 0 12px var(--tm-accent);
+  background: color-mix(in srgb, var(--tm-accent) 12%, transparent);
+  box-shadow: inset 0 0 12px color-mix(in srgb, var(--tm-accent) 18%, transparent);
 }
 
 .tm-rail-gt {
@@ -136,15 +125,97 @@ html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
   font-size: 0.42rem;
   color: var(--tm-accent);
   opacity: 0.85;
+  transform: none;
+  display: block;
+  margin-bottom: 0.2rem;
 }
 
+/* Full square of the rail top = clickable station cycle */
 .tm-rail-iox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.55rem 0.2rem 0.65rem;
+  min-height: 3.1rem;
   font-family: "Sixtyfour", "Press Start 2P", var(--tm-font-ui), monospace;
   font-size: 0.55rem;
   letter-spacing: 0.12em;
   color: var(--tm-hot);
-  transform: rotate(-2deg);
   text-shadow: 0 0 10px var(--tm-accent);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.tm-rail-iox-label {
+  display: block;
+  transform: rotate(-2deg);
+  pointer-events: none;
+}
+
+.tm-rail-iox .tm-rail-gt {
+  pointer-events: none;
+}
+
+a.tm-rail-iox:hover {
+  filter: brightness(1.12);
+  background: color-mix(in srgb, var(--tm-accent) 14%, transparent);
+  text-shadow: 0 0 16px var(--tm-hot);
+}
+
+a.tm-rail-iox:active {
+  filter: brightness(1.05);
+  background: color-mix(in srgb, var(--tm-accent) 20%, transparent);
+}
+
+/* Color station pills (IOX / ABX …) */
+.tm-nav-stations {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.4rem 0.55rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  list-style: none;
+}
+
+.tm-nav-stations-label {
+  flex: 0 0 100%;
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+
+.tm-station-pill {
+  display: inline-block;
+  font-family: "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.42rem;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.65;
+}
+
+.tm-station-pill:hover {
+  opacity: 1;
+  border-color: currentColor;
+}
+
+.tm-station-pill.is-on {
+  opacity: 1;
+  border-color: var(--tm-hot, currentColor);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--tm-accent, currentColor) 25%, transparent);
+  text-decoration: none;
 }
 
 .tm-rail-face {
@@ -166,11 +237,11 @@ html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   font-family: var(--tm-font);
-  font-size: 0.95rem;
-  letter-spacing: 0.12em;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
   color: var(--tm-hot);
-  max-height: 5rem;
-  overflow: hidden;
+  max-height: 6.5rem;
+  overflow: visible;
 }
 
 /* ! important: tools must not restyle shell rail (chatBOX used bare form {}) */
