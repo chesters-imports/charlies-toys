@@ -1,0 +1,130 @@
+/* RX — amber recovery terminal · RXX chip · repair / convalescence */
+
+body.terminal-skin-rx {
+  --rxx-bright: #d4a017;
+  --rxx-ultrabright: #ffcc33;
+  --rxx-midlight: #a67c00;
+  --rxx-standard: #8a6800;
+  --rxx-highlighter: #3a3010;
+  --rxx-background: #1a1608;
+  --rxx-dark: #5a4a10;
+  --rxx-tint: #4a4018;
+
+  --tm-bg: var(--rxx-background);
+  --tm-tree-bg: #121008;
+  --tm-fg: #ffd866;
+  --tm-fg-dim: #c9a227;
+  --tm-accent: var(--rxx-bright);
+  --tm-hot: var(--rxx-ultrabright);
+  --tm-line: var(--rxx-dark);
+
+  --tm-scan: linear-gradient(rgba(0, 0, 0, 0.42) 2px, transparent 1px);
+  --tm-scan-size: 100% 3px;
+
+  --pocket-scroll-track: #121008;
+  --pocket-scroll-thumb: #6a5818;
+  --pocket-scroll-thumb-hover: #d4a017;
+
+  color: var(--tm-fg);
+  background-color: var(--rxx-background);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  box-shadow: inset 0 0 40vh rgba(40, 30, 0, 0.5);
+}
+
+body.terminal-skin-rx .tm-rail {
+  background: #0e0c06;
+  border-right-color: var(--rxx-bright);
+  box-shadow:
+    inset -6px 0 18px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(212, 160, 23, 0.16);
+}
+
+body.terminal-skin-rx .tm-rail-x {
+  box-shadow: 0 0 10px rgba(212, 160, 23, 0.28);
+}
+
+body.terminal-skin-rx .tm-rail-x:hover {
+  box-shadow: 0 0 16px rgba(255, 204, 51, 0.5);
+}
+
+body.terminal-skin-rx .tm-sidebar {
+  background-color: #121008;
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border-right: 1px solid var(--rxx-dark);
+}
+
+body.terminal-skin-rx .tm-page-title {
+  color: var(--rxx-ultrabright);
+  text-shadow: 0 0 12px rgba(255, 200, 40, 0.35);
+}
+
+body.terminal-skin-rx .tm-broken-top {
+  border-bottom-color: var(--rxx-bright);
+}
+
+body.terminal-skin-rx .tm-center {
+  position: relative;
+  background-color: var(--rxx-background);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+body.terminal-skin-rx .tm-center::before {
+  content: "PRESCRIPTION PENDING";
+  position: absolute;
+  top: 18%;
+  left: 6%;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: rgba(212, 160, 23, 0.08);
+  pointer-events: none;
+  z-index: 0;
+  white-space: nowrap;
+}
+
+body.terminal-skin-rx .tm-main,
+body.terminal-skin-rx .tm-reading {
+  position: relative;
+  z-index: 1;
+}
+
+body.terminal-skin-rx .tm-tab.is-on {
+  color: var(--rxx-ultrabright);
+  border-bottom-color: var(--rxx-bright);
+}
+
+body.terminal-skin-rx .tm-nav-arch a:hover,
+body.terminal-skin-rx .tm-nav-arch li.is-active > a {
+  color: var(--rxx-ultrabright);
+}
+
+body.terminal-skin-rx .tm-statusbar {
+  border-top-color: var(--rxx-dark);
+  background: #0e0c06;
+}
+
+body.terminal-skin-rx .tm-deck-bar {
+  background: #0e0c06;
+  border-bottom-color: var(--rxx-dark);
+}
+
+body.terminal-skin-rx .tm-deck-chip {
+  background: var(--rxx-bright);
+  color: #1a1608;
+}
+
+body.terminal-skin-rx .tm-rail-iox-label {
+  color: var(--rxx-ultrabright);
+  text-shadow: 0 0 8px rgba(255, 200, 40, 0.35);
+}
+
+body.terminal-skin-rx a {
+  color: var(--rxx-bright);
+}
+
+body.terminal-skin-rx a:hover {
+  color: var(--rxx-ultrabright);
+}

@@ -12,6 +12,7 @@ if (function_exists('sdk_station_meta')) {
 }
 $candidates = match ($which) {
     'ab' => [$root . '/land/welcome-ab.html', $root . '/land/welcome.html'],
+    'rx' => [$root . '/land/welcome-rx.html', $root . '/land/welcome.html'],
     default => [$root . '/land/welcome.html'],
 };
 $landFile = null;

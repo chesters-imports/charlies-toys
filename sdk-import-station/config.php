@@ -39,14 +39,28 @@ $media = getenv('SDK_MEDIA_ROOT') ?: ($SDK_ROOT . '/media');
 $media = rtrim(str_replace('\\', '/', $media), '/');
 define('SDK_MEDIA_ROOT', $media);
 
-foreach ([SDK_WORK_ROOT, SDK_GLASS_DIR, SDK_WIP_DIR, SDK_EXPORTS_DIR, SDK_MEDIA_ROOT, SDK_PAPER_BASE . '/io', SDK_PAPER_BASE . '/io/_root', SDK_PAPER_BASE . '/ab', SDK_PAPER_BASE . '/ab/_root'] as $d) {
+foreach ([
+    SDK_WORK_ROOT,
+    SDK_GLASS_DIR,
+    SDK_WIP_DIR,
+    SDK_EXPORTS_DIR,
+    SDK_MEDIA_ROOT,
+    SDK_PAPER_BASE . '/io',
+    SDK_PAPER_BASE . '/io/_root',
+    SDK_PAPER_BASE . '/ab',
+    SDK_PAPER_BASE . '/ab/_root',
+    SDK_PAPER_BASE . '/rx',
+    SDK_PAPER_BASE . '/rx/_root',
+    SDK_PAPER_BASE . '/icu',
+    SDK_PAPER_BASE . '/icu/_root',
+] as $d) {
     if (!is_dir($d)) {
         @mkdir($d, 0775, true);
     }
 }
 
 /**
- * Live stations (order = cycle order). AB is always second.
+ * Live stations (order = chip cycle). IO first · AB second · then more colors.
  * @return array<string, array<string, string>>
  */
 function sdk_station_defs(): array {
@@ -88,6 +102,25 @@ function sdk_station_defs(): array {
             'show_imports' => '0',
             'welcome' => 'ab',
         ],
+        'rx' => [
+            'id' => 'rx',
+            'chip' => 'RXX',
+            'skin' => 'rx',
+            'label' => 'Terminal RX',
+            'face' => 'RX',
+            'user' => 'RX-404',
+            'foot' => 'R·X',
+            'ghost' => 'prescription pending',
+            'whisper' => 'for recovery · repair · the long convalescence',
+            'brand_import' => 'RX · RECOVERY DESK',
+            'brand_files' => 'RX PAPER',
+            'hint_files' => 'paper/rx',
+            'hint_else' => 'dose · rest · wire mending',
+            'deck_chip' => 'RX · RECOVERY',
+            // files + mail only — not Sam's glass import
+            'show_imports' => '0',
+            'welcome' => 'rx',
+        ],
     ];
 }
 
@@ -114,6 +147,9 @@ function sdk_boot_station(): string {
     }
     if ($fromQ === 'iox') {
         $fromQ = 'io';
+    }
+    if ($fromQ === 'rxx') {
+        $fromQ = 'rx';
     }
     if ($fromQ !== '' && sdk_station_valid($fromQ)) {
         $_SESSION['sdk_station'] = $fromQ;
