@@ -55,6 +55,10 @@ foreach ([
     SDK_PAPER_BASE . '/rx/_root',
     SDK_PAPER_BASE . '/icu',
     SDK_PAPER_BASE . '/icu/_root',
+    SDK_PAPER_BASE . '/dr',
+    SDK_PAPER_BASE . '/dr/_root',
+    SDK_PAPER_BASE . '/dc',
+    SDK_PAPER_BASE . '/dc/_root',
 ] as $d) {
     if (!is_dir($d)) {
         @mkdir($d, 0775, true);
@@ -72,7 +76,7 @@ function sdk_station_defs(): array {
             'chip' => 'IOX',
             'skin' => 'io',
             'label' => 'Terminal IO',
-            'face' => 'SDK',
+            'face' => 'SDK-808',
             'user' => 'SDK-808',
             'foot' => 'O·X',
             'ghost' => 'put them here',
@@ -90,7 +94,7 @@ function sdk_station_defs(): array {
             'chip' => 'ABX',
             'skin' => 'ab',
             'label' => 'Terminal AB',
-            'face' => 'KDE',
+            'face' => 'KDE-555',
             'user' => 'KDE-555',
             'foot' => 'A·B',
             'ghost' => 'the line is listening',
@@ -99,7 +103,7 @@ function sdk_station_defs(): array {
             'brand_files' => "K'S PAPER",
             'hint_files' => 'paper/ab',
             'hint_else' => 'leeks · agents · the line',
-            'deck_chip' => 'ABX · SUPPRESSION',
+            'deck_chip' => "CHESTER'S IMPORTS",
             // toolkit: files now; dossier later — not Sam's glass import/export
             'show_imports' => '0',
             'welcome' => 'ab',
@@ -119,9 +123,66 @@ function sdk_station_defs(): array {
             'brand_files' => 'CUX PAPER',
             'hint_files' => 'paper/cu',
             'hint_else' => 'shots · cuts · the glass as set',
-            'deck_chip' => 'CUX · I SEE YOU',
+            'deck_chip' => "CHESTER'S IMPORTS",
             'show_imports' => '0',
             'welcome' => 'cu',
+        ],
+        // DRX — Dr. X / Daniel Wake · project concept desk (not log plant, not watchers)
+        'dr' => [
+            'id' => 'dr',
+            'chip' => 'DRX',
+            'skin' => 'dr',
+            'label' => 'Terminal DRX',
+            'face' => 'DRX-159',
+            'user' => 'DRX-159',
+            'foot' => 'D·R',
+            'ghost' => 'the whole map, not one log',
+            'whisper' => 'project thoughts · released from the yard',
+            'brand_import' => 'DRX · CONCEPT',
+            'brand_files' => 'DRX PAPER',
+            'hint_files' => 'paper/dr',
+            'hint_else' => 'dev mind · purple teal · not the glass sawmill',
+            'deck_chip' => "CHESTER'S IMPORTS",
+            'show_imports' => '0',
+            'welcome' => 'dr',
+        ],
+        // RX — Oriel · BIOS blue (flat, almost no scanlines, sharp white) — not a phosphor clone
+        'rx' => [
+            'id' => 'rx',
+            'chip' => 'RX',
+            'skin' => 'rx',
+            'label' => 'Terminal RX',
+            'face' => 'OLB-369',
+            'user' => 'OLB-369',
+            'foot' => 'R·X',
+            'ghost' => 'read the system',
+            'whisper' => 'flat blue · sharp white · she is particular',
+            'brand_import' => 'RX · BIOS',
+            'brand_files' => 'ORIEL PAPER',
+            'hint_files' => 'paper/rx',
+            'hint_else' => 'bios blue · codes · the system',
+            'deck_chip' => "CHESTER'S IMPORTS",
+            'show_imports' => '0',
+            'welcome' => 'rx',
+        ],
+        // DCO — Danny and Company · all parts · specs written here (not agent telepathy)
+        'dc' => [
+            'id' => 'dc',
+            'chip' => 'DCO',
+            'skin' => 'dc',
+            'label' => 'Terminal DCO',
+            'face' => 'DCO',
+            'user' => 'DCO',
+            'foot' => 'D·C',
+            'ghost' => 'many hands · one session',
+            'whisper' => 'danny and company · write it down',
+            'brand_import' => 'DCO · COMPANY',
+            'brand_files' => 'DCO PAPER',
+            'hint_files' => 'paper/dc',
+            'hint_else' => 'specs · outlines · the reins',
+            'deck_chip' => "CHESTER'S IMPORTS",
+            'show_imports' => '0',
+            'welcome' => 'dc',
         ],
     ];
 }
@@ -151,12 +212,19 @@ function sdk_boot_station(): string {
         $fromQ = 'io';
     }
     if ($fromQ === 'cux' || $fromQ === 'icu') {
-        // live id is cu; chip label CUX; old name ICU
+        // live id is cu; chip label CUX (agent rebrand — house name was ICU)
         $fromQ = 'cu';
     }
-    // wrong-color-day bookmarks → still yellow desk
-    if ($fromQ === 'rxx' || $fromQ === 'rx') {
-        $fromQ = 'cu';
+    // DRX · Doctor X · Daniel Wake (number later)
+    if ($fromQ === 'drx' || $fromQ === 'drw' || $fromQ === 'dx' || $fromQ === 'wx' || $fromQ === 'doctorx') {
+        $fromQ = 'dr';
+    }
+    if ($fromQ === 'rxx' || $fromQ === 'oriel') {
+        $fromQ = 'rx';
+    }
+    // DCO · Danny and Company (parts · product specs)
+    if ($fromQ === 'dco' || $fromQ === 'danny' || $fromQ === 'dannyco' || $fromQ === 'd&co') {
+        $fromQ = 'dc';
     }
     if ($fromQ !== '' && sdk_station_valid($fromQ)) {
         $_SESSION['sdk_station'] = $fromQ;

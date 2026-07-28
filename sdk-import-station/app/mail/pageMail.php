@@ -119,7 +119,7 @@ $recipients = sdk_mail_recipients($station);
   <?php endif; ?>
 
   <footer class="mail-foot muted small">
-    Outside / conf-call inject: <code>POST /api/mail/inject</code> · token <code><?= $h(sdk_mail_inject_token()) ?></code>
-    · or <code>php tools/mail_inject.php</code>
+    Wire open · station to station.
+    <?php /* Outside inject stays in tools + API; never print token on the glass (Chester's bootstrap trash). */ ?>
   </footer>
 </div>

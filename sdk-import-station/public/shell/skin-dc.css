@@ -1,0 +1,130 @@
+/* DCO — Danny and Company · many parts · one glass
+   Warm paper-ink boardroom that doesn't quite agree with itself. */
+
+body.terminal-skin-dc {
+  --dco-paper: #e8dcc8;
+  --dco-ink: #1c1410;
+  --dco-warm: #c45c26;
+  --dco-cool: #2a5a6b;
+  --dco-third: #6b3a5a;
+  --dco-bg: #1a1612;
+  --dco-panel: #241e18;
+  --dco-line: #4a3a28;
+
+  --tm-bg: var(--dco-bg);
+  --tm-tree-bg: var(--dco-panel);
+  --tm-fg: var(--dco-paper);
+  --tm-fg-dim: #a89880;
+  --tm-accent: var(--dco-warm);
+  --tm-hot: #f0d8b0;
+  --tm-line: var(--dco-line);
+
+  --tm-scan: linear-gradient(rgba(0, 0, 0, 0.25) 1px, transparent 1px);
+  --tm-scan-size: 100% 4px;
+
+  --pocket-scroll-track: #120e0a;
+  --pocket-scroll-thumb: #5a4030;
+  --pocket-scroll-thumb-hover: var(--dco-warm);
+
+  color: var(--tm-fg);
+  background-color: var(--dco-bg);
+  background-image:
+    var(--tm-scan),
+    radial-gradient(ellipse at 20% 0%, rgba(196, 92, 38, 0.12), transparent 45%),
+    radial-gradient(ellipse at 80% 100%, rgba(42, 90, 107, 0.12), transparent 40%);
+  background-size: var(--tm-scan-size), auto, auto;
+  box-shadow: inset 0 0 50vh rgba(0, 0, 0, 0.45);
+}
+
+body.terminal-skin-dc .tm-rail {
+  background: #100c08;
+  border-right-color: var(--dco-warm);
+  box-shadow:
+    inset -6px 0 18px rgba(0, 0, 0, 0.55),
+    0 0 16px rgba(196, 92, 38, 0.12);
+}
+
+body.terminal-skin-dc .tm-sidebar {
+  background-color: var(--dco-panel);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border-right: 1px solid var(--dco-line);
+}
+
+body.terminal-skin-dc .tm-page-title {
+  color: var(--dco-hot, #f0d8b0);
+  text-shadow:
+    0 0 8px rgba(196, 92, 38, 0.35),
+    1px 0 0 rgba(42, 90, 107, 0.4);
+}
+
+body.terminal-skin-dc .tm-broken-top {
+  border-bottom-color: var(--dco-cool);
+}
+
+body.terminal-skin-dc .tm-center {
+  background-color: var(--dco-bg);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+body.terminal-skin-dc .tm-center::before {
+  content: "DANNY & CO.";
+  position: absolute;
+  top: 22%;
+  left: 4%;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  color: rgba(196, 92, 38, 0.1);
+  transform: rotate(-6deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.terminal-skin-dc .tm-deck-bar {
+  background: #100c08;
+  border-bottom: 1px solid var(--dco-line);
+}
+
+body.terminal-skin-dc .tm-deck-chip {
+  color: var(--tm-hot);
+}
+
+body.terminal-skin-dc a {
+  color: #e8a070;
+}
+
+body.terminal-skin-dc a:hover {
+  color: #f0d8b0;
+}
+
+/* rail chip tile for fan */
+.tm-rail-chip-slot[data-skin="dc"] {
+  color: #f0d8b0;
+  text-shadow: 0 0 10px rgba(196, 92, 38, 0.5);
+  background:
+    linear-gradient(165deg, #2a2018 0%, #1a1410 50%, #1a2228 100%);
+}
+.tm-rail-chip-slot[data-skin="dc"] .tm-chip-glass {
+  background:
+    radial-gradient(circle at 25% 20%, rgba(196, 92, 38, 0.3), transparent 45%),
+    radial-gradient(circle at 75% 80%, rgba(42, 90, 107, 0.25), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(107, 58, 90, 0.15), transparent 50%);
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+.tm-rail-chip-slot[data-skin="dc"] .tm-chip-bezel {
+  box-shadow:
+    inset 0 0 0 1px #c45c26,
+    inset 0 -1px 0 #2a5a6b;
+}
+.tm-rail-chip-slot[data-skin="dc"] .tm-chip-face {
+  color: #a89880;
+  text-shadow: none;
+}
+.tm-rail-chip-slot[data-skin="dc"]:hover {
+  box-shadow:
+    inset 0 0 0 1px #f0d8b0,
+    0 0 14px rgba(196, 92, 38, 0.3);
+}

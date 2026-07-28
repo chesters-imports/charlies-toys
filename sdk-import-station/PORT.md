@@ -15,9 +15,11 @@ This island is the **terminal network** (IO + AB now) living as **one little pro
 | **Done** | **IOX / ABX** in-app switch (chip + themed deck menu); per-station paper roots. |
 | **Hands now** | Vault / mine → **station paper** by pull (e.g. Kat’s files into **AB**). Not agent vault crawl. |
 | **Live** | **MAIL** room — station↔station wire + outside inject (`/api/mail/inject`, `tools/mail_inject.php`). |
-| **Live** | **CUX** (id `cu`) — was ICU *I See You* · amber · paper/cu inherits ICU files · mail. |
-| **Live** | Rail **chip opens station picker** (IOX / ABX / CUX) — not color-wheel rotate. |
-| **Later** | RX · JX · send-to-color · dossier on AB · Charlie threads · shotDesk on CUX. |
+| **Live** | **CUX** (id `cu`) — was ICU *I See You* · amber · paper/cu inherits ICU files · mail. House chip name remains ICU in lore. |
+| **Live** | **DRX** (id `dr`) — Doctor X / Daniel Wake · purple+teal · **project concept desk** (not log plant, not watchers). paper/dr. |
+| **Live** | Rail **chip opens station picker** (IOX / ABX / CUX / DRX / RX) — not color-wheel rotate. |
+| **Live** | **RX** (id `rx`) — Oriel · **BIOS blue** (flat, almost no scanlines, sharp white) · paper/rx. Not a phosphor clone. |
+| **Later** | JX · send-to-color · dossier on AB · Charlie threads · shotDesk on ICU/CU · number on DRX. |
 | **Not this season** | DATBOX as migration bus · glass-log religion · postBASIC as primary capture · full alphabet topology. |
 
 **Narrative (load-bearing):** stations sit in different **timeline outcomes** of broken-time Chester; each holds files nearest that outcome’s artifact of the wife. **One global store is wrong.** Per-station paper is right. File desk preferred over postBASIC because thinking is **narrative objects in a room**.

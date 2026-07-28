@@ -1,0 +1,116 @@
+/* DRX — Doctor X · purple + teal · project concept desk (not log yard) */
+
+body.terminal-skin-dr {
+  --drx-bright: #7b5cff;
+  --drx-ultrabright: #b8a0ff;
+  --drx-teal: #2ec4b6;
+  --drx-teal-hot: #5ef0e0;
+  --drx-midlight: #4a3a8a;
+  --drx-standard: #3a2a6e;
+  --drx-highlighter: #1a1830;
+  --drx-background: #0e1020;
+  --drx-dark: #2a2850;
+  --drx-tint: #1a3040;
+
+  --tm-bg: var(--drx-background);
+  --tm-tree-bg: #0a0c18;
+  --tm-fg: #c8c0ff;
+  --tm-fg-dim: #6a9a9a;
+  --tm-accent: var(--drx-bright);
+  --tm-hot: var(--drx-teal-hot);
+  --tm-line: var(--drx-dark);
+
+  --tm-scan: linear-gradient(rgba(0, 0, 0, 0.4) 2px, transparent 1px);
+  --tm-scan-size: 100% 3px;
+
+  --pocket-scroll-track: #0a0c18;
+  --pocket-scroll-thumb: #3a3860;
+  --pocket-scroll-thumb-hover: #2ec4b6;
+
+  color: var(--tm-fg);
+  background-color: var(--drx-background);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  box-shadow: inset 0 0 40vh rgba(20, 40, 60, 0.45);
+}
+
+body.terminal-skin-dr .tm-rail {
+  background: #080a14;
+  border-right-color: var(--drx-teal);
+  box-shadow:
+    inset -6px 0 18px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(123, 92, 255, 0.18);
+}
+
+body.terminal-skin-dr .tm-rail-x {
+  box-shadow: 0 0 10px rgba(46, 196, 182, 0.35);
+}
+
+body.terminal-skin-dr .tm-rail-x:hover {
+  box-shadow: 0 0 16px rgba(94, 240, 224, 0.55);
+}
+
+body.terminal-skin-dr .tm-sidebar {
+  background-color: #0a0c18;
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+  border-right: 1px solid var(--drx-dark);
+}
+
+body.terminal-skin-dr .tm-page-title {
+  color: var(--drx-ultrabright);
+  text-shadow:
+    0 0 10px rgba(123, 92, 255, 0.4),
+    0 0 18px rgba(46, 196, 182, 0.2);
+}
+
+body.terminal-skin-dr .tm-broken-top {
+  border-bottom-color: var(--drx-teal);
+}
+
+body.terminal-skin-dr .tm-center {
+  position: relative;
+  background-color: var(--drx-background);
+  background-image: var(--tm-scan);
+  background-size: var(--tm-scan-size);
+}
+
+body.terminal-skin-dr .tm-center::before {
+  content: "DR X · THE WHOLE MAP";
+  position: absolute;
+  top: 18%;
+  left: 6%;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  color: rgba(46, 196, 182, 0.12);
+  pointer-events: none;
+  z-index: 0;
+  white-space: nowrap;
+}
+
+body.terminal-skin-dr .tm-deck-bar {
+  background: #0a0c18;
+  border-bottom: 1px solid var(--drx-dark);
+}
+
+body.terminal-skin-dr .tm-deck-chip {
+  color: var(--drx-ultrabright);
+}
+
+body.terminal-skin-dr a {
+  color: var(--drx-teal-hot);
+}
+
+body.terminal-skin-dr a:hover {
+  color: var(--drx-ultrabright);
+}
+
+body.terminal-skin-dr .tm-station-item.is-on {
+  border-color: var(--drx-teal);
+  box-shadow: 0 0 12px rgba(46, 196, 182, 0.25);
+}
+
+body.terminal-skin-dr .tm-station-chip {
+  color: var(--drx-teal-hot);
+}

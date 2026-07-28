@@ -1,0 +1,205 @@
+/* RX — Oriel · BIOS blue
+   Flat. Almost no scanlines. Sharp clean white type.
+   Not phosphor green. Not amber CRT. Not “another terminal skin.”
+   She insisted. */
+
+body.terminal-skin-rx {
+  /* Classic POST intensity — vivid system blue, not soft “product” blue */
+  --rx-bios-blue: #0000aa;
+  --rx-bios-deep: #000082;
+  --rx-bios-void: #000055;
+  --rx-panel: #00009a;
+  --rx-panel-edge: #2020c0;
+  --rx-white: #f0f0f0;
+  --rx-white-hot: #ffffff;
+  --rx-gray: #b0b0b0;
+  --rx-dim: #8080c0;
+  --rx-select: #0000ff;
+  --rx-cursor: #aaaaaa;
+
+  --tm-bg: var(--rx-bios-blue);
+  --tm-tree-bg: var(--rx-bios-deep);
+  --tm-fg: var(--rx-white);
+  --tm-fg-dim: var(--rx-gray);
+  --tm-accent: var(--rx-white-hot);
+  --tm-hot: var(--rx-white-hot);
+  --tm-line: var(--rx-panel-edge);
+
+  /* KILL scanlines — flat field only */
+  --tm-scan: none;
+  --tm-scan-size: 0;
+
+  --tm-font: var(--tm-font-bios);
+  --tm-font-ui: var(--tm-font-bios);
+  --tm-font-mono: var(--tm-font-bios);
+
+  --pocket-scroll-track: var(--rx-bios-void);
+  --pocket-scroll-thumb: #4040a0;
+  --pocket-scroll-thumb-hover: #8080d0;
+
+  color: var(--rx-white);
+  background-color: var(--rx-bios-blue);
+  background-image: none !important;
+  box-shadow: none;
+  font-family: var(--tm-font-bios), "Share Tech Mono", "VT323", ui-monospace, monospace;
+  letter-spacing: 0.02em;
+  image-rendering: pixelated;
+}
+
+/* body shell also paints scan via style.css — stomp it */
+body.terminal-skin-rx.terminal-station {
+  background-image: none !important;
+  background-color: var(--rx-bios-blue) !important;
+}
+
+body.terminal-skin-rx .tm-rail {
+  background: var(--rx-bios-void);
+  border-right: 2px solid var(--rx-white);
+  box-shadow: none;
+}
+
+body.terminal-skin-rx .tm-rail-x {
+  box-shadow: none;
+  color: var(--rx-white-hot);
+  border-color: var(--rx-white);
+}
+
+body.terminal-skin-rx .tm-rail-x:hover {
+  box-shadow: none;
+  background: var(--rx-select);
+  color: var(--rx-white-hot);
+}
+
+body.terminal-skin-rx .tm-sidebar {
+  background-color: var(--rx-bios-deep) !important;
+  background-image: none !important;
+  border-right: 1px solid var(--rx-panel-edge);
+  color: var(--rx-white);
+}
+
+body.terminal-skin-rx .tm-center {
+  position: relative;
+  background-color: var(--rx-bios-blue) !important;
+  background-image: none !important;
+}
+
+/* no CRT ghost slogans — quiet BIOS chrome */
+body.terminal-skin-rx .tm-center::before {
+  content: none;
+}
+
+body.terminal-skin-rx .tm-page-title {
+  color: var(--rx-white-hot);
+  text-shadow: none;
+  font-family: var(--tm-font-bios), "Share Tech Mono", monospace !important;
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body.terminal-skin-rx .tm-broken-top {
+  border-bottom: 1px solid var(--rx-white);
+}
+
+body.terminal-skin-rx .tm-deck-bar {
+  background: var(--rx-bios-void);
+  border-bottom: 1px solid var(--rx-white);
+  background-image: none !important;
+}
+
+body.terminal-skin-rx .tm-deck-chip {
+  color: var(--rx-white-hot);
+  font-family: var(--tm-font-bios), "Share Tech Mono", monospace !important;
+  text-shadow: none;
+}
+
+/* Arcade titles → BIOS mono on this station */
+body.terminal-skin-rx .tm-nav-title,
+body.terminal-skin-rx .tm-tab-path,
+body.terminal-skin-rx .tm-status,
+body.terminal-skin-rx .tm-station-chip,
+body.terminal-skin-rx .tm-station-label,
+body.terminal-skin-rx h1,
+body.terminal-skin-rx h2,
+body.terminal-skin-rx .tm-lede {
+  font-family: var(--tm-font-bios), "Share Tech Mono", "VT323", monospace !important;
+  text-shadow: none;
+}
+
+body.terminal-skin-rx a {
+  color: var(--rx-white-hot);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+body.terminal-skin-rx a:hover {
+  color: var(--rx-white-hot);
+  background: var(--rx-select);
+}
+
+body.terminal-skin-rx .tm-station-item {
+  border-color: var(--rx-panel-edge);
+  background: var(--rx-bios-deep);
+}
+
+body.terminal-skin-rx .tm-station-item.is-on {
+  border-color: var(--rx-white);
+  background: var(--rx-select);
+  box-shadow: none;
+}
+
+body.terminal-skin-rx .tm-station-chip {
+  color: var(--rx-white-hot);
+}
+
+body.terminal-skin-rx .tm-station-user,
+body.terminal-skin-rx .tm-fg-dim,
+body.terminal-skin-rx .tm-lede-quiet {
+  color: var(--rx-dim);
+}
+
+/* tree / lists: solid panels, no scan */
+body.terminal-skin-rx .tm-tree,
+body.terminal-skin-rx .tm-nav,
+body.terminal-skin-rx .tm-status-bar,
+body.terminal-skin-rx .tm-tabbar {
+  background-image: none !important;
+  background-color: var(--rx-bios-deep);
+  border-color: var(--rx-panel-edge);
+}
+
+body.terminal-skin-rx input,
+body.terminal-skin-rx textarea,
+body.terminal-skin-rx select,
+body.terminal-skin-rx button {
+  font-family: var(--tm-font-bios), "Share Tech Mono", monospace;
+  background: var(--rx-bios-void);
+  color: var(--rx-white);
+  border: 1px solid var(--rx-white);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.terminal-skin-rx button:hover,
+body.terminal-skin-rx button:focus {
+  background: var(--rx-select);
+  color: var(--rx-white-hot);
+}
+
+body.terminal-skin-rx ::selection {
+  background: var(--rx-white);
+  color: var(--rx-bios-blue);
+}
+
+/* file desk blocks that reintroduce scan */
+body.terminal-skin-rx .logimport,
+body.terminal-skin-rx .land-page {
+  background: transparent;
+  color: var(--rx-white);
+}
+
+body.terminal-skin-rx .land-page h1 {
+  color: var(--rx-white-hot);
+  font-weight: normal;
+  letter-spacing: 0.12em;
+}

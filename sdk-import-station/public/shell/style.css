@@ -114,7 +114,8 @@ html.mypi-pocket-deep body.terminal-station .tm-rail {
   padding-top: 0;
 }
 
-html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
+html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox,
+html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-chip-slot.is-current {
   opacity: 1;
   background: color-mix(in srgb, var(--tm-accent) 12%, transparent);
   box-shadow: inset 0 0 12px color-mix(in srgb, var(--tm-accent) 18%, transparent);
@@ -130,12 +131,379 @@ html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-iox {
   margin-bottom: 0.2rem;
 }
 
-/* Full square of the rail top = open station picker */
+/* Full square of the rail top = station chip; click fans all chips down the rail */
 .tm-rail-chip-wrap {
   position: relative;
   z-index: 40;
+  width: 100%;
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
+.tm-rail-chip-fan {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+/* Mini-console chip tile */
+.tm-rail-chip-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.5rem 0.12rem 0.45rem;
+  min-height: 3.35rem;
+  font-family: "Sixtyfour", "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  color: var(--tm-hot);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: #0a0a0a;
+  flex: 0 0 auto;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    max-height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.22s ease,
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.24s ease,
+    min-height 0.24s ease,
+    border-color 0.2s ease,
+    filter 0.15s ease;
+}
+
+.tm-chip-glass,
+.tm-chip-bezel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tm-chip-bezel {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.35);
+}
+
+.tm-chip-glass {
+  opacity: 0.55;
+  mix-blend-mode: screen;
+}
+
+.tm-rail-chip-slot > .tm-rail-gt,
+.tm-rail-chip-slot > .tm-rail-iox-label,
+.tm-rail-chip-slot > .tm-chip-face {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tm-rail-iox-label {
+  display: block;
+  transform: rotate(-2deg);
+  font-size: 0.58rem;
+  line-height: 1.15;
+}
+
+.tm-chip-face {
+  display: block;
+  margin-top: 0.22rem;
+  font-family: var(--tm-font), "VT323", monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+  opacity: 0.72;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  padding: 0 0.1rem;
+  text-transform: uppercase;
+}
+
+/* Current always visible; others collapsed until fan opens */
+.tm-rail-chip-slot.is-current {
+  z-index: 2;
+}
+
+.tm-rail-chip-slot.is-other {
+  max-height: 0;
+  min-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom-color: transparent;
+  transform: translateY(-0.55rem) scaleY(0.88);
+  pointer-events: none;
+  overflow: hidden;
+  /* collapse together; stagger only on open */
+  transition-delay: 0s;
+}
+
+.tm-rail.is-chip-fan .tm-rail-chip-slot.is-other {
+  max-height: 4.2rem;
+  min-height: 3.35rem;
+  opacity: 1;
+  padding-top: 0.5rem;
+  padding-bottom: 0.45rem;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(0) scaleY(1);
+  pointer-events: auto;
+  transition-delay: calc(var(--fan-i, 0) * 48ms);
+}
+
+.tm-rail.is-chip-fan .tm-rail-brand,
+.tm-rail.is-chip-fan .tm-rail-chip-wrap {
+  flex: 1 1 auto;
+  border-bottom: none;
+  min-height: 0;
+}
+
+.tm-rail.is-chip-fan .tm-rail-chip-fan {
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* When fan open, hide face / ghost / foot so chippies own the rail */
+.tm-rail.is-chip-fan .tm-rail-when-closed {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  margin: 0;
+  padding: 0;
+  transition:
+    opacity 0.18s ease,
+    max-height 0.22s ease;
+}
+
+.tm-rail-when-closed {
+  transition: opacity 0.25s ease 0.08s;
+}
+
+.tm-rail-chip-slot .tm-rail-gt {
+  pointer-events: none;
+  font-size: 0.38rem;
+  margin-bottom: 0.15rem;
+  opacity: 0.9;
+}
+
+.tm-rail-chip-slot:hover {
+  filter: brightness(1.08);
+  z-index: 3;
+}
+
+.tm-rail-chip-slot.is-current[aria-expanded="true"],
+.tm-rail.is-chip-fan .tm-rail-chip-slot.is-current {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0 16px rgba(255, 255, 255, 0.08);
+}
+
+/* ── IO · forest phosphor console ───────────────────────── */
+.tm-rail-chip-slot[data-skin="io"] {
+  color: #7dff6a;
+  text-shadow: 0 0 12px #38b433;
+  background:
+    linear-gradient(180deg, #1a2e14 0%, #0c180a 55%, #081208 100%);
+  box-shadow: inset 0 0 22px rgba(0, 255, 80, 0.08);
+}
+.tm-rail-chip-slot[data-skin="io"] .tm-chip-glass {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.28) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(ellipse at 50% 20%, rgba(80, 255, 100, 0.2), transparent 60%);
+  mix-blend-mode: normal;
+  opacity: 1;
+}
+.tm-rail-chip-slot[data-skin="io"] .tm-chip-bezel {
+  box-shadow:
+    inset 0 0 0 1px #2a6a28,
+    inset 0 0 12px rgba(56, 180, 51, 0.25);
+}
+.tm-rail-chip-slot[data-skin="io"] .tm-chip-face {
+  color: #3cb83a;
+  text-shadow: none;
+}
+.tm-rail-chip-slot[data-skin="io"]:hover {
+  filter: brightness(1.15);
+  box-shadow:
+    inset 0 0 0 1px #00ff00,
+    0 0 14px rgba(0, 255, 80, 0.25);
+}
+
+/* ── AB · red alert suppression tile ────────────────────── */
+.tm-rail-chip-slot[data-skin="ab"] {
+  color: #ff6a6a;
+  text-shadow: 0 0 10px #c43a3a;
+  background:
+    linear-gradient(180deg, #2a0c0c 0%, #140606 100%);
+}
+.tm-rail-chip-slot[data-skin="ab"] .tm-chip-glass {
+  background:
+    linear-gradient(90deg, #ff2020 0, #ff2020 3px, transparent 3px),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.35) 0 1px,
+      transparent 1px 3px
+    );
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+.tm-rail-chip-slot[data-skin="ab"] .tm-chip-bezel {
+  box-shadow:
+    inset 0 0 0 1px #8a2424,
+    inset 0 0 16px rgba(255, 40, 40, 0.2);
+}
+.tm-rail-chip-slot[data-skin="ab"] .tm-rail-gt {
+  color: #ff3b3b;
+  animation: tm-chip-ab-pulse 1.4s ease-in-out infinite;
+}
+.tm-rail-chip-slot[data-skin="ab"] .tm-chip-face {
+  color: #b84848;
+  text-shadow: none;
+}
+.tm-rail-chip-slot[data-skin="ab"]:hover {
+  background: linear-gradient(180deg, #3a1010 0%, #1a0808 100%);
+  box-shadow:
+    inset 0 0 0 1px #ff3b3b,
+    0 0 16px rgba(255, 40, 40, 0.3);
+}
+
+@keyframes tm-chip-ab-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── CU · amber watchers / set glass ────────────────────── */
+.tm-rail-chip-slot[data-skin="cu"] {
+  color: #ffd866;
+  text-shadow: 0 0 12px #d4a017;
+  background:
+    linear-gradient(180deg, #2a2210 0%, #141008 100%);
+}
+.tm-rail-chip-slot[data-skin="cu"] .tm-chip-glass {
+  background:
+    radial-gradient(ellipse at 40% 0%, rgba(255, 200, 60, 0.22), transparent 55%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.4) 0 2px,
+      transparent 2px 3px
+    );
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+.tm-rail-chip-slot[data-skin="cu"] .tm-chip-bezel {
+  box-shadow:
+    inset 0 0 0 1px #a67c00,
+    inset 0 0 14px rgba(255, 200, 40, 0.15);
+}
+.tm-rail-chip-slot[data-skin="cu"] .tm-chip-face {
+  color: #c9a227;
+  text-shadow: none;
+}
+.tm-rail-chip-slot[data-skin="cu"]:hover {
+  box-shadow:
+    inset 0 0 0 1px #ffcc33,
+    0 0 14px rgba(255, 200, 40, 0.28);
+}
+
+/* ── DR · purple + teal concept slab ────────────────────── */
+.tm-rail-chip-slot[data-skin="dr"] {
+  color: #d4ccff;
+  text-shadow: 0 0 12px #7b5cff;
+  background:
+    linear-gradient(160deg, #1a1435 0%, #0e1020 45%, #0a1a1c 100%);
+}
+.tm-rail-chip-slot[data-skin="dr"] .tm-chip-glass {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(123, 92, 255, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(46, 196, 182, 0.28), transparent 40%);
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+.tm-rail-chip-slot[data-skin="dr"] .tm-chip-bezel {
+  box-shadow:
+    inset 0 0 0 1px #7b5cff,
+    inset 0 -1px 0 #2ec4b6,
+    inset 0 0 16px rgba(94, 240, 224, 0.12);
+}
+.tm-rail-chip-slot[data-skin="dr"] .tm-rail-gt {
+  color: #5ef0e0;
+  text-shadow: 0 0 8px #2ec4b6;
+}
+.tm-rail-chip-slot[data-skin="dr"] .tm-chip-face {
+  color: #6a9a9a;
+  text-shadow: none;
+}
+.tm-rail-chip-slot[data-skin="dr"]:hover {
+  box-shadow:
+    inset 0 0 0 1px #5ef0e0,
+    0 0 16px rgba(123, 92, 255, 0.35);
+}
+
+/* ── RX · flat BIOS brick (no CRT romance) ──────────────── */
+.tm-rail-chip-slot[data-skin="rx"] {
+  color: #f0f0f0;
+  text-shadow: none;
+  font-family: var(--tm-font-bios), "Share Tech Mono", "VT323", monospace;
+  background: #0000aa;
+  letter-spacing: 0.06em;
+}
+.tm-rail-chip-slot[data-skin="rx"] .tm-chip-glass {
+  display: none;
+}
+.tm-rail-chip-slot[data-skin="rx"] .tm-chip-bezel {
+  box-shadow: inset 0 0 0 1px #ffffff;
+  opacity: 0.85;
+}
+.tm-rail-chip-slot[data-skin="rx"] .tm-rail-gt,
+.tm-rail-chip-slot[data-skin="rx"] .tm-rail-iox-label,
+.tm-rail-chip-slot[data-skin="rx"] .tm-chip-face {
+  font-family: var(--tm-font-bios), "Share Tech Mono", "VT323", monospace;
+  text-shadow: none;
+  transform: none;
+}
+.tm-rail-chip-slot[data-skin="rx"] .tm-rail-iox-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+}
+.tm-rail-chip-slot[data-skin="rx"] .tm-chip-face {
+  color: #b0b0c0;
+  opacity: 1;
+}
+.tm-rail-chip-slot[data-skin="rx"]:hover {
+  background: #0000ff;
+  color: #ffffff;
+  filter: none;
+  box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+/* legacy class hooks still used by deep-mode rules */
 .tm-rail-iox,
 button.tm-rail-iox {
   display: flex;
@@ -156,93 +524,6 @@ button.tm-rail-iox {
   cursor: pointer;
   border: none;
   background: transparent;
-}
-
-/* Station picker flies out of the rail chip */
-.tm-station-menu {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  margin-left: 2px;
-  min-width: 12.5rem;
-  background: var(--tm-tree-bg);
-  border: 1px solid var(--tm-accent);
-  box-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
-  padding: 0.35rem 0;
-  z-index: 50;
-}
-
-.tm-station-menu-head {
-  font-family: var(--tm-font-ui), monospace;
-  font-size: 0.55rem;
-  letter-spacing: 0.14em;
-  color: var(--tm-fg-dim);
-  padding: 0.25rem 0.65rem 0.45rem;
-  border-bottom: 1px solid var(--tm-line);
-  margin-bottom: 0.2rem;
-}
-
-a.tm-station-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 0.65rem;
-  text-decoration: none;
-  color: var(--tm-fg);
-  font-family: var(--tm-font), sans-serif;
-  font-size: 0.78rem;
-  border-left: 2px solid transparent;
-}
-
-a.tm-station-item:hover {
-  background: color-mix(in srgb, var(--tm-accent) 16%, transparent);
-  color: var(--tm-hot);
-}
-
-a.tm-station-item.is-on {
-  border-left-color: var(--tm-hot);
-  color: var(--tm-hot);
-}
-
-.tm-station-chip {
-  font-family: "Press Start 2P", var(--tm-font-ui), monospace;
-  font-size: 0.42rem;
-  letter-spacing: 0.08em;
-  min-width: 2.4rem;
-  color: var(--tm-accent);
-}
-
-.tm-station-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  min-width: 0;
-}
-
-.tm-station-label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tm-station-user {
-  font-size: 0.68rem;
-  opacity: 0.65;
-}
-
-.tm-station-here {
-  margin-left: auto;
-  color: var(--tm-hot);
-}
-
-.tm-rail-iox-label {
-  display: block;
-  transform: rotate(-2deg);
-  pointer-events: none;
-}
-
-.tm-rail-iox .tm-rail-gt {
-  pointer-events: none;
 }
 
 a.tm-rail-iox:hover,
@@ -460,6 +741,7 @@ aside.tm-rail form.tm-rail-out {
   padding: 0.35rem 0 1rem;
   scrollbar-width: thin;
   scrollbar-color: var(--pocket-scroll-thumb) transparent;
+  transition: flex-basis 0.22s ease, width 0.22s ease, min-width 0.22s ease;
 }
 
 .tm-sidebar::-webkit-scrollbar {
@@ -467,6 +749,114 @@ aside.tm-rail form.tm-rail-out {
 }
 .tm-sidebar::-webkit-scrollbar-thumb {
   background: var(--pocket-scroll-thumb);
+}
+
+/* collapse station network → thin file-menu rail */
+.tm-nav-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: calc(100% - 0.5rem);
+  margin: 0.15rem 0.25rem 0.45rem;
+  padding: 0.35rem 0.25rem;
+  box-sizing: border-box;
+  font-family: "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.06em;
+  color: var(--tm-fg-dim);
+  background: color-mix(in srgb, var(--tm-accent) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tm-line) 80%, transparent);
+  cursor: pointer;
+}
+
+.tm-nav-collapse:hover {
+  color: var(--tm-hot);
+  border-color: var(--tm-accent);
+  background: color-mix(in srgb, var(--tm-accent) 18%, transparent);
+}
+
+.tm-nav-collapse-icon {
+  font-size: 0.55rem;
+  line-height: 1;
+}
+
+.tm-workspace.is-nav-collapsed .tm-sidebar,
+.tm-sidebar.is-collapsed {
+  flex: 0 0 2.55rem;
+  width: 2.55rem;
+  min-width: 2.55rem;
+  max-width: 2.55rem;
+  padding: 0.25rem 0 0.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.tm-workspace.is-nav-collapsed .tm-nav-collapse,
+.tm-sidebar.is-collapsed .tm-nav-collapse {
+  width: calc(100% - 0.2rem);
+  margin: 0.1rem 0.1rem 0.35rem;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.4rem 0.1rem;
+  font-size: 0.32rem;
+}
+
+.tm-workspace.is-nav-collapsed .tm-nav-collapse-label,
+.tm-sidebar.is-collapsed .tm-nav-collapse-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  letter-spacing: 0.12em;
+}
+
+.tm-sidebar-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.2rem;
+  padding: 0 0.15rem;
+}
+
+.tm-sidebar-mini[hidden] {
+  display: none !important;
+}
+
+.tm-mini-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.85rem;
+  font-family: "Press Start 2P", var(--tm-font-ui), monospace;
+  font-size: 0.42rem;
+  color: var(--tm-fg-dim);
+  text-decoration: none;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.tm-mini-link:hover {
+  color: var(--tm-hot);
+  border-color: color-mix(in srgb, var(--tm-accent) 50%, transparent);
+  background: color-mix(in srgb, var(--tm-accent) 12%, transparent);
+}
+
+.tm-mini-link.is-active {
+  color: var(--tm-hot);
+  border-color: var(--tm-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tm-accent) 30%, transparent);
+}
+
+.tm-mini-dot {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.15rem;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--tm-hot);
+  box-shadow: 0 0 6px var(--tm-accent);
 }
 
 .tm-center {

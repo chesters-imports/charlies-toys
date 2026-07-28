@@ -1,4 +1,4 @@
-# Runtime / agent noise
+﻿# Runtime / agent noise
 **/__pycache__/
 *.py[cod]
 *.log
@@ -11,7 +11,7 @@ sdk-import-station/work/wip/
 sdk-import-station/work/catalog.json
 sdk-import-station/work/catalog.md
 
-# Life paper / ineffable capture — local only until Hands says publish
+# Life paper / ineffable capture â€” local only until Hands says publish
 sdk-import-station/paper/
 ineffable-box/prod/paper/
 
@@ -30,3 +30,9 @@ sdk-import-station/desk-server.err
 # Station mail payloads (local narrative)
 sdk-import-station/mail/messages/*.json
 
+# Operator mats / papers — local only for now (un-ignore later when Hands wants them on the boat)
+**/safe_box/**
+!**/safe_box/.gitkeep
+**/paper/
+# Live operator books (mats)
+meta-time-machine/prod/books/

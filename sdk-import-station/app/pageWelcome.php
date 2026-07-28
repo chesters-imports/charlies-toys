@@ -13,6 +13,9 @@ if (function_exists('sdk_station_meta')) {
 $candidates = match ($which) {
     'ab' => [$root . '/land/welcome-ab.html', $root . '/land/welcome.html'],
     'cu' => [$root . '/land/welcome-cu.html', $root . '/land/welcome.html'],
+    'dr' => [$root . '/land/welcome-dr.html', $root . '/land/welcome.html'],
+    'rx' => [$root . '/land/welcome-rx.html', $root . '/land/welcome.html'],
+    'dc' => [$root . '/land/welcome-dc.html', $root . '/land/welcome.html'],
     default => [$root . '/land/welcome.html'],
 };
 $landFile = null;

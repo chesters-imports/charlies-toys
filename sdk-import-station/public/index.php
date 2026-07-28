@@ -176,10 +176,23 @@ foreach (sdk_station_order() as $sid) {
         'chip' => $sm['chip'] ?? strtoupper($sid),
         'label' => $sm['label'] ?? $sid,
         'user' => $sm['user'] ?? '',
+        'face' => $sm['face'] ?? '',
+        'skin' => (string) ($sm['skin'] ?? $sid),
         'href' => sdk_href($targetRoom, ['station' => $sid]),
         'on' => $sid === $stationId,
     ];
 }
+// Current chip pinned to top of the fan (click again to close).
+$stationPickerOn = [];
+$stationPickerOff = [];
+foreach ($stationPicker as $spRow) {
+    if (!empty($spRow['on'])) {
+        $stationPickerOn[] = $spRow;
+    } else {
+        $stationPickerOff[] = $spRow;
+    }
+}
+$stationPicker = array_merge($stationPickerOn, $stationPickerOff);
 
 $importsOpen = $showImports && ($room === 'desk' || $room === 'active' || $room === 'search');
 $filesOpen = ($room === 'files');
@@ -206,6 +219,9 @@ try {
   <link rel="stylesheet" href="/shell/skin-io.css">
   <link rel="stylesheet" href="/shell/skin-ab.css">
   <link rel="stylesheet" href="/shell/skin-cu.css">
+  <link rel="stylesheet" href="/shell/skin-dr.css">
+  <link rel="stylesheet" href="/shell/skin-rx.css">
+  <link rel="stylesheet" href="/shell/skin-dc.css">
   <!-- Tool layout + flatten nested boxes only -->
   <link rel="stylesheet" href="/logImport.css">
   <link rel="stylesheet" href="/shell/sdk-cognition.css">
@@ -230,88 +246,137 @@ try {
 </header>
 
 <div class="tm-app">
-  <aside class="tm-rail" aria-label="Session rail">
-    <?php /* Chip opens station picker — pick IOX / ABX / CUX (not color-wheel). */ ?>
+  <aside class="tm-rail" id="sessionRail" aria-label="Session rail">
+    <?php /* Chip fan: current pinned top · click → chippies slide open down the rail */ ?>
     <div class="tm-rail-brand tm-rail-chip-wrap">
-      <button
-        type="button"
-        class="tm-rail-iox tm-rail-chip-btn"
-        id="stationChipBtn"
+      <div
+        class="tm-rail-chip-fan"
+        id="stationChipFan"
+        role="toolbar"
+        aria-label="Station chips"
         aria-expanded="false"
-        aria-controls="stationChipMenu"
-        aria-haspopup="true"
-        title="open stations"
       >
-        <span class="tm-rail-gt" aria-hidden="true">&gt;|</span>
-        <span class="tm-rail-iox-label"><?= $h($chip) ?></span>
-      </button>
-      <div class="tm-station-menu" id="stationChipMenu" hidden role="menu" aria-label="Stations">
-        <div class="tm-station-menu-head">STATIONS</div>
-        <?php foreach ($stationPicker as $sp): ?>
+        <?php
+        $fanI = 0;
+        foreach ($stationPicker as $sp):
+            $spSkin = $sp['skin'] ?? $sp['id'];
+            $isOn = !empty($sp['on']);
+            $fanStyle = $isOn ? '' : '--fan-i:' . $fanI;
+            if (!$isOn) {
+                $fanI++;
+            }
+            $faceBit = (string) ($sp['face'] ?? $sp['user'] ?? '');
+            if (strlen($faceBit) > 9) {
+                $faceBit = substr($faceBit, 0, 8) . '…';
+            }
+            ?>
+          <?php if ($isOn): ?>
+          <button
+            type="button"
+            class="tm-rail-chip-slot is-current"
+            id="stationChipBtn"
+            data-station="<?= $h($sp['id']) ?>"
+            data-skin="<?= $h($spSkin) ?>"
+            aria-expanded="false"
+            aria-controls="stationChipFan"
+            title="open station chips · click again to close"
+          >
+            <span class="tm-chip-glass" aria-hidden="true"></span>
+            <span class="tm-chip-bezel" aria-hidden="true"></span>
+            <span class="tm-rail-gt" aria-hidden="true">&gt;|</span>
+            <span class="tm-rail-iox-label"><?= $h($sp['chip']) ?></span>
+            <span class="tm-chip-face"><?= $h($faceBit !== '' ? $faceBit : $sp['user']) ?></span>
+          </button>
+          <?php else: ?>
           <a
-            role="menuitem"
-            class="tm-station-item<?= !empty($sp['on']) ? ' is-on' : '' ?>"
+            class="tm-rail-chip-slot is-other"
             href="<?= $h($sp['href']) ?>"
             data-station="<?= $h($sp['id']) ?>"
+            data-skin="<?= $h($spSkin) ?>"
+            style="<?= $h($fanStyle) ?>"
+            title="<?= $h($sp['label'] . ' · ' . $sp['user']) ?>"
+            tabindex="-1"
           >
-            <span class="tm-station-chip"><?= $h($sp['chip']) ?></span>
-            <span class="tm-station-meta">
-              <span class="tm-station-label"><?= $h($sp['label']) ?></span>
-              <span class="tm-station-user"><?= $h($sp['user']) ?></span>
-            </span>
-            <?php if (!empty($sp['on'])): ?>
-              <span class="tm-station-here" aria-hidden="true">·</span>
-            <?php endif; ?>
+            <span class="tm-chip-glass" aria-hidden="true"></span>
+            <span class="tm-chip-bezel" aria-hidden="true"></span>
+            <span class="tm-rail-gt" aria-hidden="true">&gt;|</span>
+            <span class="tm-rail-iox-label"><?= $h($sp['chip']) ?></span>
+            <span class="tm-chip-face"><?= $h($faceBit !== '' ? $faceBit : $sp['user']) ?></span>
           </a>
+          <?php endif; ?>
         <?php endforeach; ?>
       </div>
     </div>
-    <div class="tm-rail-face">
+    <div class="tm-rail-face tm-rail-when-closed">
       <span class="tm-rail-face-l">U</span>
       <span class="tm-rail-face-n"><?= $h($face) ?></span>
     </div>
-    <div class="tm-rail-ghost" aria-hidden="true"><?= $h($ghost) ?></div>
-    <div class="tm-rail-fill"></div>
-    <div class="tm-rail-foot" aria-hidden="true"><?= $h($foot) ?></div>
+    <div class="tm-rail-ghost tm-rail-when-closed" aria-hidden="true"><?= $h($ghost) ?></div>
+    <div class="tm-rail-fill tm-rail-when-closed"></div>
+    <div class="tm-rail-foot tm-rail-when-closed" aria-hidden="true"><?= $h($foot) ?></div>
   </aside>
 
-  <div class="tm-workspace">
-    <aside class="tm-sidebar" aria-label="Station tree">
-      <div class="tm-page-title flicker">STATION<br>NETWORK</div>
-      <div class="tm-logged">
-        LOGGED IN AS: <strong><?= $h($userLabel) ?></strong>
+  <div class="tm-workspace" id="stationWorkspace">
+    <aside class="tm-sidebar" id="stationSidebar" aria-label="Station tree">
+      <button
+        type="button"
+        class="tm-nav-collapse"
+        id="navCollapseBtn"
+        aria-expanded="true"
+        aria-controls="stationSidebar"
+        title="collapse station network · more room to write"
+      >
+        <span class="tm-nav-collapse-icon" aria-hidden="true">«</span>
+        <span class="tm-nav-collapse-label">hide</span>
+      </button>
+
+      <div class="tm-sidebar-full">
+        <div class="tm-page-title flicker">STATION<br>NETWORK</div>
+        <div class="tm-logged">
+          LOGGED IN AS: <strong><?= $h($userLabel) ?></strong>
+        </div>
+        <nav class="tm-nav-arch" aria-label="Station">
+          <ul>
+            <li class="<?= $room === 'welcome' ? 'is-active' : '' ?>">
+              <a href="<?= $h(sdk_href('welcome')) ?>">WELCOME MESSAGE</a>
+            </li>
+            <li class="<?= $filesOpen ? 'is-active' : '' ?>">
+              <a href="<?= $h(sdk_href('files')) ?>">FILES</a>
+            </li>
+            <li class="<?= $mailOpen ? 'is-active' : '' ?>">
+              <a href="<?= $h(sdk_href('mail')) ?>">MAIL<?= $mailUnread > 0 ? ' · ' . (int) $mailUnread : '' ?></a>
+            </li>
+            <?php if ($showImports): ?>
+            <li class="tm-nav-parent <?= $importsOpen ? 'is-open is-active' : '' ?>">
+              <a href="<?= $h(sdk_href('desk')) ?>">IMPORTS</a>
+              <ul class="tm-nav-sub">
+                <li class="<?= $room === 'desk' ? 'is-active' : '' ?>">
+                  <a href="<?= $h(sdk_href('desk')) ?>">START AN IMPORT</a>
+                </li>
+                <li class="<?= $room === 'active' ? 'is-active' : '' ?>">
+                  <a href="<?= $h(sdk_href('active')) ?>">ACTIVE IMPORTS</a>
+                </li>
+                <li class="<?= $room === 'search' ? 'is-active' : '' ?>">
+                  <a href="<?= $h(sdk_href('search')) ?>">SEARCH GLASS</a>
+                </li>
+              </ul>
+            </li>
+            <li class="<?= $room === 'exports' ? 'is-active' : '' ?>">
+              <a href="<?= $h(sdk_href('exports')) ?>">EXPORTS</a>
+            </li>
+            <?php endif; ?>
+          </ul>
+        </nav>
       </div>
-      <nav class="tm-nav-arch" aria-label="Station">
-        <ul>
-          <li class="<?= $room === 'welcome' ? 'is-active' : '' ?>">
-            <a href="<?= $h(sdk_href('welcome')) ?>">WELCOME MESSAGE</a>
-          </li>
-          <li class="<?= $filesOpen ? 'is-active' : '' ?>">
-            <a href="<?= $h(sdk_href('files')) ?>">FILES</a>
-          </li>
-          <li class="<?= $mailOpen ? 'is-active' : '' ?>">
-            <a href="<?= $h(sdk_href('mail')) ?>">MAIL<?= $mailUnread > 0 ? ' · ' . (int) $mailUnread : '' ?></a>
-          </li>
-          <?php if ($showImports): ?>
-          <li class="tm-nav-parent <?= $importsOpen ? 'is-open is-active' : '' ?>">
-            <a href="<?= $h(sdk_href('desk')) ?>">IMPORTS</a>
-            <ul class="tm-nav-sub">
-              <li class="<?= $room === 'desk' ? 'is-active' : '' ?>">
-                <a href="<?= $h(sdk_href('desk')) ?>">START AN IMPORT</a>
-              </li>
-              <li class="<?= $room === 'active' ? 'is-active' : '' ?>">
-                <a href="<?= $h(sdk_href('active')) ?>">ACTIVE IMPORTS</a>
-              </li>
-              <li class="<?= $room === 'search' ? 'is-active' : '' ?>">
-                <a href="<?= $h(sdk_href('search')) ?>">SEARCH GLASS</a>
-              </li>
-            </ul>
-          </li>
-          <li class="<?= $room === 'exports' ? 'is-active' : '' ?>">
-            <a href="<?= $h(sdk_href('exports')) ?>">EXPORTS</a>
-          </li>
-          <?php endif; ?>
-        </ul>
+
+      <nav class="tm-sidebar-mini" aria-label="Station (collapsed)" hidden>
+        <a class="tm-mini-link<?= $room === 'welcome' ? ' is-active' : '' ?>" href="<?= $h(sdk_href('welcome')) ?>" title="Welcome">W</a>
+        <a class="tm-mini-link<?= $filesOpen ? ' is-active' : '' ?>" href="<?= $h(sdk_href('files')) ?>" title="Files">F</a>
+        <a class="tm-mini-link<?= $mailOpen ? ' is-active' : '' ?>" href="<?= $h(sdk_href('mail')) ?>" title="Mail">M<?= $mailUnread > 0 ? '<span class="tm-mini-dot"></span>' : '' ?></a>
+        <?php if ($showImports): ?>
+        <a class="tm-mini-link<?= $importsOpen ? ' is-active' : '' ?>" href="<?= $h(sdk_href('desk')) ?>" title="Imports">I</a>
+        <a class="tm-mini-link<?= $room === 'exports' ? ' is-active' : '' ?>" href="<?= $h(sdk_href('exports')) ?>" title="Exports">E</a>
+        <?php endif; ?>
       </nav>
     </aside>
 
@@ -348,33 +413,89 @@ try {
 </div>
 
 <script>
-/* Rail chip: open station picker (not color-wheel) */
+/* Station network sidebar collapse · more room to write */
 (function () {
+  var workspace = document.getElementById("stationWorkspace");
+  var sidebar = document.getElementById("stationSidebar");
+  var btn = document.getElementById("navCollapseBtn");
+  var mini = sidebar && sidebar.querySelector(".tm-sidebar-mini");
+  var full = sidebar && sidebar.querySelector(".tm-sidebar-full");
+  if (!workspace || !sidebar || !btn) return;
+
+  var KEY = "sdk_nav_collapsed";
+
+  function setCollapsed(on) {
+    workspace.classList.toggle("is-nav-collapsed", on);
+    sidebar.classList.toggle("is-collapsed", on);
+    btn.setAttribute("aria-expanded", on ? "false" : "true");
+    btn.title = on
+      ? "expand station network"
+      : "collapse station network · more room to write";
+    var icon = btn.querySelector(".tm-nav-collapse-icon");
+    var lab = btn.querySelector(".tm-nav-collapse-label");
+    if (icon) icon.textContent = on ? "»" : "«";
+    if (lab) lab.textContent = on ? "net" : "hide";
+    if (mini) mini.hidden = !on;
+    if (full) full.hidden = on;
+    try {
+      localStorage.setItem(KEY, on ? "1" : "0");
+    } catch (e) {}
+  }
+
+  var start = false;
+  try {
+    start = localStorage.getItem(KEY) === "1";
+  } catch (e) {}
+  setCollapsed(start);
+
+  btn.addEventListener("click", function (e) {
+    e.preventDefault();
+    setCollapsed(!workspace.classList.contains("is-nav-collapsed"));
+  });
+})();
+
+/* Rail chip fan: slide open all station chips down the left rail */
+(function () {
+  var rail = document.getElementById("sessionRail");
+  var fan = document.getElementById("stationChipFan");
   var btn = document.getElementById("stationChipBtn");
-  var menu = document.getElementById("stationChipMenu");
-  if (!btn || !menu) return;
-  function closeMenu() {
-    menu.hidden = true;
-    btn.setAttribute("aria-expanded", "false");
+  if (!rail || !fan || !btn) return;
+
+  function others() {
+    return fan.querySelectorAll(".tm-rail-chip-slot.is-other");
   }
-  function openMenu() {
-    menu.hidden = false;
-    btn.setAttribute("aria-expanded", "true");
+
+  function setOpen(open) {
+    rail.classList.toggle("is-chip-fan", open);
+    fan.setAttribute("aria-expanded", open ? "true" : "false");
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    btn.title = open
+      ? "close station chips · click again"
+      : "open station chips · click again to close";
+    others().forEach(function (el) {
+      el.tabIndex = open ? 0 : -1;
+    });
   }
+
+  function isOpen() {
+    return rail.classList.contains("is-chip-fan");
+  }
+
   btn.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
-    if (menu.hidden) openMenu();
-    else closeMenu();
+    setOpen(!isOpen());
   });
+
   document.addEventListener("click", function (e) {
-    if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) {
-      closeMenu();
-    }
+    if (!isOpen()) return;
+    if (rail.contains(e.target)) return;
+    setOpen(false);
   });
+
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && !menu.hidden) {
-      closeMenu();
+    if (e.key === "Escape" && isOpen()) {
+      setOpen(false);
       btn.focus();
     }
   });
