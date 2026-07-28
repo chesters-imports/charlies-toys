@@ -30,9 +30,13 @@ sdk-import-station/desk-server.err
 # Station mail payloads (local narrative)
 sdk-import-station/mail/messages/*.json
 
-# Operator mats / papers — local only for now (un-ignore later when Hands wants them on the boat)
-**/safe_box/**
-!**/safe_box/.gitkeep
-**/paper/
+
 # Live operator books (mats)
 meta-time-machine/prod/books/
+
+# Operator mats / papers — local only for now (Hands will un-ignore later)
+safe_box/
+**/safe_box/
+paper/
+**/paper/
+
