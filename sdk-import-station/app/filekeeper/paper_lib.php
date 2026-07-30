@@ -235,22 +235,31 @@ function fk_load_stem(string $stem): ?array {
 
 /**
  * @return list<array<string,mixed>> revision rows oldest→newest (ledger-shaped)
+ *
+ * Desk open uses the LAST row here. Files always carry a `head`; some (agent
+ * writes, hand edits) leave `revisions` empty. Without head fallback, click
+ * shows a blank "new file" even though the list title is correct.
  */
 function fk_revisions(string $stem): array {
     $doc = fk_load_stem($stem);
     if (!$doc) {
         return [];
     }
+    $folder = fk_folder_norm((string) ($doc['folder'] ?? ''));
     $revs = $doc['revisions'] ?? [];
     if (!is_array($revs)) {
         $revs = [];
     }
     $out = [];
+    $seenRev = [];
     foreach ($revs as $r) {
         if (!is_array($r)) {
             continue;
         }
         $revN = (int) ($r['rev'] ?? 0);
+        if ($revN < 1) {
+            $revN = count($out) + 1;
+        }
         $cUid = (string) ($r['c_uid'] ?? ($stem . '-r' . $revN));
         $out[] = [
             'c_uid' => $cUid,
@@ -262,10 +271,37 @@ function fk_revisions(string $stem): array {
             'meta_json' => json_encode([
                 'stem_c_uid' => $stem,
                 'rev' => $revN,
-                'folder' => (string) ($doc['folder'] ?? ''),
+                'folder' => $folder,
             ], JSON_UNESCAPED_UNICODE),
         ];
+        $seenRev[$revN] = true;
     }
+
+    $head = $doc['head'] ?? null;
+    if (is_array($head) && (($head['title'] ?? '') !== '' || ($head['body'] ?? '') !== '')) {
+        $headRev = (int) ($head['rev'] ?? 0);
+        if ($headRev < 1) {
+            $headRev = $out ? (max(array_keys($seenRev) ?: [0]) + 1) : 1;
+        }
+        // Prefer head when no revisions, or when head is a newer rev than last revision row
+        $needHead = !$out || empty($seenRev[$headRev]);
+        if ($needHead) {
+            $out[] = [
+                'c_uid' => (string) ($head['c_uid'] ?? ($stem . '-r' . $headRev)),
+                'topic' => (string) ($head['title'] ?? ''),
+                'body' => (string) ($head['body'] ?? ''),
+                'tags_raw' => (string) ($head['tags_raw'] ?? ''),
+                'event_unix' => (int) ($head['event_unix'] ?? 0),
+                'ingest_unix' => (int) ($head['saved_at'] ?? 0),
+                'meta_json' => json_encode([
+                    'stem_c_uid' => $stem,
+                    'rev' => $headRev,
+                    'folder' => $folder,
+                ], JSON_UNESCAPED_UNICODE),
+            ];
+        }
+    }
+
     return $out;
 }
 
