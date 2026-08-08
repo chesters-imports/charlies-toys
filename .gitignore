@@ -40,3 +40,9 @@ safe_box/
 paper/
 **/paper/
 
+
+hermes/prod/_err.txt
+hermes/prod/_out.txt
+hermes/prod/_launch_test.log
+*.log
+
