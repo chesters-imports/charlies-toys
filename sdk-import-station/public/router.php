@@ -11,7 +11,7 @@ if ($path === '/api/health' || $path === '/health') {
         'ok' => true,
         'rom' => 'sdk-import-station',
         'service' => 'iox',
-        'rooms' => ['welcome', 'files', 'mail', 'desk', 'active', 'search', 'exports'],
+        'rooms' => ['welcome', 'files', 'mail', 'dossier', 'desk', 'active', 'search', 'exports'],
         'paper' => defined('SDK_PAPER_ROOT') ? SDK_PAPER_ROOT : null,
         'media' => defined('SDK_MEDIA_ROOT') ? SDK_MEDIA_ROOT : null,
         'mail' => true,

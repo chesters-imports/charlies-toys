@@ -1,0 +1,65 @@
+{
+    "schema": "dossier.ab.v1",
+    "station": "ab",
+    "version": 1,
+    "updated": 1785459389,
+    "persons": [],
+    "factions": [
+        {
+            "id": "f_5f386e01",
+            "name": "Jack's Cross",
+            "status": "active",
+            "morality": "self-run",
+            "body": "Who bears Jack's Cross? And do they mingle like a faction, or like enemies in the same room?",
+            "updated": 1785459368,
+            "created": 1785458171
+        },
+        {
+            "id": "f_cce4de75",
+            "name": "Mystic Flameless",
+            "status": "unsure",
+            "morality": "adversary",
+            "body": "Flameless or inflamed? A group of witch-adjacent community goers. Are they a cult, or a gathering? Did they intend harm, or just end up there? Another large emergence node.",
+            "updated": 1785458799,
+            "created": 1785458140
+        },
+        {
+            "id": "f_3e286e71",
+            "name": "Seven Snakes",
+            "status": "unsure",
+            "morality": "adversary",
+            "body": "A motley crew of generation women who believe the heart of Misery belongs to them.",
+            "updated": 1785459374,
+            "created": 1785458069
+        },
+        {
+            "id": "f_bafb1920",
+            "name": "Stone Boys",
+            "status": "active",
+            "morality": "adversary",
+            "body": "They act like they might give you something real, but in the end they all turn to stone. Medusa didn't turn them to stone, they were always destined to become Stone Boys.",
+            "updated": 1785459359,
+            "created": 1785458020
+        },
+        {
+            "id": "f_9e3a7089",
+            "name": "The Tree People",
+            "status": "dissolved",
+            "morality": "friendly",
+            "body": "Educators or indoctrinators? You feel the sense of community, but at what cost? A terrible emergence point.",
+            "updated": 1785459383,
+            "created": 1785457975
+        },
+        {
+            "id": "f_13bb1fbe",
+            "name": "Geometry Bros",
+            "status": "active",
+            "morality": "friendly",
+            "body": "A group of men who are sure that the dots and lines mean more than the mind that made them.",
+            "updated": 1785459389,
+            "created": 1785457933
+        }
+    ],
+    "memberships": [],
+    "notes": []
+}

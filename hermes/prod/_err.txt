@@ -1,0 +1,5 @@
+[pywebview] Using WinForms / Chromium
+[pywebview] before_load event fired. injecting pywebview object
+[pywebview] Loading JS files from C:\Users\theda\AppData\Local\Programs\Python\Python312\Lib\site-packages\webview\js
+[pywebview] _pywebviewready event fired
+[pywebview] loaded event fired

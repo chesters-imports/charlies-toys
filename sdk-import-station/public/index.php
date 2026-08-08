@@ -57,7 +57,10 @@ if (in_array($room, ['file', 'filekeeper', 'fk'], true)) {
 if (in_array($room, ['email', 'inbox'], true)) {
     $room = 'mail';
 }
-if (!in_array($room, ['welcome', 'files', 'mail', 'desk', 'active', 'exports', 'import', 'search', 'find', 'hunt'], true)) {
+if (in_array($room, ['dossierdesk', 'dd', 'factions'], true)) {
+    $room = 'dossier';
+}
+if (!in_array($room, ['welcome', 'files', 'mail', 'desk', 'active', 'exports', 'import', 'search', 'find', 'hunt', 'dossier'], true)) {
     $room = 'welcome';
 }
 if ($room === 'import') {
@@ -69,18 +72,28 @@ if (in_array($room, ['find', 'hunt'], true)) {
 
 // AB (show_imports=0): no glass import/export toolkit — Sam's desk only on IO
 $showImports = (($st['show_imports'] ?? '1') === '1');
+// Dossier is AB (and future red desks) — not glass
+$showDossier = ($stationId === 'ab' || $room === 'dossier');
 if (!$showImports && in_array($room, ['desk', 'active', 'exports', 'search'], true)) {
     $room = 'files';
+}
+if ($room === 'dossier' && $stationId !== 'ab') {
+    // force AB when opening dossier
+    $_GET['station'] = 'ab';
+    $stationId = 'ab';
+    $st = sdk_station_meta('ab');
 }
 
 $li = dirname(__DIR__) . '/app/logimport';
 $fk = dirname(__DIR__) . '/app/filekeeper';
+$dd = dirname(__DIR__) . '/app/dossier';
 $app = dirname(__DIR__) . '/app';
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && $room !== 'welcome') {
     $isFileKeeper = isset($_POST['filekeeper_action'])
         || $room === 'files';
     $isMail = isset($_POST['mail_action']) || $room === 'mail';
+    $isDossier = isset($_POST['dd_action']) || $room === 'dossier';
     $isExportStatus = isset($_POST['mark_complete'])
         || isset($_POST['mark_in_progress'])
         || (isset($_POST['logimport_export_action']) && (string) $_POST['logimport_export_action'] !== '');
@@ -88,6 +101,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && $room !== 'welcome') {
         require $app . '/mail/actorMail.php';
         // actor redirects
         $room = 'mail';
+    } elseif ($isDossier) {
+        require $dd . '/actorDesk.php';
+        $room = 'dossier';
     } elseif ($isFileKeeper) {
         require $fk . '/actorDesk.php';
         // if actor set error without redirect, stay on files
@@ -109,6 +125,8 @@ if ($room === 'welcome') {
     require $fk . '/pageDesk.php';
 } elseif ($room === 'mail') {
     require $app . '/mail/pageMail.php';
+} elseif ($room === 'dossier') {
+    require $dd . '/pageDesk.php';
 } elseif ($room === 'active') {
     require $li . '/pageActive.php';
 } elseif ($room === 'exports') {
@@ -126,6 +144,7 @@ $roomDisplay = match ($room) {
     'welcome' => 'Welcome',
     'files' => 'Files',
     'mail' => 'Mail',
+    'dossier' => 'Dossier',
     'active' => 'Active imports',
     'exports' => 'Exports',
     'search' => 'Search glass',
@@ -135,6 +154,7 @@ $roomSlug = match ($room) {
     'welcome' => 'welcome',
     'files' => 'files',
     'mail' => 'mail',
+    'dossier' => 'dossier',
     'active' => 'imports-active',
     'exports' => 'exports',
     'search' => 'search',
@@ -150,6 +170,7 @@ $foot = $st['foot'];
 $hint = match ($room) {
     'files' => $st['hint_files'],
     'mail' => 'station wire · mail/{messages}',
+    'dossier' => 'people · factions · membership · field notes',
     default => $st['hint_else'],
 };
 $face = $st['face'];
@@ -346,6 +367,11 @@ try {
             <li class="<?= $mailOpen ? 'is-active' : '' ?>">
               <a href="<?= $h(sdk_href('mail')) ?>">MAIL<?= $mailUnread > 0 ? ' · ' . (int) $mailUnread : '' ?></a>
             </li>
+            <?php if ($stationId === 'ab'): ?>
+            <li class="<?= $room === 'dossier' ? 'is-active' : '' ?>">
+              <a href="<?= $h(sdk_href('dossier', ['station' => 'ab'])) ?>">DOSSIER</a>
+            </li>
+            <?php endif; ?>
             <?php if ($showImports): ?>
             <li class="tm-nav-parent <?= $importsOpen ? 'is-open is-active' : '' ?>">
               <a href="<?= $h(sdk_href('desk')) ?>">IMPORTS</a>
@@ -373,6 +399,9 @@ try {
         <a class="tm-mini-link<?= $room === 'welcome' ? ' is-active' : '' ?>" href="<?= $h(sdk_href('welcome')) ?>" title="Welcome">W</a>
         <a class="tm-mini-link<?= $filesOpen ? ' is-active' : '' ?>" href="<?= $h(sdk_href('files')) ?>" title="Files">F</a>
         <a class="tm-mini-link<?= $mailOpen ? ' is-active' : '' ?>" href="<?= $h(sdk_href('mail')) ?>" title="Mail">M<?= $mailUnread > 0 ? '<span class="tm-mini-dot"></span>' : '' ?></a>
+        <?php if ($stationId === 'ab'): ?>
+        <a class="tm-mini-link<?= $room === 'dossier' ? ' is-active' : '' ?>" href="<?= $h(sdk_href('dossier', ['station' => 'ab'])) ?>" title="Dossier">D</a>
+        <?php endif; ?>
         <?php if ($showImports): ?>
         <a class="tm-mini-link<?= $importsOpen ? ' is-active' : '' ?>" href="<?= $h(sdk_href('desk')) ?>" title="Imports">I</a>
         <a class="tm-mini-link<?= $room === 'exports' ? ' is-active' : '' ?>" href="<?= $h(sdk_href('exports')) ?>" title="Exports">E</a>

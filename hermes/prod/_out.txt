@@ -1,0 +1,14 @@
+the-deck-host: frameless=ON  devtools=ON
+  caption: gem menu · Alt+M · Ctrl+N new · drag · size · Ctrl± zoom · F11 deep · Esc surface
+  profiles: desk · datbox · office · companion/rail
+[deck-host] starting ROM process in C:\ALICE_BOX\charlies-toys\hermes\prod\box_sys
+[deck-host]   C:\Users\theda\AppData\Local\Programs\Python\Python312\python.exe server.py
+[deck-host] ROM pid=36964 argv=['C:\\Users\\theda\\AppData\\Local\\Programs\\Python\\Python312\\python.exe', 'server.py'] cwd=C:\ALICE_BOX\charlies-toys\hermes\prod\box_sys
+[deck-host] ROM log  C:\ALICE_BOX\charlies-toys\hermes\prod\box_sys\desk-server.log
+[deck-host] waiting for http://127.0.0.1:43169/api/health …
+[deck-host] ROM is up
+[deck-host] profile=desk  mode=standard  size=520x720  tiers compact=640x660 standard=520x720 expanded=568x960  min=640x480  on_top=False
+[deck-host] caption inject try=0 result=None
+[deck-host] startup window mode → standard:640x720
+[deck-host] caption inject try=1 result=None
+[deck-host] startup window mode → standard:640x720

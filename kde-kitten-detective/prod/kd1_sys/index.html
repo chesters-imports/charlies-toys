@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detective K · Kitten Noir</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Special+Elite&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body class="kd1">
+  <header class="kd-bar" data-deck-chrome>
+    <span class="kd-logo" data-deck-menu title="CO.KDE-002-KD1">KDE <strong>DETECTIVE K</strong></span>
+    <span class="kd-drag" data-deck-drag aria-hidden="true"></span>
+    <div class="kd-win" data-deck-window-controls></div>
+  </header>
+
+  <main class="kd-main" id="app">
+    <!-- TITLE -->
+    <section class="screen screen-title is-on" id="screenTitle" aria-label="title">
+      <div class="title-fog" aria-hidden="true"></div>
+      <div class="title-card">
+        <p class="title-sku">CO.KDE-002-KD1</p>
+        <h1 class="title-h">DETECTIVE&nbsp;K</h1>
+        <p class="title-sub">Kitten Noir · Chapter I</p>
+        <p class="title-whisper">A strange town. A detective who can’t remember her own name.<br />The cases keep looping.</p>
+        <button type="button" class="btn-start" id="btnStart">OPEN THE OFFICE</button>
+        <p class="title-hint">click the room · when someone knocks, answer (door or knock…)</p>
+      </div>
+      <div class="title-silhouette" aria-hidden="true">
+        <div class="sil-head"></div>
+        <div class="sil-ears"></div>
+        <div class="sil-body"></div>
+      </div>
+    </section>
+
+    <!-- OFFICE · pocket 800×600 dense set -->
+    <section class="screen screen-office" id="screenOffice" aria-label="office" hidden>
+      <div class="office-room">
+        <!-- back wall + rain window -->
+        <div class="wall" aria-hidden="false">
+          <button type="button" class="hotspot win" id="hotWindow" title="window" aria-label="look out window">
+            <div class="win-frame">
+              <div class="blinds" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <div class="window-rain" aria-hidden="true"></div>
+            </div>
+          </button>
+          <div class="neon-sign" aria-hidden="true">CASE<br />STREET</div>
+          <button type="button" class="hotspot clock" id="officeClock" title="clock">2:17</button>
+        </div>
+
+        <!-- door on left -->
+        <button type="button" class="door hotspot" id="hotDoor" title="office door" aria-label="office door">
+          <span class="door-panel"></span>
+          <span class="door-knob"></span>
+        </button>
+
+        <!-- cork hangs on wall, right -->
+        <aside class="cork" aria-label="cork board">
+          <div class="cork-frame">
+            <div class="cork-title">OPEN LOOPS</div>
+            <button type="button" class="pin pin-a" data-inspect="pin-who">who am I</button>
+            <button type="button" class="pin pin-b" data-inspect="pin-case">78 Case St</button>
+            <button type="button" class="pin pin-c" data-inspect="pin-q">???</button>
+            <div class="string s1" aria-hidden="true"></div>
+            <div class="string s2" aria-hidden="true"></div>
+          </div>
+        </aside>
+
+        <!-- big desk fills lower half -->
+        <div class="desk">
+          <div class="desk-top">
+            <button type="button" class="lamp hotspot" id="hotLamp" title="desk lamp" aria-label="lamp">
+              <div class="lamp-shade"></div>
+              <div class="lamp-glow" id="lampGlow"></div>
+              <div class="lamp-arm"></div>
+              <div class="lamp-base"></div>
+            </button>
+
+            <button type="button" class="phone hotspot" id="hotPhone" title="talk box" aria-label="talk box">
+              <div class="phone-handset"></div>
+              <div class="phone-body"></div>
+            </button>
+
+            <div class="blotter">
+              <div class="blotter-stain" aria-hidden="true"></div>
+              <p class="blotter-note" id="blotterNote">
+                Office open.<br />
+                <span class="dim">Click props · cork · door. Knock when the hall gets weird.</span>
+              </p>
+            </div>
+
+            <button type="button" class="in-tray hotspot" id="inTray" title="IN tray">
+              <div class="tray-label">IN</div>
+              <div class="paper p1"></div>
+              <div class="paper p2"></div>
+              <div class="paper p3" id="trayPaperTop"></div>
+              <span class="tray-badge" id="trayBadge" hidden>1</span>
+            </button>
+
+            <button type="button" class="mug hotspot" id="hotMug" title="mug" aria-label="coffee mug">
+              <span class="mug-body"></span>
+              <span class="mug-handle"></span>
+            </button>
+
+            <div class="nameplate hotspot" id="hotName" title="desk plate" role="button" tabindex="0">
+              <span class="nameplate-text" id="nameplateText">DETECTIVE ???</span>
+            </div>
+          </div>
+          <div class="desk-front" aria-hidden="true"></div>
+        </div>
+
+        <div class="chair" aria-hidden="true">
+          <div class="chair-back"></div>
+          <div class="chair-seat"></div>
+          <div class="chair-leg"></div>
+        </div>
+
+        <button type="button" class="floor-cat hotspot" id="hotCat" title="cat??" aria-label="cat under desk">
+          <span class="cat-body"></span>
+          <span class="cat-head"></span>
+          <span class="cat-ear l"></span>
+          <span class="cat-ear r"></span>
+          <span class="cat-tail"></span>
+        </button>
+      </div>
+
+      <footer class="office-bar">
+        <button type="button" class="btn-ghost" id="btnTitle">← title</button>
+        <span class="office-status" id="officeStatus">desk idle · CO.KDE-002-KD1</span>
+        <button type="button" class="btn-ghost" id="btnKnock" title="someone at the door">knock…</button>
+      </footer>
+    </section>
+
+    <!-- PAPER / DOSSIER OVERLAY -->
+    <div class="dossier" id="dossier" hidden>
+      <div class="dossier-card" role="dialog" aria-labelledby="dossierTitle">
+        <div class="dossier-clip" aria-hidden="true"></div>
+        <p class="dossier-id" id="dossierId">FILE —</p>
+        <h2 class="dossier-title" id="dossierTitle">—</h2>
+        <div class="dossier-body" id="dossierBody"></div>
+        <div class="dossier-actions">
+          <button type="button" class="btn-start btn-sm" id="dossierPin">pin to cork</button>
+          <button type="button" class="btn-ghost" id="dossierClose">close</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

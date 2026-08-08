@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hermes · CO.TOY-005-HERMES</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body class="hm">
+  <header class="hm-chrome" data-deck-chrome>
+    <span class="hm-chip" data-deck-menu>CHARLIE<strong>'S</strong></span>
+    <span class="hm-drag" data-deck-drag>HERMES · MAIL</span>
+    <div class="hm-win" data-deck-window-controls></div>
+  </header>
+
+  <main class="hm-desk">
+    <article class="hm-card">
+      <h1 class="hm-title">Write someone</h1>
+      <p class="hm-whisper">Hermes still delivers letters — not just action notes. Address is the desk mailbox (e.g. <code>ADM.casestreet</code>). Pocket Desktop must be running. For filing papers you already have: drop them on the CASE STREET MAIL box on the desk.</p>
+
+      <label class="hm-label">To (mailbox address)
+        <input id="addr" class="hm-input" type="text" spellcheck="false" placeholder="ADM.casestreet" autocomplete="off" />
+      </label>
+
+      <label class="hm-label">From
+        <input id="from" class="hm-input" type="text" value="Hermes" />
+      </label>
+
+      <label class="hm-label">Subject
+        <input id="subj" class="hm-input" type="text" placeholder="a real letter, if you dare" />
+      </label>
+
+      <label class="hm-label">Letter body
+        <textarea id="body" class="hm-area" rows="10" placeholder="say something soft · or ship a page · he was a lover first…"></textarea>
+      </label>
+
+      <div class="hm-actions">
+        <button type="button" class="hm-btn" id="btnSend">SEND WITH CARE</button>
+        <button type="button" class="hm-btn hm-btn-ghost" id="btnRefresh">refresh mailboxes</button>
+      </div>
+
+      <p class="hm-status" id="status">waiting for a letter…</p>
+      <ul class="hm-inboxes" id="inboxList"></ul>
+    </article>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

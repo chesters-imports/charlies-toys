@@ -41,8 +41,13 @@ def main() -> int:
     print(f"[serve_rom] {' '.join(argv)}", flush=True)
     # replace this process with php so host kill tree hits php
     if sys.platform == "win32":
-        # Windows has no execvp for different image cleanly — run as child and wait
-        p = subprocess.Popen(argv, cwd=str(ROOT))
+        # Quiet: no PHP console flash (BUG02). Deck Host also CREATE_NO_WINDOW parent.
+        kwargs: dict = {"cwd": str(ROOT)}
+        cf = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+        if cf:
+            kwargs["creationflags"] = cf
+        # Log PHP stdout into desk-server.log via parent — inherit if host redirected
+        p = subprocess.Popen(argv, **kwargs)
         return int(p.wait() or 0)
     os.execv(PHP, argv)
     return 1

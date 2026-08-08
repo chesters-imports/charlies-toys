@@ -104,7 +104,7 @@ function sdk_station_defs(): array {
             'hint_files' => 'paper/ab',
             'hint_else' => 'leeks · agents · the line',
             'deck_chip' => "CHESTER'S IMPORTS",
-            // toolkit: files now; dossier later — not Sam's glass import/export
+            // toolkit: files + dossier (REQ-006) — not Sam's glass import/export
             'show_imports' => '0',
             'welcome' => 'ab',
         ],
@@ -304,6 +304,7 @@ function sdk_href(string $room, array $q = []): string {
         'welcome', 'land', 'home' => '/?room=welcome',
         'files', 'file', 'filekeeper', 'fk' => '/?room=files',
         'mail', 'email', 'inbox' => '/?room=mail',
+        'dossier', 'dossierdesk', 'dd', 'factions' => '/?room=dossier',
         'import', 'desk' => '/?room=desk',
         'active', 'imports-active' => '/?room=active',
         'exports' => '/?room=exports',

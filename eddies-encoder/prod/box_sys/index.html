@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Eddy's Encoder · CO.TOY-004-EEE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body class="ee">
+  <div class="ee-atmosphere" aria-hidden="true">
+    <div class="ee-atm-a"></div>
+    <div class="ee-atm-b"></div>
+  </div>
+
+  <header class="ee-chrome" data-deck-chrome>
+    <span class="ee-chip" data-deck-menu>CHARLIE<strong>'S</strong></span>
+    <span class="ee-drag" data-deck-drag>EDDY · ENCODER · EEE</span>
+    <div class="ee-win" data-deck-window-controls></div>
+  </header>
+
+  <main class="ee-desk">
+    <!-- LEFT: stamp machine only -->
+    <aside class="ee-col-machine">
+      <article class="ee-machine" aria-label="Strange pull machine">
+        <div class="ee-machine-tag">KARAOKE STAMP</div>
+        <div class="ee-machine-slot">
+          <div class="ee-kven-face" id="pullFace">— — —</div>
+        </div>
+        <div class="ee-machine-levers">
+          <button type="button" class="ee-lever" id="btnPull">PULL</button>
+          <button type="button" class="ee-lever ee-lever-use" id="btnUsePull">USE</button>
+          <button type="button" class="ee-lever ee-lever-own" id="btnOwn">OWN</button>
+        </div>
+        <p class="ee-machine-whisper">Eddie was never Kevin. Pull · use · bag. LLL-DDD.</p>
+        <button type="button" class="ee-new-slip" id="btnNew">+ new creature</button>
+      </article>
+      <p class="ee-desk-note" id="statusLine">click a card to open · bag holds the rest</p>
+    </aside>
+
+    <!-- RIGHT: index only — dense, scrollable -->
+    <section class="ee-col-bag" aria-label="Bag of cards">
+      <div class="ee-stack-rail">
+        <span class="ee-stack-title">INDEX</span>
+        <input type="search" id="searchQ" class="ee-stack-search" placeholder="find…" />
+        <span class="ee-stack-count" id="bagCount">0</span>
+      </div>
+      <div class="ee-cards" id="entryList"></div>
+    </section>
+  </main>
+
+  <!-- modal: slip + links when a card is open -->
+  <div class="ee-modal" id="creatureModal" hidden>
+    <div class="ee-modal-scrim" id="modalScrim"></div>
+    <div class="ee-modal-sheet" role="dialog" aria-labelledby="modalTitle">
+      <header class="ee-modal-bar">
+        <span class="ee-modal-title" id="modalTitle">CREATURE SLIP</span>
+        <button type="button" class="ee-modal-x" id="btnCloseModal" aria-label="Close">×</button>
+      </header>
+
+      <div class="ee-slip ee-slip-in-modal">
+        <div class="ee-slip-body">
+          <label class="ee-field"><span>KVEN</span><input id="fKven" maxlength="7" placeholder="ABC-123" autocomplete="off" /></label>
+          <label class="ee-field"><span>LABEL</span><input id="fLabel" placeholder="guarded true name" autocomplete="off" /></label>
+          <label class="ee-field"><span>ALTS</span><input id="fAlts" placeholder="in-world · comma" autocomplete="off" /></label>
+          <label class="ee-field"><span>MATCHES</span><input id="fMatches" placeholder="log spellings · comma" autocomplete="off" /></label>
+          <label class="ee-field"><span>TYPE</span>
+            <select id="fType">
+              <option>person</option>
+              <option>object</option>
+              <option>event</option>
+              <option>place</option>
+              <option>other</option>
+            </select>
+          </label>
+          <label class="ee-field ee-field-wide"><span>NOTES</span><textarea id="fNotes" rows="2" placeholder="forester crumbs"></textarea></label>
+          <label class="ee-field"><span>FIRST</span><input id="fFirst" placeholder="unix / YYYY-MM-DD" /></label>
+          <label class="ee-field"><span>LAST</span><input id="fLast" placeholder="unix / YYYY-MM-DD" /></label>
+        </div>
+        <footer class="ee-slip-foot">
+          <button type="button" class="ee-stamp-btn" id="btnSave">BAG IT</button>
+          <button type="button" class="ee-ghost-btn" id="btnDelete" hidden>delete</button>
+        </footer>
+      </div>
+
+      <div class="ee-tape" id="linksPanel">
+        <div class="ee-tape-head">
+          TAPE FROM <span id="linkFrom" class="ee-mono">—</span>
+        </div>
+        <p class="ee-tape-help">
+          <strong>Kind</strong> = the relationship (dropdown grows as you invent kinds).
+          <strong>Note</strong> = optional detail (why / when / scene) — not a second kind.
+        </p>
+        <div class="ee-tape-form">
+          <label class="ee-tape-lab"><span>To (KVEN)</span>
+            <input id="linkTo" placeholder="ABC-123" maxlength="7" />
+          </label>
+          <label class="ee-tape-lab"><span>Kind of link</span>
+            <select id="linkType"></select>
+          </label>
+          <label class="ee-tape-lab ee-tape-lab-wide"><span>Note (optional)</span>
+            <input id="linkNote" placeholder="e.g. karaoke night · only in logs as…" />
+          </label>
+          <button type="button" class="ee-stamp-btn ee-stamp-sm" id="btnLink">STICK TAPE</button>
+        </div>
+        <div class="ee-tape-list" id="linkList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ee-toast" id="toast" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>
