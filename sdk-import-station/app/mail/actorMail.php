@@ -18,7 +18,11 @@ if ($action === 'send') {
     if (!$r['ok']) {
         $_SESSION['mail_flash'] = 'err:' . ($r['error'] ?? 'send failed');
     } else {
-        $_SESSION['mail_flash'] = 'ok:sent ' . ($r['mail']['id'] ?? '');
+        $extra = '';
+        if (!empty($r['desk']['leaf_id'])) {
+            $extra = ' · desk ' . $r['desk']['leaf_id'] . ' → ' . ($r['desk']['address'] ?? 'archivist');
+        }
+        $_SESSION['mail_flash'] = 'ok:sent ' . ($r['mail']['id'] ?? '') . $extra;
     }
     header('Location: ' . sdk_href('mail', ['box' => 'sent']));
     exit;

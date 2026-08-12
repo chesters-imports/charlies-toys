@@ -18,31 +18,53 @@
 
   <main class="hm-desk">
     <article class="hm-card">
-      <h1 class="hm-title">Write someone</h1>
-      <p class="hm-whisper">Hermes still delivers letters — not just action notes. Address is the desk mailbox (e.g. <code>ADM.casestreet</code>). Pocket Desktop must be running. For filing papers you already have: drop them on the CASE STREET MAIL box on the desk.</p>
+      <h1 class="hm-title">Write · or ship to an address</h1>
+      <p class="hm-whisper">
+        <strong>On the desk (preferred for parcels):</strong> drag a leaf, card, or envelope onto the
+        <em>HERMES MAIL</em> box on the felt — no list, no hunting.<br /><br />
+        <strong>Letter</strong> — write body here (desk chip or TERMINALS text).<br />
+        <strong>Parcel</strong> — only when you need a <em>different</em> To address (e.g. later
+        <code>k.moire</code>). Pick from the desk catalog. Not TERMINALS.
+      </p>
 
-      <label class="hm-label">To (mailbox address)
-        <input id="addr" class="hm-input" type="text" spellcheck="false" placeholder="ADM.casestreet" autocomplete="off" />
+      <div class="hm-mode" role="tablist" aria-label="send mode">
+        <button type="button" class="hm-mode-btn is-on" data-mode="letter" id="modeLetter">LETTER</button>
+        <button type="button" class="hm-mode-btn" data-mode="parcel" id="modeParcel">PARCEL</button>
+      </div>
+
+      <label class="hm-label">To
+        <input id="addr" class="hm-input" type="text" spellcheck="false" placeholder="the.archivist · or drx (letter only)" autocomplete="off" />
       </label>
 
       <label class="hm-label">From
         <input id="from" class="hm-input" type="text" value="Hermes" />
       </label>
 
-      <label class="hm-label">Subject
-        <input id="subj" class="hm-input" type="text" placeholder="a real letter, if you dare" />
-      </label>
+      <div id="letterFields">
+        <label class="hm-label">Subject
+          <input id="subj" class="hm-input" type="text" placeholder="a real letter, if you dare" />
+        </label>
+        <label class="hm-label">Letter body
+          <textarea id="body" class="hm-area" rows="8" placeholder="say something soft…"></textarea>
+        </label>
+      </div>
 
-      <label class="hm-label">Letter body
-        <textarea id="body" class="hm-area" rows="10" placeholder="say something soft · or ship a page · he was a lover first…"></textarea>
-      </label>
+      <div id="parcelFields" hidden>
+        <label class="hm-label">Parcel from this desk
+          <select id="parcel" class="hm-input hm-select">
+            <option value="">— refresh & pick leaf / card / envelope —</option>
+          </select>
+        </label>
+        <p class="hm-parcel-hint" id="parcelHint">SophiaDesk must be running. Envelope = deck + all papers inside.</p>
+        <button type="button" class="hm-btn hm-btn-ghost hm-btn-block" id="btnCatalog">refresh desk parcels</button>
+      </div>
 
       <div class="hm-actions">
         <button type="button" class="hm-btn" id="btnSend">SEND WITH CARE</button>
         <button type="button" class="hm-btn hm-btn-ghost" id="btnRefresh">refresh mailboxes</button>
       </div>
 
-      <p class="hm-status" id="status">waiting for a letter…</p>
+      <p class="hm-status" id="status">waiting…</p>
       <ul class="hm-inboxes" id="inboxList"></ul>
     </article>
   </main>

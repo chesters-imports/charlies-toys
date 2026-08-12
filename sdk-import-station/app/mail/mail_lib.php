@@ -107,13 +107,18 @@ function sdk_mail_list_for(string $station, string $box = 'inbox'): array {
             continue;
         }
         $m = sdk_mail_normalize($j);
+        // carry desk flags for UI
+        if (!empty($j['desk'])) {
+            $m['desk'] = true;
+            $m['desk_leaf'] = (string) ($j['desk_leaf'] ?? '');
+        }
         if ($box === 'sent') {
             // station-sent only (not external injects, unless from=station)
             if ($m['from'] !== $station) {
                 continue;
             }
         } else {
-            // inbox: to=station
+            // inbox: to=station (desk addresses never appear as station inbox)
             if ($m['to'] !== $station) {
                 continue;
             }
@@ -137,20 +142,109 @@ function sdk_mail_unread_count(string $station): int {
 }
 
 /**
- * Send station → station.
- * @return array{ok:bool,error?:string,mail?:array<string,mixed>}
+ * Desk / Hermes destinations (Sophia inbox addresses).
+ * Not station ids — bridge via Sophia /api/mail/send.
+ */
+function sdk_mail_is_desk_address(string $to): bool {
+    $to = strtolower(trim($to));
+    if ($to === '') {
+        return false;
+    }
+    // explicit desk mailbox
+    if (in_array($to, [
+        'the.archivist',
+        'archivist',
+        'desk',
+        'sophia',
+        'sophiadesk',
+        'adm',
+        'adm.casestreet',
+        'hermes.desk',
+    ], true)) {
+        return true;
+    }
+    // dotted addresses that are not station ids (the.archivist, ADM.something)
+    if (str_contains($to, '.') && !sdk_station_valid($to)) {
+        return true;
+    }
+    return false;
+}
+
+/** Canonical desk address for deliver_mail. */
+function sdk_mail_desk_address(string $to): string {
+    $to = strtolower(trim($to));
+    $map = [
+        'archivist' => 'the.archivist',
+        'desk' => 'the.archivist',
+        'sophia' => 'the.archivist',
+        'sophiadesk' => 'the.archivist',
+        'adm' => 'the.archivist',
+        'adm.casestreet' => 'the.archivist',
+        'hermes.desk' => 'the.archivist',
+    ];
+    return $map[$to] ?? $to;
+}
+
+/**
+ * POST a chip-letter into SophiaDesk (same path Hermes uses).
+ * @return array{ok:bool,error?:string,leaf_id?:string,address?:string}
+ */
+function sdk_mail_bridge_to_desk(
+    string $deskAddress,
+    string $title,
+    string $body,
+    string $fromLabel
+): array {
+    $url = getenv('SOPHIA_DESK_URL') ?: getenv('POCKET_DESKTOP_URL') ?: 'http://127.0.0.1:43167';
+    $url = rtrim(str_replace('\\', '/', (string) $url), '/') . '/api/mail/send';
+    $payload = json_encode([
+        'address' => $deskAddress,
+        'title' => $title,
+        'body' => $body,
+        'from' => $fromLabel,
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($payload === false) {
+        return ['ok' => false, 'error' => 'encode failed'];
+    }
+    $ctx = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/json\r\nAccept: application/json\r\n",
+            'content' => $payload,
+            'timeout' => 12,
+            'ignore_errors' => true,
+        ],
+    ]);
+    $raw = @file_get_contents($url, false, $ctx);
+    if ($raw === false) {
+        return [
+            'ok' => false,
+            'error' => 'SophiaDesk unreachable · is it running on ' . preg_replace('#/api/mail/send$#', '', $url) . '?',
+        ];
+    }
+    $j = json_decode($raw, true);
+    if (!is_array($j)) {
+        return ['ok' => false, 'error' => 'bad desk response'];
+    }
+    if (empty($j['ok'])) {
+        return ['ok' => false, 'error' => (string) ($j['error'] ?? 'desk mail failed')];
+    }
+    return [
+        'ok' => true,
+        'leaf_id' => (string) ($j['leaf_id'] ?? ''),
+        'address' => (string) ($j['address'] ?? $deskAddress),
+    ];
+}
+
+/**
+ * Send station → station, or station → desk (the.archivist via Sophia/Hermes path).
+ * @return array{ok:bool,error?:string,mail?:array<string,mixed>,desk?:array<string,mixed>}
  */
 function sdk_mail_send(string $fromStation, string $toStation, string $subject, string $body): array {
     $fromStation = strtolower(trim($fromStation));
-    $toStation = strtolower(trim($toStation));
+    $toRaw = strtolower(trim($toStation));
     if (!sdk_station_valid($fromStation)) {
         return ['ok' => false, 'error' => 'bad from station'];
-    }
-    if (!sdk_station_valid($toStation)) {
-        return ['ok' => false, 'error' => 'bad to station'];
-    }
-    if ($fromStation === $toStation) {
-        return ['ok' => false, 'error' => 'cannot mail self (use paper)'];
     }
     $subject = trim($subject);
     $body = trim($body);
@@ -161,10 +255,57 @@ function sdk_mail_send(string $fromStation, string $toStation, string $subject, 
         $subject = '(no subject)';
     }
     $fromMeta = sdk_station_meta($fromStation);
+    $fromLabel = ($fromMeta['user'] ?? strtoupper($fromStation)) . ' · ' . ($fromMeta['chip'] ?? $fromStation);
+
+    // Desk bridge — keep a local SENT copy + mint chip on Sophia
+    if (sdk_mail_is_desk_address($toRaw)) {
+        $deskAddr = sdk_mail_desk_address($toRaw);
+        $bridge = sdk_mail_bridge_to_desk($deskAddr, $subject, $body, $fromLabel);
+        if (empty($bridge['ok'])) {
+            return ['ok' => false, 'error' => $bridge['error'] ?? 'desk bridge failed'];
+        }
+        $msg = sdk_mail_save([
+            'id' => sdk_mail_id(),
+            'from' => $fromStation,
+            'from_label' => $fromLabel,
+            'to' => $deskAddr,
+            'subject' => $subject,
+            'body' => $body,
+            'created_at' => gmdate('c'),
+            'external' => false,
+            'desk' => true,
+            'desk_leaf' => $bridge['leaf_id'] ?? '',
+            'read' => [
+                $fromStation => true,
+            ],
+        ]);
+        return ['ok' => true, 'mail' => $msg, 'desk' => $bridge];
+    }
+
+    $toStation = $toRaw;
+    // aliases already resolved by compose ids; tolerate chip codes
+    if (!sdk_station_valid($toStation)) {
+        $aliases = [
+            'iox' => 'io',
+            'abx' => 'ab',
+            'cux' => 'cu',
+            'drx' => 'dr',
+            'dco' => 'dc',
+            'rx' => 'osx',
+            'oriel' => 'osx',
+        ];
+        $toStation = $aliases[$toStation] ?? $toStation;
+    }
+    if (!sdk_station_valid($toStation)) {
+        return ['ok' => false, 'error' => 'bad to station (or desk address)'];
+    }
+    if ($fromStation === $toStation) {
+        return ['ok' => false, 'error' => 'cannot mail self (use paper)'];
+    }
     $msg = sdk_mail_save([
         'id' => sdk_mail_id(),
         'from' => $fromStation,
-        'from_label' => ($fromMeta['user'] ?? strtoupper($fromStation)) . ' · ' . ($fromMeta['chip'] ?? $fromStation),
+        'from_label' => $fromLabel,
         'to' => $toStation,
         'subject' => $subject,
         'body' => $body,
@@ -229,10 +370,15 @@ function sdk_mail_mark_read(string $id, string $station): bool {
     return true;
 }
 
-/** Station options for compose (everyone except self). @return list<array{id:string,label:string}> */
+/** Station options for compose (everyone except self) + desk archivist. @return list<array{id:string,label:string}> */
 function sdk_mail_recipients(?string $except = null): array {
     $except = $except ?? sdk_station();
     $out = [];
+    // Desk first — Hermes path → the.archivist leaf
+    $out[] = [
+        'id' => 'the.archivist',
+        'label' => 'DESK · the.archivist (Sophia / Hermes)',
+    ];
     foreach (sdk_station_order() as $id) {
         if ($id === $except) {
             continue;

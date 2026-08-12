@@ -22,9 +22,10 @@ C:\ALICE_BOX\.glass-logs\
 | | name: `{import_order}-{OT\|NT\|BN}-{face}[.{part}].glassbox` |
 | | msg chip: `{export_id}.{bag_seq}` e.g. `001-OT-008.1.0` |
 | **station paper (fileKeeper)** | `sdk-import-station/paper/{station}/` |
-| | stations: **io** · **ab** · **rx** · **icu** (more later) |
-| | `_root/*.fk.json` · `{folder}/*.fk.json` |
-| | each doc may have `"station"` + `legacy_stem` / `legacy_dom` |
+| | stations: **io** · **ab** · **osx** (was rx) · **dr** · **dc** · **cu** · … |
+| | **Primary:** `leaf[n]-….chip` + station-root `terminal[{auth}]-filekeeper.bin` |
+| | folders: `_root/` · `{FOLDER}/` · chips sit in folders; bin co-located at station root |
+| | legacy `.fk.json` under `_fk_archive/` after chip cutover |
 
 ```
 GLASS_LOGS_ROOT=C:\ALICE_BOX\.glass-logs
@@ -50,7 +51,7 @@ Hands’ prior fileKeeper work lived in Chester SQLite (not vaults):
 | **io** | most life bag, MUSIC, ALEPH BET, SINE_WAVE, IO welcome |
 | **ab** | **MLK-038 LEEK FILES** (K), AGENT_TRACKER, WOLF IN THE WIRES, rEMINDERS, ABX welcome |
 | **icu** | ICU welcome |
-| **rx** | RX welcome |
+| **osx** | OSX welcome |
 
 Safe re-run of port skips existing `legacy_stem`. Rehome is idempotent-ish (rewrites station field + path).
 

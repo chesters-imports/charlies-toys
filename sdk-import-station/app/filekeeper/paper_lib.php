@@ -1,12 +1,16 @@
 <?php
 /**
- * Station paper store — real folders under SDK_PAPER_ROOT (IO life files).
- * Not ledger / not glass. One stem = one .fk.json (head + revision history).
+ * Station paper store — chips + terminal.bin (Sophia-shaped).
+ * Primary matter: leaf[n]-….chip · membership: terminal[{auth}]-filekeeper.bin
+ * No revision history. Auth = station chip code (IOX, DRX, OSX, …).
  */
 declare(strict_types=1);
 
 function fk_paper_root(): string {
-    if (function_exists('sdk_paper_root_path')) {
+    // migration / tools may pin an arbitrary station folder
+    if (!empty($GLOBALS['FK_PAPER_ROOT_OVERRIDE'])) {
+        $r = rtrim(str_replace('\\', '/', (string) $GLOBALS['FK_PAPER_ROOT_OVERRIDE']), '/');
+    } elseif (function_exists('sdk_paper_root_path')) {
         $r = sdk_paper_root_path();
     } else {
         $r = defined('SDK_PAPER_ROOT') ? SDK_PAPER_ROOT : (SDK_ROOT . '/paper/io');
@@ -21,67 +25,82 @@ function fk_paper_root(): string {
     return $r;
 }
 
+/** Station folder id (io, dr, osx, …). */
+function fk_station_id(): string {
+    if (!empty($GLOBALS['FK_STATION_OVERRIDE'])) {
+        return strtolower((string) $GLOBALS['FK_STATION_OVERRIDE']);
+    }
+    if (function_exists('sdk_station')) {
+        return strtolower((string) sdk_station());
+    }
+    return 'io';
+}
+
+/** Auth / chip code on papers: IOX, DRX, OSX, DCO, ABX, CUX, … */
+function fk_station_auth(?string $stationId = null): string {
+    $id = $stationId !== null ? strtolower($stationId) : fk_station_id();
+    $fallback = [
+        'io' => 'IOX',
+        'ab' => 'ABX',
+        'cu' => 'CUX',
+        'icu' => 'CUX',
+        'dr' => 'DRX',
+        'osx' => 'OSX',
+        'rx' => 'OSX',
+        'dc' => 'DCO',
+        'jx' => 'JX',
+    ];
+    // only trust sdk meta when this id is a live station (invalid ids fall back to IOX in meta)
+    if (
+        function_exists('sdk_station_valid')
+        && function_exists('sdk_station_meta')
+        && sdk_station_valid($id)
+    ) {
+        $m = sdk_station_meta($id);
+        $chip = strtoupper(trim((string) ($m['chip'] ?? '')));
+        if ($chip !== '') {
+            return $chip;
+        }
+    }
+    return $fallback[$id] ?? strtoupper($id);
+}
+
+function fk_terminal_uid(?string $stationId = null): string {
+    $auth = strtolower(fk_station_auth($stationId));
+    return 'terminal[' . $auth . ']';
+}
+
+function fk_bin_filename(?string $stationId = null): string {
+    return fk_terminal_uid($stationId) . '-filekeeper.bin';
+}
+
+function fk_bin_path(?string $stationId = null): string {
+    // bin sits in station root, beside folder dirs / chips
+    if ($stationId !== null && function_exists('sdk_paper_root_path')) {
+        $root = rtrim(str_replace('\\', '/', sdk_paper_root_path($stationId)), '/');
+    } else {
+        $root = fk_paper_root();
+    }
+    return $root . '/' . fk_bin_filename($stationId);
+}
+
 function fk_folder_norm(string $folder): string {
     $folder = str_replace(['\\', '..'], ['/', ''], trim($folder));
     $folder = trim($folder, '/');
     if ($folder === '' || $folder === '.' || $folder === '_root') {
         return '';
     }
-    // one layer only
     $folder = explode('/', $folder)[0];
     $folder = preg_replace('/[^\w\- .]+/u', '', $folder) ?? '';
     $folder = trim($folder);
     if (strlen($folder) > 80) {
         $folder = substr($folder, 0, 80);
     }
+    // reserved
+    if (preg_match('/^_fk_archive|_mausoleum|^\./', $folder)) {
+        return '';
+    }
     return $folder;
-}
-
-/**
- * Narrative stem for new files — readable when chipped onto cards later.
- * e.g. FK-IO-enemies-list-EL-a3f2b1 · FK-AB-wolf-in-the-wires-WITW-c91e02
- */
-function fk_stem_slug(string $title): string {
-    $station = 'io';
-    if (function_exists('sdk_station')) {
-        $station = strtolower(sdk_station());
-    }
-    $station = preg_replace('/[^\w]+/', '', $station) ?: 'io';
-
-    $title = trim($title);
-    // Treat underscores / dots like spaces (sine_wave_waving.txt → real words)
-    $forWords = preg_replace('/\.(txt|md|json|log)$/i', '', $title) ?? $title;
-    $forWords = str_replace(['_', '.', '/'], ' ', $forWords);
-    $words = preg_split('/\s+/', $forWords) ?: [];
-    $initials = '';
-    foreach ($words as $w) {
-        if ($w === '') {
-            continue;
-        }
-        if (preg_match('/[A-Za-z]/', $w, $m)) {
-            $initials .= strtoupper($m[0]);
-        } elseif (preg_match('/\d/', $w, $m)) {
-            $initials .= $m[0];
-        }
-        if (strlen($initials) >= 6) {
-            break;
-        }
-    }
-    if ($initials === '') {
-        $initials = 'X';
-    }
-
-    $s = strtolower($forWords);
-    $s = preg_replace('/[^a-z0-9]+/', '-', $s) ?? 'file';
-    $s = trim($s, '-');
-    if ($s === '') {
-        $s = 'file';
-    }
-    if (strlen($s) > 36) {
-        $s = rtrim(substr($s, 0, 36), '-');
-    }
-    $salt = substr(bin2hex(random_bytes(3)), 0, 6);
-    return 'FK-' . strtoupper($station) . '-' . $s . '-' . $initials . '-' . $salt;
 }
 
 function fk_dir_for_folder(string $folder): string {
@@ -93,46 +112,362 @@ function fk_dir_for_folder(string $folder): string {
     return $root . '/' . $folder;
 }
 
-function fk_path_for_stem(string $stem, string $folder = ''): string {
-    $stem = preg_replace('/[^\w\-]+/', '', $stem) ?? '';
-    if ($stem === '') {
-        throw new InvalidArgumentException('bad stem');
+function fk_title_slug(string $title): string {
+    $s = strtolower(trim($title));
+    $s = preg_replace('/[^a-z0-9]+/', '', $s) ?? '';
+    if ($s === '') {
+        $s = 'untitled';
     }
-    // Prefer known folder if provided; else search
-    if ($folder !== '' || $folder === '') {
-        $try = fk_dir_for_folder($folder) . '/' . $stem . '.fk.json';
-        if (is_file($try)) {
-            return $try;
-        }
+    if (strlen($s) > 40) {
+        $s = substr($s, 0, 40);
     }
-    $found = fk_find_stem_path($stem);
-    if ($found !== null) {
-        return $found;
-    }
-    return fk_dir_for_folder($folder) . '/' . $stem . '.fk.json';
+    return $s;
 }
 
-function fk_find_stem_path(string $stem): ?string {
-    $stem = preg_replace('/[^\w\-]+/', '', $stem) ?? '';
-    if ($stem === '') {
-        return null;
+/** leaf[n] only */
+function fk_norm_leaf_uid(string $uid): string {
+    $uid = trim($uid);
+    if (preg_match('/^leaf\[(\d+)\]$/i', $uid, $m)) {
+        return 'leaf[' . (int) $m[1] . ']';
     }
+    // legacy stem or c_uid leaf[n]-r1
+    if (preg_match('/^leaf\[(\d+)\]/i', $uid, $m)) {
+        return 'leaf[' . (int) $m[1] . ']';
+    }
+    return $uid;
+}
+
+function fk_is_leaf_uid(string $uid): bool {
+    return (bool) preg_match('/^leaf\[\d+\]$/i', trim($uid));
+}
+
+/** Next free leaf[n] under current station paper root (scan all folders). */
+function fk_next_leaf_uid(): string {
+    $max = -1;
+    foreach (fk_scan_chip_paths() as $p) {
+        $base = basename($p);
+        if (preg_match('/^leaf\[(\d+)\]/i', $base, $m)) {
+            $max = max($max, (int) $m[1]);
+        }
+    }
+    return 'leaf[' . ($max + 1) . ']';
+}
+
+/**
+ * @return list<string> absolute paths to .chip files in station
+ */
+function fk_scan_chip_paths(): array {
     $root = fk_paper_root();
-    $name = $stem . '.fk.json';
-    $direct = $root . '/_root/' . $name;
-    if (is_file($direct)) {
-        return $direct;
+    $out = [];
+    $scan = static function (string $dir) use (&$out, &$scan): void {
+        if (!is_dir($dir)) {
+            return;
+        }
+        foreach (scandir($dir) ?: [] as $f) {
+            if ($f === '.' || $f === '..') {
+                continue;
+            }
+            $full = $dir . '/' . $f;
+            if (is_dir($full)) {
+                if ($f === '_fk_archive' || $f[0] === '.') {
+                    continue;
+                }
+                // only one layer of folders for paper (plus _root)
+                if (basename($dir) === basename(fk_paper_root()) || basename($dir) === '_root' || true) {
+                    // scan immediate children only for station root folders
+                }
+                continue;
+            }
+            if (str_ends_with(strtolower($f), '.chip')) {
+                $out[] = str_replace('\\', '/', $full);
+            }
+        }
+    };
+    // _root chips
+    if (is_dir($root . '/_root')) {
+        foreach (scandir($root . '/_root') ?: [] as $f) {
+            if (str_ends_with(strtolower($f), '.chip')) {
+                $out[] = $root . '/_root/' . $f;
+            }
+        }
     }
-    foreach (scandir($root) ?: [] as $d) {
-        if ($d === '.' || $d === '..' || $d === '_root') {
+    // chips loose in station root (rare)
+    foreach (scandir($root) ?: [] as $f) {
+        if (str_ends_with(strtolower($f), '.chip')) {
+            $out[] = $root . '/' . $f;
+        }
+    }
+    // folder chips
+    foreach (fk_list_folders() as $folder) {
+        $dir = $root . '/' . $folder;
+        if (!is_dir($dir)) {
             continue;
         }
-        $p = $root . '/' . $d . '/' . $name;
-        if (is_file($p)) {
+        foreach (scandir($dir) ?: [] as $f) {
+            if (str_ends_with(strtolower($f), '.chip')) {
+                $out[] = $dir . '/' . $f;
+            }
+        }
+    }
+    return $out;
+}
+
+function fk_find_chip_path(string $leafUid): ?string {
+    $leafUid = fk_norm_leaf_uid($leafUid);
+    if (!fk_is_leaf_uid($leafUid)) {
+        // try legacy: search by file stem containing old FK- name — not used for primary
+        return null;
+    }
+    $prefix = $leafUid . '-';
+    $exact = $leafUid . '.chip';
+    foreach (fk_scan_chip_paths() as $p) {
+        $b = basename($p);
+        if ($b === $exact || str_starts_with($b, $prefix)) {
             return $p;
         }
     }
     return null;
+}
+
+function fk_chip_filename(string $leafUid, string $title): string {
+    $leafUid = fk_norm_leaf_uid($leafUid);
+    return $leafUid . '-' . fk_title_slug($title) . '.chip';
+}
+
+/** @return array{meta:array<string,mixed>,body:string}|null */
+function fk_parse_chip_file(string $path): ?array {
+    if (!is_file($path)) {
+        return null;
+    }
+    $raw = file_get_contents($path);
+    if ($raw === false || $raw === '') {
+        return null;
+    }
+    $raw = str_replace("\r\n", "\n", $raw);
+    if (!str_starts_with($raw, "---\n")) {
+        return null;
+    }
+    $end = strpos($raw, "\n---\n", 4);
+    if ($end === false) {
+        // allow trailing --- only
+        if (preg_match('/^---\n(.*)\n---\s*$/s', $raw, $m)) {
+            $fm = $m[1];
+            $body = '';
+        } else {
+            return null;
+        }
+    } else {
+        $fm = substr($raw, 4, $end - 4);
+        $body = substr($raw, $end + 5);
+        if (str_starts_with($body, "\n")) {
+            // keep as-is
+        }
+    }
+    $meta = fk_parse_simple_fm($fm);
+    return ['meta' => $meta, 'body' => (string) $body];
+}
+
+/**
+ * Minimal nested FM parser (store/chip/pin blocks).
+ * @return array<string,mixed>
+ */
+function fk_parse_simple_fm(string $fm): array {
+    $lines = explode("\n", $fm);
+    $root = [];
+    $stack = [&$root];
+    $indents = [-1];
+    $pendingKey = null;
+    $pendingIndent = 0;
+
+    foreach ($lines as $line) {
+        if (trim($line) === '' || str_starts_with(ltrim($line), '#')) {
+            continue;
+        }
+        if (!preg_match('/^(\s*)([^:]+):\s*(.*)$/', $line, $m)) {
+            continue;
+        }
+        $indent = strlen(str_replace("\t", '  ', $m[1]));
+        $key = trim($m[2]);
+        $val = trim($m[3]);
+
+        while (count($indents) > 1 && $indent <= $indents[count($indents) - 1]) {
+            array_pop($indents);
+            array_pop($stack);
+        }
+        $cur = &$stack[count($stack) - 1];
+
+        if ($val === '' || $val === '|' || $val === '>') {
+            $cur[$key] = [];
+            $stack[] = &$cur[$key];
+            $indents[] = $indent;
+            continue;
+        }
+        // list on same line: ["a", "b"]
+        if (str_starts_with($val, '[')) {
+            $decoded = json_decode($val, true);
+            $cur[$key] = is_array($decoded) ? $decoded : [];
+            continue;
+        }
+        // quoted / json string
+        if (
+            (str_starts_with($val, '"') && str_ends_with($val, '"'))
+            || (str_starts_with($val, "'") && str_ends_with($val, "'"))
+        ) {
+            $decoded = json_decode($val);
+            $cur[$key] = is_string($decoded) ? $decoded : trim($val, "\"'");
+            continue;
+        }
+        if (preg_match('/^-?\d+$/', $val)) {
+            $cur[$key] = (int) $val;
+            continue;
+        }
+        $cur[$key] = $val;
+    }
+    return $root;
+}
+
+function fk_yaml_scalar($v): string {
+    if (is_int($v) || is_float($v)) {
+        return (string) $v;
+    }
+    if (is_bool($v)) {
+        return $v ? 'true' : 'false';
+    }
+    $s = (string) $v;
+    if ($s === '' || preg_match('/[:#\[\]{}\n\r"\']/', $s) || preg_match('/^\s|\s$/', $s)) {
+        return json_encode($s, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+    return $s;
+}
+
+/**
+ * @param array<string,mixed> $chip meta: uid, name, auth, tags?, folder?, tps_created?, tps_updated?
+ */
+function fk_format_chip_text(array $chip, string $body): string {
+    $uid = fk_norm_leaf_uid((string) ($chip['uid'] ?? 'leaf[0]'));
+    $name = (string) ($chip['name'] ?? 'untitled');
+    $auth = (string) ($chip['auth'] ?? fk_station_auth());
+    $created = (int) ($chip['tps_created'] ?? time());
+    $updated = (int) ($chip['tps_updated'] ?? $created);
+    $tags = $chip['tags'] ?? [];
+    if (!is_array($tags)) {
+        $tags = [];
+    }
+    $tags = array_values(array_filter(array_map('strval', $tags), static fn ($t) => $t !== ''));
+    $fname = fk_chip_filename($uid, $name);
+    $tagsJson = json_encode($tags, JSON_UNESCAPED_UNICODE);
+    $lines = [
+        '---',
+        'store:',
+        '  file: ' . $fname,
+        'chip:',
+        '  uid: ' . $uid,
+        '  name: ' . fk_yaml_scalar($name),
+        '  auth: ' . fk_yaml_scalar($auth),
+        'pin:',
+        '  tps_created: ' . $created,
+        '  tps_updated: ' . $updated,
+        '  tags: ' . $tagsJson,
+    ];
+    $folder = fk_folder_norm((string) ($chip['folder'] ?? ''));
+    if ($folder !== '') {
+        $lines[] = '  folder: ' . fk_yaml_scalar($folder);
+    }
+    if (!empty($chip['legacy_stem'])) {
+        $lines[] = '  legacy_stem: ' . fk_yaml_scalar((string) $chip['legacy_stem']);
+    }
+    $lines[] = '---';
+    $text = implode("\n", $lines) . "\n";
+    if ($body !== '') {
+        $text .= $body;
+        if (!str_ends_with($body, "\n")) {
+            $text .= "\n";
+        }
+    }
+    return $text;
+}
+
+/**
+ * @return array{ok:bool,path?:string,uid?:string,error?:string}
+ */
+function fk_write_chip(array $chip, string $body, string $folder = ''): array {
+    $uid = fk_norm_leaf_uid((string) ($chip['uid'] ?? ''));
+    if (!fk_is_leaf_uid($uid)) {
+        $uid = fk_next_leaf_uid();
+    }
+    $chip['uid'] = $uid;
+    $name = trim((string) ($chip['name'] ?? 'untitled')) ?: 'untitled';
+    $chip['name'] = $name;
+    $chip['auth'] = (string) ($chip['auth'] ?? fk_station_auth());
+    $folder = fk_folder_norm($folder !== '' ? $folder : (string) ($chip['folder'] ?? ''));
+    $chip['folder'] = $folder;
+    $dir = fk_dir_for_folder($folder);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
+    $fname = fk_chip_filename($uid, $name);
+    $path = $dir . '/' . $fname;
+    // remove old path for this uid if rename
+    $old = fk_find_chip_path($uid);
+    $text = fk_format_chip_text($chip, $body);
+    if (file_put_contents($path, $text) === false) {
+        return ['ok' => false, 'error' => 'write failed'];
+    }
+    if ($old !== null && str_replace('\\', '/', $old) !== str_replace('\\', '/', $path) && is_file($old)) {
+        @unlink($old);
+    }
+    fk_rebuild_terminal_bin();
+    return ['ok' => true, 'path' => $path, 'uid' => $uid];
+}
+
+/**
+ * Chip → API head row (legacy list shape).
+ * @return array<string,mixed>|null
+ */
+function fk_chip_to_head(string $path): ?array {
+    $parsed = fk_parse_chip_file($path);
+    if (!$parsed) {
+        return null;
+    }
+    $meta = $parsed['meta'];
+    $chip = is_array($meta['chip'] ?? null) ? $meta['chip'] : [];
+    $pin = is_array($meta['pin'] ?? null) ? $meta['pin'] : [];
+    $uid = fk_norm_leaf_uid((string) ($chip['uid'] ?? ''));
+    if (!fk_is_leaf_uid($uid)) {
+        return null;
+    }
+    $folder = fk_folder_norm((string) ($pin['folder'] ?? ''));
+    // infer folder from path if missing
+    if ($folder === '') {
+        $parent = basename(dirname($path));
+        if ($parent !== '_root' && $parent !== basename(fk_paper_root())) {
+            $folder = fk_folder_norm($parent);
+        }
+    }
+    $tags = $pin['tags'] ?? [];
+    if (!is_array($tags)) {
+        $tags = [];
+    }
+    $tagsRaw = implode(', ', array_map('strval', $tags));
+    $created = (int) ($pin['tps_created'] ?? 0);
+    $updated = (int) ($pin['tps_updated'] ?? $created);
+    return [
+        'c_uid' => $uid,
+        'topic' => (string) ($chip['name'] ?? ''),
+        'body' => (string) $parsed['body'],
+        'tags_raw' => $tagsRaw,
+        'event_unix' => $created,
+        'ingest_unix' => $updated,
+        'meta_json' => json_encode([
+            'stem_c_uid' => $uid,
+            'rev' => 1,
+            'folder' => $folder,
+        ], JSON_UNESCAPED_UNICODE),
+        '_path' => $path,
+        '_stem' => $uid,
+        '_folder' => $folder,
+        '_auth' => (string) ($chip['auth'] ?? ''),
+    ];
 }
 
 /** @return list<string> */
@@ -143,8 +478,11 @@ function fk_list_folders(): array {
         if ($d === '.' || $d === '..' || $d === '_root') {
             continue;
         }
+        if ($d === '_fk_archive' || str_starts_with($d, '.')) {
+            continue;
+        }
         $full = $root . '/' . $d;
-        if (is_dir($full) && $d[0] !== '.') {
+        if (is_dir($full)) {
             $out[] = $d;
         }
     }
@@ -153,48 +491,16 @@ function fk_list_folders(): array {
 }
 
 /**
- * Heads for tree: each stem's latest revision as a row shaped like old ledger heads.
+ * Heads for tree (each chip once).
  * @return list<array<string,mixed>>
  */
 function fk_list_heads(int $limit = 200): array {
-    $root = fk_paper_root();
     $heads = [];
-    $scan = static function (string $dir, string $folder) use (&$heads): void {
-        if (!is_dir($dir)) {
-            return;
+    foreach (fk_scan_chip_paths() as $path) {
+        $h = fk_chip_to_head($path);
+        if ($h) {
+            $heads[] = $h;
         }
-        foreach (scandir($dir) ?: [] as $f) {
-            if (!str_ends_with($f, '.fk.json')) {
-                continue;
-            }
-            $path = $dir . '/' . $f;
-            $data = fk_read_file($path);
-            if (!$data) {
-                continue;
-            }
-            $head = $data['head'] ?? [];
-            $stem = (string) ($data['stem'] ?? pathinfo($f, PATHINFO_FILENAME));
-            $heads[] = [
-                'c_uid' => (string) ($head['c_uid'] ?? $stem . '-r' . ($head['rev'] ?? 1)),
-                'topic' => (string) ($head['title'] ?? ''),
-                'body' => (string) ($head['body'] ?? ''),
-                'tags_raw' => (string) ($head['tags_raw'] ?? ''),
-                'event_unix' => (int) ($head['event_unix'] ?? 0),
-                'ingest_unix' => (int) ($head['saved_at'] ?? 0),
-                'meta_json' => json_encode([
-                    'stem_c_uid' => $stem,
-                    'rev' => (int) ($head['rev'] ?? 1),
-                    'folder' => $folder,
-                ], JSON_UNESCAPED_UNICODE),
-                '_path' => $path,
-                '_stem' => $stem,
-                '_folder' => $folder,
-            ];
-        }
-    };
-    $scan($root . '/_root', '');
-    foreach (fk_list_folders() as $folder) {
-        $scan($root . '/' . $folder, $folder);
     }
     usort($heads, static function ($a, $b) {
         $ea = (int) ($a['event_unix'] ?: $a['ingest_unix']);
@@ -207,126 +513,74 @@ function fk_list_heads(int $limit = 200): array {
     return $heads;
 }
 
-/** @return array<string,mixed>|null */
-function fk_read_file(string $path): ?array {
-    if (!is_file($path)) {
-        return null;
-    }
-    $raw = file_get_contents($path);
-    if ($raw === false || $raw === '') {
-        return null;
-    }
-    $data = json_decode($raw, true);
-    return is_array($data) ? $data : null;
-}
-
-/** @return array<string,mixed>|null full doc */
+/** @return array<string,mixed>|null full doc shaped for old callers */
 function fk_load_stem(string $stem): ?array {
-    $path = fk_find_stem_path($stem);
+    $uid = fk_norm_leaf_uid($stem);
+    $path = fk_find_chip_path($uid);
     if ($path === null) {
         return null;
     }
-    $data = fk_read_file($path);
-    if ($data) {
-        $data['_path'] = $path;
+    $h = fk_chip_to_head($path);
+    if (!$h) {
+        return null;
     }
-    return $data;
+    $meta = json_decode((string) ($h['meta_json'] ?? '{}'), true) ?: [];
+    return [
+        'stem' => $uid,
+        'folder' => (string) ($meta['folder'] ?? $h['_folder'] ?? ''),
+        'station' => fk_station_id(),
+        'head' => [
+            'c_uid' => $uid,
+            'title' => $h['topic'],
+            'body' => $h['body'],
+            'tags_raw' => $h['tags_raw'],
+            'event_unix' => $h['event_unix'],
+            'saved_at' => $h['ingest_unix'],
+            'rev' => 1,
+        ],
+        'revisions' => [],
+        '_path' => $path,
+        '_chip' => true,
+    ];
 }
 
 /**
- * @return list<array<string,mixed>> revision rows oldest→newest (ledger-shaped)
- *
- * Desk open uses the LAST row here. Files always carry a `head`; some (agent
- * writes, hand edits) leave `revisions` empty. Without head fallback, click
- * shows a blank "new file" even though the list title is correct.
+ * No revision history — single living chip as one "rev" for desk UI.
+ * @return list<array<string,mixed>>
  */
 function fk_revisions(string $stem): array {
     $doc = fk_load_stem($stem);
     if (!$doc) {
         return [];
     }
+    $head = $doc['head'] ?? [];
     $folder = fk_folder_norm((string) ($doc['folder'] ?? ''));
-    $revs = $doc['revisions'] ?? [];
-    if (!is_array($revs)) {
-        $revs = [];
-    }
-    $out = [];
-    $seenRev = [];
-    foreach ($revs as $r) {
-        if (!is_array($r)) {
-            continue;
-        }
-        $revN = (int) ($r['rev'] ?? 0);
-        if ($revN < 1) {
-            $revN = count($out) + 1;
-        }
-        $cUid = (string) ($r['c_uid'] ?? ($stem . '-r' . $revN));
-        $out[] = [
-            'c_uid' => $cUid,
-            'topic' => (string) ($r['title'] ?? ''),
-            'body' => (string) ($r['body'] ?? ''),
-            'tags_raw' => (string) ($r['tags_raw'] ?? ''),
-            'event_unix' => (int) ($r['event_unix'] ?? 0),
-            'ingest_unix' => (int) ($r['saved_at'] ?? 0),
-            'meta_json' => json_encode([
-                'stem_c_uid' => $stem,
-                'rev' => $revN,
-                'folder' => $folder,
-            ], JSON_UNESCAPED_UNICODE),
-        ];
-        $seenRev[$revN] = true;
-    }
-
-    $head = $doc['head'] ?? null;
-    if (is_array($head) && (($head['title'] ?? '') !== '' || ($head['body'] ?? '') !== '')) {
-        $headRev = (int) ($head['rev'] ?? 0);
-        if ($headRev < 1) {
-            $headRev = $out ? (max(array_keys($seenRev) ?: [0]) + 1) : 1;
-        }
-        // Prefer head when no revisions, or when head is a newer rev than last revision row
-        $needHead = !$out || empty($seenRev[$headRev]);
-        if ($needHead) {
-            $out[] = [
-                'c_uid' => (string) ($head['c_uid'] ?? ($stem . '-r' . $headRev)),
-                'topic' => (string) ($head['title'] ?? ''),
-                'body' => (string) ($head['body'] ?? ''),
-                'tags_raw' => (string) ($head['tags_raw'] ?? ''),
-                'event_unix' => (int) ($head['event_unix'] ?? 0),
-                'ingest_unix' => (int) ($head['saved_at'] ?? 0),
-                'meta_json' => json_encode([
-                    'stem_c_uid' => $stem,
-                    'rev' => $headRev,
-                    'folder' => $folder,
-                ], JSON_UNESCAPED_UNICODE),
-            ];
-        }
-    }
-
-    return $out;
+    $uid = (string) ($doc['stem'] ?? $stem);
+    return [[
+        'c_uid' => $uid,
+        'topic' => (string) ($head['title'] ?? ''),
+        'body' => (string) ($head['body'] ?? ''),
+        'tags_raw' => (string) ($head['tags_raw'] ?? ''),
+        'event_unix' => (int) ($head['event_unix'] ?? 0),
+        'ingest_unix' => (int) ($head['saved_at'] ?? 0),
+        'meta_json' => json_encode([
+            'stem_c_uid' => $uid,
+            'rev' => 1,
+            'folder' => $folder,
+        ], JSON_UNESCAPED_UNICODE),
+    ]];
 }
 
-/** @return array<string,mixed>|null single revision by c_uid */
 function fk_get_revision(string $cUid): ?array {
-    // c_uid form: {stem}-r{n} or search all
-    if (preg_match('/^(.+)-r(\d+)$/', $cUid, $m)) {
-        $stem = $m[1];
-        $want = (int) $m[2];
-        foreach (fk_revisions($stem) as $r) {
-            $rm = json_decode((string) ($r['meta_json'] ?? '{}'), true) ?: [];
-            if ((int) ($rm['rev'] ?? 0) === $want || $r['c_uid'] === $cUid) {
-                return $r;
-            }
+    $uid = fk_norm_leaf_uid($cUid);
+    if (!fk_is_leaf_uid($uid)) {
+        // legacy {stem}-r{n}
+        if (preg_match('/^(.+)-r(\d+)$/', $cUid, $m)) {
+            $uid = fk_norm_leaf_uid($m[1]);
         }
     }
-    foreach (fk_list_heads(500) as $h) {
-        $stem = (string) ($h['_stem'] ?? '');
-        foreach (fk_revisions($stem) as $r) {
-            if ($r['c_uid'] === $cUid) {
-                return $r;
-            }
-        }
-    }
-    return null;
+    $revs = fk_revisions($uid);
+    return $revs[0] ?? null;
 }
 
 /**
@@ -339,170 +593,97 @@ function fk_save(array $in): array {
         return ['ok' => false, 'error' => 'title required'];
     }
     $body = (string) ($in['body'] ?? '');
-    $tags = trim((string) ($in['tags_raw'] ?? ''));
+    $tagsRaw = trim((string) ($in['tags_raw'] ?? ''));
+    $tags = [];
+    if ($tagsRaw !== '') {
+        foreach (preg_split('/[,;]+/', $tagsRaw) ?: [] as $t) {
+            $t = trim($t);
+            if ($t !== '') {
+                $tags[] = $t;
+            }
+        }
+    }
     $folder = fk_folder_norm((string) ($in['folder'] ?? ''));
     $stem = trim((string) ($in['stem'] ?? ''));
-    $stem = preg_replace('/[^\w\-]+/', '', $stem) ?? '';
+    $uid = $stem !== '' ? fk_norm_leaf_uid($stem) : '';
     $eventUnix = (int) ($in['event_unix'] ?? 0);
     if ($eventUnix <= 0) {
         $eventUnix = time();
     }
     $now = time();
-
-    $existing = $stem !== '' ? fk_load_stem($stem) : null;
-    if ($existing && $stem !== '') {
-        $oldFolder = fk_folder_norm((string) ($existing['folder'] ?? ''));
-        $revs = $existing['revisions'] ?? [];
-        if (!is_array($revs)) {
-            $revs = [];
+    $created = $eventUnix;
+    $existing = ($uid !== '' && fk_is_leaf_uid($uid)) ? fk_load_stem($uid) : null;
+    if ($existing) {
+        $created = (int) ($existing['head']['event_unix'] ?? $eventUnix);
+        if ($created <= 0) {
+            $created = $eventUnix;
         }
-        $lastRev = 0;
-        foreach ($revs as $r) {
-            if (is_array($r)) {
-                $lastRev = max($lastRev, (int) ($r['rev'] ?? 0));
-            }
-        }
-        $newRev = $lastRev + 1;
-        $cUid = $stem . '-r' . $newRev;
-        $head = [
-            'c_uid' => $cUid,
-            'title' => $title,
-            'body' => $body,
-            'tags_raw' => $tags,
-            'event_unix' => $eventUnix,
-            'event_raw' => (string) ($in['event_raw'] ?? ''),
-            'rev' => $newRev,
-            'saved_at' => $now,
-            'timezone' => (string) ($in['timezone'] ?? ''),
-        ];
-        $revs[] = $head;
-        $station = function_exists('sdk_station') ? sdk_station() : (string) ($existing['station'] ?? 'io');
-        $doc = [
-            'stem' => $stem,
-            'folder' => $folder,
-            'station' => $station,
-            'head' => $head,
-            'revisions' => $revs,
-        ];
-        foreach (['legacy_stem', 'legacy_source', 'legacy_dom', 'legacy_place'] as $lk) {
-            if (!empty($existing[$lk])) {
-                $doc[$lk] = $existing[$lk];
-            }
-        }
-        // move file if folder changed
-        $oldPath = (string) ($existing['_path'] ?? fk_path_for_stem($stem, $oldFolder));
-        $newDir = fk_dir_for_folder($folder);
-        if (!is_dir($newDir)) {
-            @mkdir($newDir, 0775, true);
-        }
-        $newPath = $newDir . '/' . $stem . '.fk.json';
-        $json = json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        if ($json === false || file_put_contents($newPath, $json . "\n") === false) {
-            return ['ok' => false, 'error' => 'write failed'];
-        }
-        if ($oldPath !== $newPath && is_file($oldPath)) {
-            @unlink($oldPath);
-        }
-        return ['ok' => true, 'stem_c_uid' => $stem, 'rev' => $newRev];
+    } else {
+        $uid = fk_next_leaf_uid();
     }
 
-    // new stem
-    $stem = $stem !== '' ? $stem : fk_stem_slug($title);
-    // collision
-    while (fk_find_stem_path($stem) !== null) {
-        $stem = fk_stem_slug($title);
-    }
-    $cUid = $stem . '-r1';
-    $head = [
-        'c_uid' => $cUid,
-        'title' => $title,
-        'body' => $body,
-        'tags_raw' => $tags,
-        'event_unix' => $eventUnix,
-        'event_raw' => (string) ($in['event_raw'] ?? ''),
-        'rev' => 1,
-        'saved_at' => $now,
-        'timezone' => (string) ($in['timezone'] ?? ''),
-    ];
-    $station = function_exists('sdk_station') ? sdk_station() : 'io';
-    $doc = [
-        'stem' => $stem,
+    $w = fk_write_chip([
+        'uid' => $uid,
+        'name' => $title,
+        'auth' => fk_station_auth(),
+        'tps_created' => $created,
+        'tps_updated' => $now,
+        'tags' => $tags,
         'folder' => $folder,
-        'station' => $station,
-        'head' => $head,
-        'revisions' => [$head],
-    ];
-    $dir = fk_dir_for_folder($folder);
-    if (!is_dir($dir)) {
-        @mkdir($dir, 0775, true);
+    ], $body, $folder);
+
+    if (empty($w['ok'])) {
+        return ['ok' => false, 'error' => $w['error'] ?? 'write failed'];
     }
-    $path = $dir . '/' . $stem . '.fk.json';
-    $json = json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    if ($json === false || file_put_contents($path, $json . "\n") === false) {
-        return ['ok' => false, 'error' => 'write failed'];
-    }
-    return ['ok' => true, 'stem_c_uid' => $stem, 'rev' => 1];
+    return ['ok' => true, 'stem_c_uid' => $w['uid'] ?? $uid, 'rev' => 1];
 }
 
-/**
- * Delete a stem (file) from paper.
- * @return array{ok:bool,error?:string}
- */
 function fk_delete_stem(string $stem): array {
-    $stem = preg_replace('/[^\w\-]+/', '', $stem) ?? '';
-    if ($stem === '') {
-        return ['ok' => false, 'error' => 'bad stem'];
-    }
-    $path = fk_find_stem_path($stem);
+    $uid = fk_norm_leaf_uid($stem);
+    $path = fk_find_chip_path($uid);
     if ($path === null || !is_file($path)) {
         return ['ok' => false, 'error' => 'file not found'];
     }
     if (!@unlink($path)) {
         return ['ok' => false, 'error' => 'delete failed'];
     }
+    fk_rebuild_terminal_bin();
     return ['ok' => true];
 }
 
-/**
- * Move stem to another folder (reorganize). Same stem id, new path.
- * @return array{ok:bool,error?:string,folder?:string}
- */
 function fk_move_stem(string $stem, string $newFolder): array {
-    $stem = preg_replace('/[^\w\-]+/', '', $stem) ?? '';
-    if ($stem === '') {
-        return ['ok' => false, 'error' => 'bad stem'];
-    }
-    $doc = fk_load_stem($stem);
+    $uid = fk_norm_leaf_uid($stem);
+    $doc = fk_load_stem($uid);
     if (!$doc) {
         return ['ok' => false, 'error' => 'file not found'];
     }
     $newFolder = fk_folder_norm($newFolder);
-    $oldPath = (string) ($doc['_path'] ?? '');
-    $oldFolder = fk_folder_norm((string) ($doc['folder'] ?? ''));
-    if ($oldFolder === $newFolder) {
-        return ['ok' => true, 'folder' => $newFolder];
+    $head = $doc['head'] ?? [];
+    $tagsRaw = (string) ($head['tags_raw'] ?? '');
+    $tags = [];
+    if ($tagsRaw !== '') {
+        foreach (preg_split('/[,;]+/', $tagsRaw) ?: [] as $t) {
+            $t = trim($t);
+            if ($t !== '') {
+                $tags[] = $t;
+            }
+        }
     }
-    $doc['folder'] = $newFolder;
-    unset($doc['_path']);
-    $newDir = fk_dir_for_folder($newFolder);
-    if (!is_dir($newDir)) {
-        @mkdir($newDir, 0775, true);
-    }
-    $newPath = $newDir . '/' . $stem . '.fk.json';
-    $json = json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    if ($json === false || file_put_contents($newPath, $json . "\n") === false) {
-        return ['ok' => false, 'error' => 'move write failed'];
-    }
-    if ($oldPath !== '' && $oldPath !== $newPath && is_file($oldPath)) {
-        @unlink($oldPath);
+    $w = fk_write_chip([
+        'uid' => $uid,
+        'name' => (string) ($head['title'] ?? 'untitled'),
+        'auth' => fk_station_auth(),
+        'tps_created' => (int) ($head['event_unix'] ?? time()),
+        'tps_updated' => time(),
+        'tags' => $tags,
+        'folder' => $newFolder,
+    ], (string) ($head['body'] ?? ''), $newFolder);
+    if (empty($w['ok'])) {
+        return ['ok' => false, 'error' => $w['error'] ?? 'move failed'];
     }
     return ['ok' => true, 'folder' => $newFolder];
 }
 
-/**
- * Rename a folder directory (all files inside keep stems).
- * @return array{ok:bool,error?:string,folder?:string}
- */
 function fk_rename_folder(string $from, string $to): array {
     $from = fk_folder_norm($from);
     $to = fk_folder_norm($to);
@@ -524,21 +705,27 @@ function fk_rename_folder(string $from, string $to): array {
     if (!@rename($fromDir, $toDir)) {
         return ['ok' => false, 'error' => 'rename failed'];
     }
-    // update folder field inside each fk.json
     foreach (scandir($toDir) ?: [] as $f) {
-        if (!str_ends_with($f, '.fk.json')) {
+        if (!str_ends_with(strtolower($f), '.chip')) {
             continue;
         }
         $path = $toDir . '/' . $f;
-        $data = fk_read_file($path);
-        if (!$data) {
+        $parsed = fk_parse_chip_file($path);
+        if (!$parsed) {
             continue;
         }
-        $data['folder'] = $to;
-        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        if ($json !== false) {
-            file_put_contents($path, $json . "\n");
-        }
+        $chip = is_array($parsed['meta']['chip'] ?? null) ? $parsed['meta']['chip'] : [];
+        $pin = is_array($parsed['meta']['pin'] ?? null) ? $parsed['meta']['pin'] : [];
+        fk_write_chip([
+            'uid' => (string) ($chip['uid'] ?? ''),
+            'name' => (string) ($chip['name'] ?? 'untitled'),
+            'auth' => (string) ($chip['auth'] ?? fk_station_auth()),
+            'tps_created' => (int) ($pin['tps_created'] ?? time()),
+            'tps_updated' => (int) ($pin['tps_updated'] ?? time()),
+            'tags' => is_array($pin['tags'] ?? null) ? $pin['tags'] : [],
+            'folder' => $to,
+            'legacy_stem' => (string) ($pin['legacy_stem'] ?? ''),
+        ], (string) $parsed['body'], $to);
     }
     return ['ok' => true, 'folder' => $to];
 }
@@ -561,6 +748,94 @@ function fk_mkdir(string $folder): array {
 }
 
 /**
+ * Rebuild terminal[auth]-filekeeper.bin from chips on this station.
+ */
+function fk_rebuild_terminal_bin(): void {
+    $root = fk_paper_root();
+    $auth = fk_station_auth();
+    $uid = fk_terminal_uid();
+    $members = [];
+    $minCreated = 0;
+    $maxUpdated = 0;
+    foreach (fk_list_heads(0) as $h) {
+        $id = (string) ($h['_stem'] ?? $h['c_uid'] ?? '');
+        if (fk_is_leaf_uid($id)) {
+            $members[] = $id;
+        }
+        $c = (int) ($h['event_unix'] ?? 0);
+        $u = (int) ($h['ingest_unix'] ?? 0);
+        if ($c > 0 && ($minCreated === 0 || $c < $minCreated)) {
+            $minCreated = $c;
+        }
+        if ($u > $maxUpdated) {
+            $maxUpdated = $u;
+        }
+    }
+    // de-dupe preserve order
+    $seen = [];
+    $uniq = [];
+    foreach ($members as $m) {
+        if (!isset($seen[$m])) {
+            $seen[$m] = true;
+            $uniq[] = $m;
+        }
+    }
+    $members = $uniq;
+    $now = time();
+    if ($minCreated <= 0) {
+        $minCreated = $now;
+    }
+    if ($maxUpdated <= 0) {
+        $maxUpdated = $now;
+    }
+    $fname = fk_bin_filename();
+    $chipsJson = json_encode($members, JSON_UNESCAPED_UNICODE);
+    $name = $auth . ' Files';
+    $text = implode("\n", [
+        '---',
+        'store:',
+        '  file: ' . $fname,
+        '  type: bin',
+        '  bit_count: ' . count($members),
+        'bin:',
+        '  uid: ' . $uid,
+        '  type: filekeeper',
+        '  name: ' . fk_yaml_scalar($name),
+        '  auth: ' . fk_yaml_scalar($auth),
+        '  class: terminal',
+        '  chips: ' . $chipsJson,
+        'pin:',
+        '  tps_created: ' . $minCreated,
+        '  tps_updated: ' . $maxUpdated,
+        '  tags: []',
+        '---',
+        '',
+    ]);
+    // drop other terminal*.bin in root (rebrand / rename)
+    foreach (scandir($root) ?: [] as $f) {
+        if (preg_match('/^terminal\[.+\]-filekeeper\.bin$/i', $f) && $f !== $fname) {
+            @unlink($root . '/' . $f);
+        }
+    }
+    file_put_contents($root . '/' . $fname, $text);
+}
+
+/* ─── legacy JSON helpers (migration / archive only) ─── */
+
+/** @return array<string,mixed>|null */
+function fk_read_file(string $path): ?array {
+    if (!is_file($path)) {
+        return null;
+    }
+    $raw = file_get_contents($path);
+    if ($raw === false || $raw === '') {
+        return null;
+    }
+    $data = json_decode($raw, true);
+    return is_array($data) ? $data : null;
+}
+
+/**
  * Server-side loose datetime (fallback when JS unix empty).
  */
 function fk_parse_event_time(string $raw, string $tz = ''): ?int {
@@ -568,7 +843,6 @@ function fk_parse_event_time(string $raw, string $tz = ''): ?int {
     if ($raw === '' || preg_match('/^(now|today|n)$/i', $raw)) {
         return time();
     }
-    // strip weekday noise
     $s = preg_replace('/[\x{200B}-\x{200F}\x{FEFF}]/u', '', $raw) ?? $raw;
     $s = preg_replace('/\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun)\b[, ]*/i', '', $s) ?? $s;
     $s = preg_replace('/\s+/', ' ', trim($s)) ?? $s;
@@ -579,7 +853,6 @@ function fk_parse_event_time(string $raw, string $tz = ''): ?int {
         }
         return $n;
     }
-    // m/d/Y h:i am/pm
     if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(am|pm)?$/i', $s, $m)) {
         $y = (int) $m[3];
         if ($y < 100) {
@@ -605,7 +878,6 @@ function fk_render_md(string $body): string {
     if ($body === '') {
         return '';
     }
-    // pull out pre-built HTML blocks (media figures) so we don't escape them
     $slots = [];
     $body = preg_replace_callback(
         '/<figure\b[^>]*>.*?<\/figure>/is',
@@ -617,7 +889,6 @@ function fk_render_md(string $body): string {
         $body
     ) ?? $body;
 
-    // fenced code
     $parts = preg_split('/^```[a-zA-Z0-9]*\s*$/m', $body) ?: [$body];
     if (count($parts) > 1) {
         $html = '';
@@ -646,13 +917,11 @@ function fk_render_md(string $body): string {
 }
 
 function fk_render_md_inline_block(string $body): string {
-    // Keep blank lines: markdown often smooshes; Chester paper should breathe.
     $lines = preg_split('/\r\n|\r|\n/', $body) ?: [];
     $out = [];
     $para = [];
     $flush = static function () use (&$para, &$out): void {
         if ($para) {
-            // Each source line stays a visual line (hard breaks — not smooshed prose)
             $bits = [];
             foreach ($para as $pl) {
                 $t = htmlspecialchars($pl, ENT_QUOTES, 'UTF-8');
@@ -689,14 +958,12 @@ function fk_render_md_inline_block(string $body): string {
         }
         if (trim($line) === '') {
             $flush();
-            // Each blank source line = real vertical gap (stackable)
             $out[] = '<div class="fk-gap" aria-hidden="true"></div>';
             continue;
         }
         $para[] = $line;
     }
     $flush();
-    // wrap consecutive li
     $html = implode("\n", $out);
     $html = preg_replace('/(?:<li>.*?<\/li>\n?)+/s', '<ul class="fk-ul">$0</ul>', $html) ?? $html;
     return $html;

@@ -51,8 +51,8 @@ foreach ([
     SDK_PAPER_BASE . '/ab/_root',
     SDK_PAPER_BASE . '/cu',
     SDK_PAPER_BASE . '/cu/_root',
-    SDK_PAPER_BASE . '/rx',
-    SDK_PAPER_BASE . '/rx/_root',
+    SDK_PAPER_BASE . '/osx',
+    SDK_PAPER_BASE . '/osx/_root',
     SDK_PAPER_BASE . '/icu',
     SDK_PAPER_BASE . '/icu/_root',
     SDK_PAPER_BASE . '/dr',
@@ -146,24 +146,25 @@ function sdk_station_defs(): array {
             'show_imports' => '0',
             'welcome' => 'dr',
         ],
-        // RX — Oriel · BIOS blue (flat, almost no scanlines, sharp white) — not a phosphor clone
-        'rx' => [
-            'id' => 'rx',
-            'chip' => 'RX',
-            'skin' => 'rx',
-            'label' => 'Terminal RX',
+        // OSX — Oriel · BIOS blue (was RX; she outgrew that shirt)
+        // flat, almost no scanlines, sharp white — not a phosphor clone
+        'osx' => [
+            'id' => 'osx',
+            'chip' => 'OSX',
+            'skin' => 'osx',
+            'label' => 'Terminal OSX',
             'face' => 'OLB-369',
             'user' => 'OLB-369',
-            'foot' => 'R·X',
+            'foot' => 'O·S',
             'ghost' => 'read the system',
             'whisper' => 'flat blue · sharp white · she is particular',
-            'brand_import' => 'RX · BIOS',
+            'brand_import' => 'OSX · BIOS',
             'brand_files' => 'ORIEL PAPER',
-            'hint_files' => 'paper/rx',
+            'hint_files' => 'paper/osx',
             'hint_else' => 'bios blue · codes · the system',
             'deck_chip' => "CHESTER'S IMPORTS",
             'show_imports' => '0',
-            'welcome' => 'rx',
+            'welcome' => 'osx',
         ],
         // DCO — Danny and Company · all parts · specs written here (not agent telepathy)
         'dc' => [
@@ -219,8 +220,17 @@ function sdk_boot_station(): string {
     if ($fromQ === 'drx' || $fromQ === 'drw' || $fromQ === 'dx' || $fromQ === 'wx' || $fromQ === 'doctorx') {
         $fromQ = 'dr';
     }
-    if ($fromQ === 'rxx' || $fromQ === 'oriel') {
-        $fromQ = 'rx';
+    // OSX · Oriel (was RX / rxx / oriel)
+    if (
+        $fromQ === 'osx'
+        || $fromQ === 'rx'
+        || $fromQ === 'rxx'
+        || $fromQ === 'oriel'
+        || $fromQ === 'oriole'
+        || $fromQ === 'olb'
+        || $fromQ === 'olb-369'
+    ) {
+        $fromQ = 'osx';
     }
     // DCO · Danny and Company (parts · product specs)
     if ($fromQ === 'dco' || $fromQ === 'danny' || $fromQ === 'dannyco' || $fromQ === 'd&co') {

@@ -77,7 +77,7 @@ $recipients = sdk_mail_recipients($station);
       </label>
       <div class="mail-actions">
         <button type="submit" class="mail-btn">Send on the wire</button>
-        <span class="muted small">from this station only · outside mail uses inject</span>
+        <span class="muted small">stations on the wire · DESK → the.archivist chip (Sophia must be running)</span>
       </div>
     </form>
 

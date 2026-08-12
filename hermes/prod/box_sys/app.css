@@ -64,6 +64,42 @@ html, body {
   padding: 0.05rem 0.25rem;
   border-radius: 3px;
 }
+.hm-mode {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0 0 0.75rem;
+}
+.hm-mode-btn {
+  flex: 1;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 252, 245, 0.55);
+  color: var(--ink);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.hm-mode-btn.is-on {
+  background: var(--teal);
+  color: #f2efe6;
+  border-color: var(--teal);
+}
+.hm-select {
+  cursor: pointer;
+}
+.hm-parcel-hint {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 0.72rem;
+  opacity: 0.75;
+  line-height: 1.35;
+}
+.hm-btn-block {
+  width: 100%;
+  margin-top: 0.25rem;
+}
 .hm-label {
   display: block;
   font-size: 0.68rem;

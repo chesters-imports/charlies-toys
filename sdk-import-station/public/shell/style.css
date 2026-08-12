@@ -467,36 +467,36 @@ html.mypi-pocket-deep body.terminal-station .tm-rail-brand .tm-rail-chip-slot.is
 }
 
 /* ── RX · flat BIOS brick (no CRT romance) ──────────────── */
-.tm-rail-chip-slot[data-skin="rx"] {
+.tm-rail-chip-slot[data-skin="osx"] {
   color: #f0f0f0;
   text-shadow: none;
   font-family: var(--tm-font-bios), "Share Tech Mono", "VT323", monospace;
   background: #0000aa;
   letter-spacing: 0.06em;
 }
-.tm-rail-chip-slot[data-skin="rx"] .tm-chip-glass {
+.tm-rail-chip-slot[data-skin="osx"] .tm-chip-glass {
   display: none;
 }
-.tm-rail-chip-slot[data-skin="rx"] .tm-chip-bezel {
+.tm-rail-chip-slot[data-skin="osx"] .tm-chip-bezel {
   box-shadow: inset 0 0 0 1px #ffffff;
   opacity: 0.85;
 }
-.tm-rail-chip-slot[data-skin="rx"] .tm-rail-gt,
-.tm-rail-chip-slot[data-skin="rx"] .tm-rail-iox-label,
-.tm-rail-chip-slot[data-skin="rx"] .tm-chip-face {
+.tm-rail-chip-slot[data-skin="osx"] .tm-rail-gt,
+.tm-rail-chip-slot[data-skin="osx"] .tm-rail-iox-label,
+.tm-rail-chip-slot[data-skin="osx"] .tm-chip-face {
   font-family: var(--tm-font-bios), "Share Tech Mono", "VT323", monospace;
   text-shadow: none;
   transform: none;
 }
-.tm-rail-chip-slot[data-skin="rx"] .tm-rail-iox-label {
+.tm-rail-chip-slot[data-skin="osx"] .tm-rail-iox-label {
   font-size: 0.62rem;
   letter-spacing: 0.14em;
 }
-.tm-rail-chip-slot[data-skin="rx"] .tm-chip-face {
+.tm-rail-chip-slot[data-skin="osx"] .tm-chip-face {
   color: #b0b0c0;
   opacity: 1;
 }
-.tm-rail-chip-slot[data-skin="rx"]:hover {
+.tm-rail-chip-slot[data-skin="osx"]:hover {
   background: #0000ff;
   color: #ffffff;
   filter: none;

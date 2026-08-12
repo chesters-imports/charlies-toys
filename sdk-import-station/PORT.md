@@ -17,8 +17,8 @@ This island is the **terminal network** (IO + AB now) living as **one little pro
 | **Live** | **MAIL** room — station↔station wire + outside inject (`/api/mail/inject`, `tools/mail_inject.php`). |
 | **Live** | **CUX** (id `cu`) — was ICU *I See You* · amber · paper/cu inherits ICU files · mail. House chip name remains ICU in lore. |
 | **Live** | **DRX** (id `dr`) — Doctor X / Daniel Wake · purple+teal · **project concept desk** (not log plant, not watchers). paper/dr. |
-| **Live** | Rail **chip opens station picker** (IOX / ABX / CUX / DRX / RX) — not color-wheel rotate. |
-| **Live** | **RX** (id `rx`) — Oriel · **BIOS blue** (flat, almost no scanlines, sharp white) · paper/rx. Not a phosphor clone. |
+| **Live** | Rail **chip opens station picker** (IOX / ABX / CUX / DRX / OSX / DCO) — not color-wheel rotate. |
+| **Live** | **OSX** (id `osx`, was RX) — Oriel · **BIOS blue** (flat, almost no scanlines, sharp white) · paper/osx. New costume. Not a phosphor clone. |
 | **Later** | JX · send-to-color · dossier on AB · Charlie threads · shotDesk on ICU/CU · number on DRX. |
 | **Not this season** | DATBOX as migration bus · glass-log religion · postBASIC as primary capture · full alphabet topology. |
 

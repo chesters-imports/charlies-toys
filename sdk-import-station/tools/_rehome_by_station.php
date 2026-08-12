@@ -24,7 +24,7 @@ foreach ($pdo->query($sql) as $r) {
         continue;
     }
     $dom = strtolower(trim((string) ($r['dom'] ?? 'io')));
-    if (!in_array($dom, ['io', 'ab', 'rx', 'icu', 'cu', 'jx'], true)) {
+    if (!in_array($dom, ['io', 'ab', 'osx', 'icu', 'cu', 'jx'], true)) {
         $dom = 'io';
     }
     // latest write wins
@@ -69,7 +69,7 @@ foreach ($files as $path) {
         } elseif (preg_match('/\bICU\b|WELCOME TO ICU/i', $title)) {
             $station = 'icu';
         } elseif (preg_match('/\bRX\b|WELCOME TO RX/i', $title)) {
-            $station = 'rx';
+            $station = 'osx';
         } elseif ($legacy === '') {
             $unknown++;
         }
@@ -109,7 +109,7 @@ foreach ($files as $path) {
 // drop empty leftover dirs under io (optional soft)
 echo "\nDONE stamped=$stamped moved_off_io_path=$moved unknown_map=$unknown\n";
 echo "paper base: $paperBase\n";
-foreach (['io', 'ab', 'rx', 'icu'] as $s) {
+foreach (['io', 'ab', 'osx', 'icu'] as $s) {
     $p = $paperBase . '/' . $s;
     $n = 0;
     if (is_dir($p)) {

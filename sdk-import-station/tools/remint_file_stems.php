@@ -10,7 +10,7 @@ require $root . '/config.php';
 require $root . '/app/filekeeper/paper_lib.php';
 
 $paperBase = defined('SDK_PAPER_BASE') ? SDK_PAPER_BASE : ($root . '/paper');
-$stations = ['io', 'ab', 'rx', 'icu'];
+$stations = ['io', 'ab', 'osx', 'icu'];
 
 function fk_mint_stem_for(string $title, string $station, string $salt = ''): string {
     $station = preg_replace('/[^\w]+/', '', strtolower($station)) ?: 'io';
