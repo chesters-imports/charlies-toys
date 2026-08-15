@@ -13,11 +13,6 @@ KDE_SYS = PROD / "kde_sys"
 # charlies-toys/kde-notes-chords/prod → parents[2] = ALICE_BOX
 DECK_HOST_PY = PROD.parents[2] / "the-deck-host" / "shell" / "deck_host.py"
 
-PORT = os.environ.get("KDE_PORT", "43140")
-URL = f"http://127.0.0.1:{PORT}/"
-HEALTH = f"http://127.0.0.1:{PORT}/api/health"
-
-
 def main() -> int:
     if not (KDE_SYS / "server.py").is_file():
         print("server missing", file=sys.stderr)
@@ -29,6 +24,7 @@ def main() -> int:
     profile = os.environ.get("DECK_HOST_PROFILE", "desk").strip() or "desk"
     width = os.environ.get("KDE_WIDTH", "800")
     height = os.environ.get("KDE_HEIGHT", "600")
+    # In-process ROM serve — same path the itch pack uses (no extra Python).
     cmd = [
         sys.executable,
         str(DECK_HOST_PY),
@@ -40,15 +36,7 @@ def main() -> int:
         str(width),
         "--height",
         str(height),
-        "--url",
-        URL,
-        "--health",
-        HEALTH,
-        "--health-timeout",
-        "20",
-        "--spawn",
-        f"{sys.executable} server.py",
-        "--spawn-cwd",
+        "--rom-dir",
         str(KDE_SYS),
     ]
     print("KDE Notes & Chords · CO.KDE-001-INSTR · Deck Host 800×600")

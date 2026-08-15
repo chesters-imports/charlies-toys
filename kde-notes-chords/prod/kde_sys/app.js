@@ -46,7 +46,7 @@
         "A woman of an average age. Just some mary in a red dress wearing a necklace with a lamb pendant.",
       clues: [
         "It's a cold Tuesday. Every Tuesday's been cold for decades now.",
-        "A woman walks into the Office at 78 Case Street. Sour face. Sour hands.",
+        "A woman walks into the Office at 78 K Street. Sour face. Sour hands.",
         "I ask her how I can help. She looks bothered I even exist.",
         "I wonder what drives a woman to ask for help in a place that clearly disgusts her.",
         "She hands me a set of keys and a black wallet.",
@@ -449,7 +449,7 @@
     clueCount = 1;
     caseClosed = false;
     customerEl.textContent = "CASE: " + currentCase.title;
-    if (caseEl) caseEl.textContent = "78 Case Street";
+    if (caseEl) caseEl.textContent = "78 K Street";
     app.className = "kde-main " + currentCase.slug;
     clearFolderKeepBanner();
   }
@@ -654,6 +654,6 @@
 
   deadSpin();
   paintSoundBtn();
-  caseEl.textContent = "78 Case Street";
+  caseEl.textContent = "78 K Street";
   customerEl.textContent = "—";
 })();

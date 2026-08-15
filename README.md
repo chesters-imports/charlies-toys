@@ -8,6 +8,7 @@ Personal objects (charlie-toys), not DATBOX product SKUs.
 | **[ineffable-box](./ineffable-box/)** | Always-on **omen / hymn / secret** reporter (Oman · Jasmine · Teehee); thin companion window |
 | **[eddies-encoder](./eddies-encoder/)** | **Eddy's Encoder** — dirty **KVEN** mint · strange pull · `eddie.teehee` / `eddylinks.teehee` · Deck Host 43145 |
 | **[meta-time-machine](./meta-time-machine/)** | TPS / Time Machina rail |
+| **[kde-notes-chords](./kde-notes-chords/)** | Pocket strip · 15 keys · cases · **itch pack** via Deck Host |
 
 Empty slots stay empty until named.  
 **Not this season’s center:** DATBOX migration, alphabet OS, chat-log religion.

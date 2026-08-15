@@ -1,0 +1,10 @@
+{
+  "title": "KDE Notes & Chords",
+  "sku": "CO.KDE-001-INSTR",
+  "maker": "KDE Fugue Inc.",
+  "profile": "desk",
+  "width": 800,
+  "height": 600,
+  "debug": false,
+  "rom_dir": "rom"
+}

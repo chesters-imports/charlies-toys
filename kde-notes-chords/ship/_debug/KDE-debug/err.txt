@@ -1,0 +1,1 @@
+[deck-host] rom-dir failed: 'charmap' codec can't encode character '\u2192' in position 99: character maps to <undefined>

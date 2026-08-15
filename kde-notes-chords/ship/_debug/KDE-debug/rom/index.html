@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KDE Notes &amp; Chords</title>
+  <link rel="stylesheet" href="/fonts/faces.css" />
+  <link rel="stylesheet" href="/app.css" />
+  <script src="/vendor/Tone.min.js"></script>
+</head>
+<body class="kde">
+  <header class="kde-bar" data-deck-chrome>
+    <span class="kde-logo" data-deck-menu>KDE <strong>Notes &amp; Chords</strong></span>
+    <span class="kde-drag" data-deck-drag aria-hidden="true"></span>
+    <div class="kde-win" data-deck-window-controls></div>
+  </header>
+
+  <main class="kde-main" id="app">
+    <div class="game-screen">
+      <div class="folder-wrap">
+        <div class="folder-chrome">
+          <div class="folder-tab major_clue" id="folderTab">
+            <h3 id="customer" class="heading">—</h3>
+          </div>
+          <h1 id="case" class="heading street-title">78 Case Street</h1>
+        </div>
+        <div class="folder-body clue" id="clue" aria-label="case scraps">
+          <div class="case-banner" id="caseBanner" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- machine bar under the file: strip + PLAY/SOUND -->
+    <div class="machine-bar">
+      <div class="piano-wrap">
+        <div id="reels" class="reels" aria-label="keys"></div>
+      </div>
+      <div class="btns">
+        <button type="button" class="spin" id="btnPlay" title="Play">PLAY</button>
+        <button type="button" class="audio" id="btnAudio" title="Sound">SOUND</button>
+      </div>
+      <p id="last_spin" class="last-spin"></p>
+    </div>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

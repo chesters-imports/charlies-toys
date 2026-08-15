@@ -1,0 +1,4 @@
+the-deck-host: frameless=ON  devtools=ON
+  caption: gem menu · Alt+M · Ctrl+N new · drag · size · Ctrl± zoom · F11 deep · Esc surface
+  profiles: desk · datbox · office · companion/rail
+[deck-host] manifest  C:\ALICE_BOX\charlies-toys\kde-notes-chords\ship\_debug\KDE-debug\rom.manifest

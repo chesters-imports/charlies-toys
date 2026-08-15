@@ -1,0 +1,830 @@
+/* KDE Notes & Chords · 800×600 pocket machine
+   Strange piano strip · detective case file · narrative, not cash
+   Faces live in /fonts/faces.css (offline / itch). */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.kde {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 13px;
+  color: #c8b8a0;
+  background: #0c0a0e;
+  /* rain on the office window */
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(80, 40, 90, 0.25), transparent 50%),
+    radial-gradient(ellipse at 90% 100%, rgba(20, 40, 70, 0.35), transparent 45%),
+    linear-gradient(180deg, #141018 0%, #0a080c 100%);
+}
+
+.kde-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.5rem;
+  background: #08060a;
+  color: #d8c8b0;
+  border-bottom: 1px solid #3a2030;
+  box-shadow: 0 1px 0 rgba(120, 40, 60, 0.25);
+}
+
+.kde-logo {
+  font-family: "Special Elite", cursive;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+}
+
+.kde-logo strong {
+  color: #c45c6a;
+  font-weight: 400;
+}
+
+.kde-drag {
+  flex: 1;
+  height: 0.9rem;
+  cursor: grab;
+  opacity: 0.25;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.08) 3px,
+    rgba(255, 255, 255, 0.08) 4px
+  );
+}
+
+.kde-main {
+  height: calc(100% - 2rem);
+  overflow: hidden;
+  padding: 0.35rem 0.45rem 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-height: 0;
+}
+
+.folder-chrome {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.street-title {
+  flex: 0 1 auto;
+  margin: 0 0.15rem 0.15rem 0;
+  text-align: right;
+  opacity: 0.85;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #b09078;
+  text-shadow: 0 0 10px rgba(100, 40, 60, 0.3);
+  max-width: 48%;
+}
+
+/* ── machine bar: strip + PLAY under the folder ──────────── */
+.machine-bar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.4rem;
+  padding: 0.3rem 0.3rem 0.25rem;
+  background: linear-gradient(180deg, #141018 0%, #0c0a0e 100%);
+  border: 1px solid #3a2838;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 -2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.machine-bar .piano-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.machine-bar .btns {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.machine-bar .last-spin {
+  flex: 1 1 100%;
+  margin: 0;
+  min-height: 0.75rem;
+  order: 3;
+}
+
+.reels {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 2px;
+  width: 100%;
+  margin: 0;
+  padding: 0.25rem 0.2rem;
+  background: linear-gradient(180deg, #0a080c 0%, #050408 100%);
+  border: 1px solid #2a1a28;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+
+/* equal length always — match is color/glow, not height */
+.tile {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 2.85rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0.3rem;
+  font-size: 0.45rem;
+  color: transparent;
+  border-radius: 0 0 2px 2px;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset -2px 0 4px rgba(0, 0, 0, 0.25),
+    inset 2px 0 3px rgba(255, 255, 255, 0.05),
+    0 2px 0 rgba(0, 0, 0, 0.35);
+}
+
+.tile.match {
+  filter: brightness(1.25) saturate(1.15);
+  outline: 2px solid #e8c070;
+  outline-offset: -2px;
+  z-index: 2;
+  box-shadow:
+    inset 0 0 10px rgba(255, 220, 120, 0.3),
+    0 0 8px rgba(200, 80, 100, 0.35);
+}
+
+/* KEY — hot red (one face) */
+.SP {
+  background: linear-gradient(180deg, #e02828 0%, #8a1010 45%, #4a0808 100%);
+}
+.SP::after {
+  content: "KEY";
+  color: #fff;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* CLUE — blues, clearly different from each other */
+.HP1 {
+  background: linear-gradient(180deg, #3060ff 0%, #1020a0 50%, #080840 100%);
+}
+.HP2 {
+  background: linear-gradient(180deg, #40c0ff 0%, #0080c0 50%, #003850 100%);
+}
+.HP1::before,
+.HP2::before {
+  content: "CLUE";
+  color: #fff;
+  font-size: 0.45rem;
+  font-weight: 700;
+  position: absolute;
+  top: 0.3rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* HINT — greens / gold-green, not mud */
+.MP1 {
+  background: linear-gradient(180deg, #40e040 0%, #188818 55%, #0a4010 100%);
+}
+.MP2 {
+  background: linear-gradient(180deg, #e0e040 0%, #989820 55%, #404008 100%);
+}
+.MP3 {
+  background: linear-gradient(180deg, #20c080 0%, #107848 55%, #083020 100%);
+}
+.MP1::before,
+.MP2::before,
+.MP3::before {
+  content: "HINT";
+  color: #fff;
+  font-size: 0.45rem;
+  font-weight: 700;
+  position: absolute;
+  top: 0.3rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* FEEL — purples / violets, each distinct (not one grey-purple blob) */
+.LP1 {
+  background: linear-gradient(180deg, #b060ff 0%, #6020a0 50%, #300850 100%);
+}
+.LP2 {
+  background: linear-gradient(180deg, #ff60c0 0%, #a02070 50%, #500830 100%);
+}
+.LP3 {
+  background: linear-gradient(180deg, #8060ff 0%, #4030a0 50%, #181040 100%);
+}
+.LP4 {
+  background: linear-gradient(180deg, #c0a0ff 0%, #7060b0 50%, #302850 100%);
+}
+.LP1::before,
+.LP2::before,
+.LP3::before,
+.LP4::before {
+  content: "FEEL";
+  color: #fff;
+  font-size: 0.45rem;
+  font-weight: 700;
+  position: absolute;
+  top: 0.3rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.game-screen {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.heading {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: #d0b090;
+  text-shadow: 0 0 12px rgba(120, 40, 60, 0.35);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btns {
+  display: flex;
+  gap: 0.3rem;
+  flex: 0 0 auto;
+}
+
+.spin,
+.audio {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.6rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #5a3040;
+  background: #1a1018;
+  color: #e0c0b0;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  min-width: 4.2rem;
+  width: 4.2rem;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.spin:hover,
+.audio:hover {
+  background: #2a1820;
+  border-color: #8a4050;
+}
+
+.spin:active {
+  transform: translateY(1px);
+}
+
+.audio.is-on {
+  border-color: #406050;
+  color: #a0d0b0;
+}
+
+.audio.is-muted {
+  border-color: #5a4050;
+  color: #806870;
+  opacity: 0.85;
+}
+
+/* ── detective case file ─────────────────────────────────── */
+.folder-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.05rem;
+}
+
+.folder-tab.major_clue {
+  position: relative;
+  z-index: 3;
+  flex: 0 0 auto;
+  height: 1.55rem;
+  padding: 0.22rem 0.7rem 0 0.75rem;
+  width: min(52%, 12.5rem);
+  border-radius: 6px 12px 0 0;
+  border: 1px solid #8a7048;
+  border-bottom: none;
+  color: #2a1c10;
+  /* same fiber language as the open folder */
+  background-color: #b89060;
+  background-image:
+    linear-gradient(180deg, rgba(255, 240, 200, 0.2), transparent 70%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #d4b888 0%, #b89060 55%, #a07848 100%);
+  background-blend-mode: soft-light, multiply, normal;
+  box-shadow:
+    1px -1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.folder-tab.major_clue::after {
+  /* little tab crease / wear line */
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 12%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(60, 40, 20, 0.25),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.folder-tab.major_clue h3 {
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: #1a3060;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.25);
+}
+
+.folder-tab.is-case-flash {
+  animation: caseFlash 0.85s ease;
+}
+
+@keyframes caseFlash {
+  0% {
+    background: #e8c070;
+  }
+  100% {
+    background: linear-gradient(180deg, #c4a070 0%, #a88858 100%);
+  }
+}
+
+.folder-body.clue,
+.clue {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #8a7048;
+  border-radius: 0 6px 6px 6px;
+  padding: 0;
+  box-shadow:
+    2px 3px 10px rgba(0, 0, 0, 0.5),
+    inset 0 0 50px rgba(40, 20, 10, 0.22);
+  /* manila + fiber + lamp */
+  background-color: #c49658;
+  background-image:
+    radial-gradient(ellipse at 78% 8%, rgba(255, 230, 180, 0.18), transparent 50%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1.35rem,
+      rgba(80, 50, 20, 0.07) 1.35rem,
+      rgba(80, 50, 20, 0.07) 1.4rem
+    ),
+    linear-gradient(165deg, #e0c090 0%, #c4a06a 40%, #a87848 100%);
+  background-blend-mode: soft-light, multiply, normal, normal;
+}
+
+.case-banner {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%) rotate(-2deg);
+  z-index: 20;
+  padding: 0.5rem 0.9rem;
+  background: #100810;
+  color: #e8c8b0;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.95rem;
+  border: 1px solid #8a3040;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  letter-spacing: 0.04em;
+}
+
+.case-banner.is-on {
+  opacity: 1;
+}
+
+/* base scrap — overwritten heavily per kind */
+.frag {
+  position: absolute;
+  width: 9.5rem;
+  max-width: 40%;
+  max-height: 6.8rem;
+  min-height: 2.8rem;
+  padding: 0.55rem 0.45rem 0.4rem 0.5rem;
+  background: #f8f4e8;
+  border: 1px solid #b0a088;
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.22);
+  color: #1e2830;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.64rem;
+  line-height: 1.28;
+  text-align: left;
+  z-index: 4;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+/* ── HINT (MP) — typed office slip ───────────────────────── */
+.frag.frag-clue {
+  width: 9.6rem;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 0.9rem,
+      rgba(0, 60, 120, 0.05) 0.9rem,
+      rgba(0, 60, 120, 0.05) 0.92rem
+    ),
+    #f4f0e4;
+  border: 1px solid #a09880;
+  border-left: 2px solid #4a6080;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.18);
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.62rem;
+}
+
+.frag.frag-clue .frag-body {
+  max-height: 5rem;
+  overflow: hidden;
+}
+
+/* ── CLUE / high (HP) — yellow sticky note ───────────────── */
+.frag.frag-high {
+  width: 8.2rem;
+  max-width: 36%;
+  min-height: 3.6rem;
+  max-height: 5.8rem;
+  padding: 0.7rem 0.45rem 0.45rem;
+  background: linear-gradient(165deg, #fff59a 0%, #f0e050 55%, #e0d040 100%);
+  border: none;
+  border-bottom: 1px solid rgba(160, 140, 40, 0.35);
+  box-shadow:
+    2px 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.72rem;
+  color: #2a2410;
+  /* sticky curl */
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 92%,
+    96% 100%,
+    0 100%
+  );
+}
+
+.frag.frag-high .sticky-tab {
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 0.28rem;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 0 0 2px 2px;
+  pointer-events: none;
+}
+
+.frag.frag-high .frag-body {
+  max-height: 4.2rem;
+  overflow: hidden;
+}
+
+.frag.frag-high .fragNm {
+  opacity: 0.4;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.48rem;
+}
+
+/* ── FEEL (LP) — quiet torn whisper (lowest pay, piles often) ─ */
+.frag.frag-feel {
+  width: 7.2rem;
+  max-width: 32%;
+  min-height: 2.1rem;
+  max-height: 4rem;
+  padding: 0.4rem 0.45rem 0.35rem 0.5rem;
+  background: rgba(236, 230, 220, 0.72);
+  border: none;
+  color: #5a5048;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.6rem;
+  font-style: italic;
+  line-height: 1.3;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  opacity: 0.78;
+  z-index: 3; /* under clues / stickies / key notes */
+  /* softer tear — less “jagged noise” */
+  clip-path: polygon(
+    3% 5%,
+    12% 0%,
+    35% 3%,
+    60% 0%,
+    88% 4%,
+    100% 14%,
+    98% 55%,
+    100% 90%,
+    85% 100%,
+    40% 97%,
+    8% 100%,
+    0% 80%,
+    2% 40%
+  );
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12));
+}
+
+.frag.frag-feel .frag-body {
+  max-height: 2.8rem;
+  overflow: hidden;
+}
+
+.frag.frag-feel .fragNm {
+  font-family: "IBM Plex Mono", monospace;
+  font-style: normal;
+  font-size: 0.42rem;
+  opacity: 0.25;
+}
+
+.frag.frag-feel.is-dragging {
+  opacity: 0.95;
+  z-index: 30 !important;
+}
+
+/* ── KEY / special (SP) — urgent red-marked note ─────────── */
+.frag.frag-special {
+  width: 9.2rem;
+  max-width: 40%;
+  min-height: 3rem;
+  max-height: 6.2rem;
+  padding: 0.55rem 0.5rem 0.4rem;
+  background:
+    linear-gradient(180deg, #fff5f5 0%, #ffe8e8 100%);
+  border: 1px solid #c06060;
+  box-shadow:
+    2px 3px 5px rgba(80, 0, 0, 0.18),
+    inset 0 0 0 1px rgba(255, 200, 200, 0.4);
+  font-family: "Amatic SC", cursive;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #6a1010;
+  line-height: 1.2;
+}
+
+.frag.frag-special .key-stamp {
+  display: inline-block;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: #a01010;
+  border: 1.5px solid rgba(160, 16, 16, 0.7);
+  padding: 0 0.25rem;
+  transform: rotate(-8deg);
+  margin-bottom: 0.2rem;
+  line-height: 1.2;
+  opacity: 0.9;
+}
+
+.frag.frag-special .frag-body {
+  max-height: 4rem;
+  overflow: hidden;
+  display: block;
+}
+
+.frag.frag-special .fragNm {
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 600;
+  opacity: 0.4;
+}
+
+/*
+ * CLIENT DOSSIER — not a white scrap.
+ * Buff cardstock, red stamp, case id, typewriter body.
+ */
+.frag.frag-bio {
+  width: 11.5rem;
+  max-width: 48%;
+  min-height: 4.2rem;
+  max-height: 9rem;
+  z-index: 12;
+  padding: 0.45rem 0.5rem 0.4rem 0.55rem;
+  overflow: visible;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 40%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 0.85rem,
+      rgba(80, 50, 30, 0.06) 0.85rem,
+      rgba(80, 50, 30, 0.06) 0.88rem
+    ),
+    linear-gradient(165deg, #e8d4a8 0%, #d4b888 55%, #c4a878 100%);
+  border: 1px solid #8a7048;
+  border-left: 3px solid #6a2018;
+  box-shadow:
+    2px 3px 6px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 240, 200, 0.25);
+  color: #2a1c10;
+  font-family: "Courier New", Courier, monospace;
+  text-align: left;
+}
+
+.frag.frag-bio .bio-stamp {
+  display: inline-block;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: #8a1818;
+  border: 1.5px solid rgba(138, 24, 24, 0.65);
+  padding: 0.05rem 0.28rem 0;
+  transform: rotate(-6deg);
+  margin: 0.1rem 0 0.25rem;
+  opacity: 0.9;
+  line-height: 1.1;
+}
+
+.frag.frag-bio .bio-id {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.06em;
+  color: #5a4030;
+  margin-bottom: 0.15rem;
+  opacity: 0.85;
+}
+
+.frag.frag-bio .bio-who {
+  display: block;
+  font-family: "Special Elite", "Permanent Marker", cursive;
+  font-size: 0.78rem;
+  color: #1a1420;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.02em;
+  border-bottom: 1px dotted rgba(60, 40, 20, 0.35);
+  padding-bottom: 0.15rem;
+}
+
+.frag.frag-bio .frag-body {
+  display: block;
+  max-height: 4.2rem;
+  overflow: hidden;
+  font-size: 0.62rem;
+  line-height: 1.3;
+  color: #2c2018;
+}
+
+.frag.frag-bio .fragNm {
+  display: none;
+}
+
+/*
+ * Paperclip sits on the UPPER RIGHT corner and hangs OFF the paper
+ * onto the manila folder (overlap sense).
+ */
+.frag.frag-bio .paperclip {
+  position: absolute;
+  /* hang off top-right corner: half on scrap, half on manila */
+  top: -0.75rem;
+  right: -0.45rem;
+  left: auto;
+  width: 1.1rem;
+  height: 1.85rem;
+  border: 2.5px solid #6e6e80;
+  border-bottom-color: #4a4a58;
+  border-radius: 0.6rem;
+  background: linear-gradient(
+    105deg,
+    rgba(230, 230, 240, 0.35) 0%,
+    rgba(170, 170, 185, 0.65) 45%,
+    rgba(120, 120, 140, 0.4) 100%
+  );
+  box-shadow:
+    1px 2px 4px rgba(0, 0, 0, 0.4),
+    inset 1px 0 0 rgba(255, 255, 255, 0.5);
+  transform: rotate(32deg);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.frag.frag-bio .paperclip::before {
+  /* loop over the paper edge */
+  content: "";
+  position: absolute;
+  top: -0.15rem;
+  left: 50%;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-left: -0.28rem;
+  border: 2px solid #7a7a8a;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.frag.frag-bio .paperclip::after {
+  content: "";
+  position: absolute;
+  top: 0.35rem;
+  left: 0.15rem;
+  right: 0.15rem;
+  bottom: 0.2rem;
+  border: 1.5px solid rgba(90, 90, 110, 0.55);
+  border-radius: 0.3rem;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.2),
+    transparent 60%
+  );
+}
+
+.frag:active,
+.frag.is-dragging {
+  cursor: grabbing;
+  z-index: 30 !important;
+  box-shadow: 4px 6px 14px rgba(0, 0, 0, 0.35);
+}
+
+.frag .frag-body {
+  display: block;
+  max-height: 5.2rem;
+  overflow: hidden;
+}
+
+.fragNm {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 0.5rem;
+  font-weight: 800;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.last-spin {
+  flex: 0 0 auto;
+  margin: 0.1rem 0 0;
+  font-size: 0.58rem;
+  color: #706060;
+  min-height: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+
