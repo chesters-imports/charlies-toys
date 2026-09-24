@@ -1,0 +1,9 @@
+name = "",
+txt_look = """""",
+echo_look = "",
+txt_think = """""",
+echo_think = "",
+txt_mem = """""",
+echo_mem = "",
+is_memorable = False,
+is_changeable = False

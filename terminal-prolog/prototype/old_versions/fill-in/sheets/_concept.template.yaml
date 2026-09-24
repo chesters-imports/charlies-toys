@@ -1,0 +1,27 @@
+# Copy to concepts/<id>.yaml  e.g. concepts/who.yaml
+id: example
+# optional: also add id to a space's present: list in spaces notes
+
+look: |
+  YOU TRY TO LOOK AT EXAMPLE.
+
+    (what they see)
+
+echo_look: |
+  Echo's quip after look.
+
+remember: |
+  YOU REMEMBER EXAMPLE.
+
+    (pull into memory)
+
+echo_remember: |
+  Echo after remember.
+
+think: |
+  YOU THINK ABOUT EXAMPLE.
+
+    (only works once remembered)
+
+echo_think: |
+  Echo after think.
