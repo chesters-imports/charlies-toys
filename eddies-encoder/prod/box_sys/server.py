@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import random
 import re
 import secrets
@@ -19,6 +20,7 @@ SAFE = PROD / "safe_box"
 ENTRIES = SAFE / "eddie.teehee"
 LINKS = SAFE / "eddylinks.teehee"
 PREFS = SAFE / "eddie_prefs.json"
+PAPER = SAFE / "paper"
 HOST = "127.0.0.1"
 PORT = 43145
 
@@ -134,6 +136,250 @@ def valid_kven(s: str) -> bool:
     return bool(re.fullmatch(r"[A-Za-z]{3}-\d{3}", (s or "").strip()))
 
 
+def mint_crate_id() -> str:
+    return "crate." + os.urandom(8).hex().upper()
+
+
+def yaml_scalar(s: str) -> str:
+    t = str(s or "")
+    if not t:
+        return '""'
+    if re.search(r'[:#\[\]{}"\n&*!|>%@`]', t) or t.strip() != t or t.lower() in {
+        "true",
+        "false",
+        "null",
+        "yes",
+        "no",
+    }:
+        return json.dumps(t, ensure_ascii=False)
+    return t
+
+
+def yaml_list(vals: list[str]) -> str:
+    bits = [str(x).strip() for x in vals if str(x).strip()]
+    if not bits:
+        return "[]"
+    return "[" + ", ".join(yaml_scalar(x) for x in bits) + "]"
+
+
+def split_fm(text: str) -> tuple[dict[str, Any], str]:
+    raw = (text or "").replace("\r\n", "\n").replace("\r", "\n")
+    if raw.startswith("\ufeff"):
+        raw = raw[1:]
+    if not raw.startswith("---\n"):
+        return {}, raw
+    end = raw.find("\n---\n", 4)
+    if end < 0:
+        return {}, raw
+    head = raw[4:end]
+    body = raw[end + 5 :]
+    meta: dict[str, Any] = {}
+    for line in head.split("\n"):
+        if not line.strip() or line.lstrip().startswith("#") or ":" not in line:
+            continue
+        key, val = line.split(":", 1)
+        key = key.strip()
+        val = val.strip()
+        if not key:
+            continue
+        if val.startswith("[") and val.endswith("]"):
+            inner = val[1:-1].strip()
+            meta[key] = (
+                [p.strip().strip('"').strip("'") for p in inner.split(",") if p.strip()]
+                if inner
+                else []
+            )
+        else:
+            meta[key] = val.strip('"').strip("'")
+    return meta, body
+
+
+def paper_path(kven: str) -> Path:
+    return PAPER / (kven.strip().upper() + ".md")
+
+
+def edges_for(kven: str, links: list[dict[str, Any]]) -> list[str]:
+    k = kven.strip().upper()
+    out: list[str] = []
+    seen: set[str] = set()
+    for row in links or []:
+        other = ""
+        if str(row.get("from_kven") or "").strip().upper() == k:
+            other = str(row.get("to_kven") or "").strip().upper()
+        elif str(row.get("to_kven") or "").strip().upper() == k:
+            other = str(row.get("from_kven") or "").strip().upper()
+        if other and other not in seen and valid_kven(other):
+            seen.add(other)
+            out.append(other)
+    return out
+
+
+def pull_entry_from_paper(ent: dict[str, Any]) -> dict[str, Any]:
+    """BIOS / roam Keep on the md file is the face Eddy should show."""
+    kven = str(ent.get("kven") or "").strip().upper()
+    if not valid_kven(kven):
+        return ent
+    path = paper_path(kven)
+    if not path.is_file():
+        return ent
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return ent
+    meta, _body = split_fm(text)
+    title = str(meta.get("title") or "").strip()
+    if title:
+        ent["label"] = title
+    if "aliases" in meta:
+        ent["alts"] = _str_list(meta.get("aliases"))
+    if "matches" in meta:
+        ent["matches"] = _str_list(meta.get("matches"))
+    if str(meta.get("type") or "").strip():
+        ent["type"] = str(meta.get("type") or "").strip()
+    if "note" in meta:
+        ent["notes"] = str(meta.get("note") or "").strip()
+    crate = str(meta.get("crate") or "").strip()
+    if crate:
+        ent["crate"] = crate
+    for key in ("first_occurred", "last_occurred"):
+        if key in meta:
+            ent[key] = meta.get(key) or None
+    return ent
+
+
+def write_kven_paper(ent: dict[str, Any], links: list[dict[str, Any]] | None = None) -> Path | None:
+    """Write YAML face. Keep the body (your writing). Never eat a live crate."""
+    kven = str(ent.get("kven") or "").strip().upper()
+    if not valid_kven(kven):
+        return None
+    PAPER.mkdir(parents=True, exist_ok=True)
+    path = paper_path(kven)
+    meta: dict[str, Any] = {}
+    body = ""
+    if path.is_file():
+        try:
+            meta, body = split_fm(path.read_text(encoding="utf-8"))
+        except OSError:
+            meta, body = {}, ""
+    crate = str(ent.get("crate") or meta.get("crate") or "").strip()
+    if not crate:
+        crate = mint_crate_id()
+    ent["crate"] = crate
+    label = str(ent.get("label") or meta.get("title") or kven).strip() or kven
+    owned = {
+        "crate": crate,
+        "title": label,
+        "kven": kven,
+        "kind": "kven",
+        "type": str(ent.get("type") or meta.get("type") or "person").strip() or "person",
+        "aliases": list(ent.get("alts") or []),
+        "matches": list(ent.get("matches") or []),
+        "edges": edges_for(kven, links or []),
+        "note": str(ent.get("notes") or "").strip(),
+    }
+    for key in ("first_occurred", "last_occurred"):
+        val = ent.get(key)
+        if val not in (None, "", []):
+            owned[key] = val
+    skip = {
+        "crate",
+        "title",
+        "kven",
+        "kind",
+        "type",
+        "aliases",
+        "matches",
+        "edges",
+        "note",
+        "first_occurred",
+        "last_occurred",
+    }
+    extras = [(k, meta[k]) for k in meta if k not in skip]
+    lines = ["---"]
+    for key in (
+        "crate",
+        "title",
+        "kven",
+        "kind",
+        "type",
+        "aliases",
+        "matches",
+        "edges",
+        "note",
+        "first_occurred",
+        "last_occurred",
+    ):
+        if key not in owned:
+            continue
+        val = owned[key]
+        if key in {"aliases", "matches", "edges"}:
+            lines.append(key + ": " + yaml_list(list(val)))
+        elif key == "note" and not val:
+            continue
+        else:
+            lines.append(key + ": " + yaml_scalar(str(val)))
+    for key, val in extras:
+        if isinstance(val, list):
+            lines.append(key + ": " + yaml_list([str(x) for x in val]))
+        else:
+            lines.append(key + ": " + yaml_scalar(str(val)))
+    lines.append("---")
+    body = (body or "").replace("\r\n", "\n").replace("\r", "\n")
+    if not body.strip():
+        body = "# {{title}}\n"
+    text = "\n".join(lines) + "\n\n" + body.lstrip("\n")
+    if not text.endswith("\n"):
+        text += "\n"
+    path.write_text(text, encoding="utf-8", newline="\n")
+    return path
+
+
+def write_hall_if_missing() -> None:
+    PAPER.mkdir(parents=True, exist_ok=True)
+    shell = PAPER / "_shell.md"
+    if not shell.is_file():
+        shell.write_text(
+            "---\n"
+            "crate: " + mint_crate_id() + "\n"
+            "title: Eddy's Encoder\n"
+            "---\n\n"
+            "{{paper}}\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+    blot = PAPER / "index.md"
+    if not blot.is_file():
+        blot.write_text(
+            "---\n"
+            "crate: " + mint_crate_id() + "\n"
+            "title: Eddy's Encoder\n"
+            "---\n\n"
+            "# {{title}}\n\n"
+            "VEN slips. Roam this folder. Write on a slip; Eddy keeps the YAML face.\n\n"
+            "{{files}}\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+
+
+def sync_papers() -> None:
+    write_hall_if_missing()
+    e = load_entries()
+    links = load_links().get("links") or []
+    changed = False
+    for ent in e.get("entries") or []:
+        before = str(ent.get("crate") or "")
+        write_kven_paper(ent, links)
+        if str(ent.get("crate") or "") != before:
+            changed = True
+    if changed:
+        save_entries(e)
+
+
+def refresh_entries_from_paper(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [pull_entry_from_paper(dict(ent)) for ent in entries]
+
+
 def json_bytes(obj: Any, code: int = 200) -> tuple[int, bytes, str]:
     body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
     return code, body, "application/json; charset=utf-8"
@@ -185,13 +431,15 @@ class Handler(SimpleHTTPRequestHandler):
             e = load_entries()
             l = load_links()
             p = load_prefs()
+            entries = refresh_entries_from_paper(e.get("entries") or [])
             code, body, ctype = json_bytes(
                 {
-                    "entries": e.get("entries") or [],
+                    "entries": entries,
                     "links": l.get("links") or [],
                     "link_types": e.get("link_types") or DEFAULT_LINK_TYPES,
                     "prefs": p,
                     "updated": max(int(e.get("updated") or 0), int(l.get("updated") or 0)),
+                    "paper": str(PAPER),
                 }
             )
             self._send(code, body, ctype)
@@ -200,7 +448,7 @@ class Handler(SimpleHTTPRequestHandler):
             q = (qs.get("q") or [""])[0].strip().lower()
             e = load_entries()
             hits = []
-            for ent in e.get("entries") or []:
+            for ent in refresh_entries_from_paper(e.get("entries") or []):
                 blob = " ".join(
                     [
                         ent.get("kven") or "",
@@ -260,7 +508,9 @@ class Handler(SimpleHTTPRequestHandler):
             }
             e.setdefault("entries", []).insert(0, ent)
             save_entries(e)
-            code, body, ctype = json_bytes({"entry": ent}, 201)
+            write_kven_paper(ent, load_links().get("links") or [])
+            save_entries(e)
+            code, body, ctype = json_bytes({"entry": ent, "paper": str(paper_path(kven))}, 201)
             self._send(code, body, ctype)
             return
 
@@ -284,6 +534,8 @@ class Handler(SimpleHTTPRequestHandler):
                 ]
                 save_links(l)
                 save_entries(e)
+                for ent in e.get("entries") or []:
+                    write_kven_paper(ent, l.get("links") or [])
                 code, body, ctype = json_bytes({"ok": True})
                 self._send(code, body, ctype)
                 return
@@ -296,7 +548,9 @@ class Handler(SimpleHTTPRequestHandler):
                 ent["matches"] = _str_list(data.get("matches"))
             ent["modified"] = now()
             save_entries(e)
-            code, body, ctype = json_bytes({"entry": ent})
+            write_kven_paper(ent, load_links().get("links") or [])
+            save_entries(e)
+            code, body, ctype = json_bytes({"entry": ent, "paper": str(paper_path(kven))})
             self._send(code, body, ctype)
             return
 
@@ -323,6 +577,10 @@ class Handler(SimpleHTTPRequestHandler):
             }
             l.setdefault("links", []).insert(0, link)
             save_links(l)
+            for kven in (fk, tk):
+                row = next((x for x in (e.get("entries") or []) if x.get("kven") == kven), None)
+                if row:
+                    write_kven_paper(row, l.get("links") or [])
             code, body, ctype = json_bytes({"link": link, "link_types": e.get("link_types")}, 201)
             self._send(code, body, ctype)
             return
@@ -331,13 +589,22 @@ class Handler(SimpleHTTPRequestHandler):
         if m:
             lid = m.group(1)
             l = load_links()
-            before = len(l.get("links") or [])
+            dropped = next((x for x in (l.get("links") or []) if x.get("id") == lid), None)
             l["links"] = [x for x in (l.get("links") or []) if x.get("id") != lid]
-            if len(l["links"]) == before:
+            if dropped is None:
                 code, body, ctype = json_bytes({"error": "not found"}, 404)
                 self._send(code, body, ctype)
                 return
             save_links(l)
+            e = load_entries()
+            links_now = l.get("links") or []
+            for kven in (
+                str(dropped.get("from_kven") or "").upper(),
+                str(dropped.get("to_kven") or "").upper(),
+            ):
+                row = next((x for x in (e.get("entries") or []) if x.get("kven") == kven), None)
+                if row:
+                    write_kven_paper(row, links_now)
             code, body, ctype = json_bytes({"ok": True})
             self._send(code, body, ctype)
             return
@@ -357,10 +624,12 @@ def _str_list(v: Any) -> list[str]:
 def main() -> None:
     load_entries()
     load_links()
+    sync_papers()
     httpd = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"Eddy's Encoder · CO.TOY-004-EEE · http://{HOST}:{PORT}/")
     print(f"  bag: {ENTRIES}")
     print(f"  links: {LINKS}")
+    print(f"  paper: {PAPER}")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:

@@ -19,13 +19,17 @@ run-eddie.bat
 - Port **43145** · glass **800×600** desk profile  
 - **Never** Chrome chrome as home  
 - Bags: `prod/safe_box/eddie.teehee` · `prod/safe_box/eddylinks.teehee`
+- Paper: `prod/safe_box/paper/{VEN}.md` — one slip per KVEN. Roam this folder from Pocket Go. Eddy owns the YAML face; the body is yours (cabinets hang on that file).
 
 ### Bags
 
 | File | Holds |
 |------|--------|
-| `eddie.teehee` | entries + growing `link_types` |
-| `eddylinks.teehee` | flat links (legible, separate) |
+| `eddie.teehee` | karaoke index (label, alts, matches) |
+| `eddylinks.teehee` | tape of links |
+| `paper/{VEN}.md` | **master slip** — YAML face + your writing |
+
+Pocket Go: connect `paper/` as `roam.eddie` (BIOS Hosts → + roam, or `_hosts.yaml`). Do not copy the folder into `~hosts`.
 
 ### v0
 
