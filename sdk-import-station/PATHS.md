@@ -21,20 +21,20 @@ C:\ALICE_BOX\.glass-logs\
 | sealed wood | `sdk-import-station/work/exports/*.glassbox` |
 | | name: `{import_order}-{OT\|NT\|BN}-{face}[.{part}].glassbox` |
 | | msg chip: `{export_id}.{bag_seq}` e.g. `001-OT-008.1.0` |
-| **station paper (fileKeeper)** | `sdk-import-station/paper/{station}/` |
-| | stations: **io** · **ab** · **osx** (was rx) · **dr** · **dc** · **cu** · … |
-| | **Primary:** `leaf[n]-….chip` + station-root `terminal[{auth}]-filekeeper.bin` |
-| | folders: `_root/` · `{FOLDER}/` · chips sit in folders; bin co-located at station root |
-| | legacy `.fk.json` under `_fk_archive/` after chip cutover |
+| **station paper (fileKeeper chips)** | `sdk-import-station/paper/{station}/` |
+| | **archive.** leaf chips + `terminal[{auth}]-filekeeper.bin`. Not the live library. |
+| **FILES library (live)** | `sdk-import-station/library/` |
+| | Go paper vault. Pocket Go connects it as `roam.files`. Halls: **io** · **ab** · **cu** · **dr** · **osx** · **dc**. Starts empty. Do not copy chips or `go.terminals` into it. |
 
 ```
 GLASS_LOGS_ROOT=C:\ALICE_BOX\.glass-logs
 SDK_PAPER_ROOT=C:\ALICE_BOX\charlies-toys\sdk-import-station\paper\io
+SDK_LIBRARY_ROOT=C:\ALICE_BOX\charlies-toys\sdk-import-station\library
 ```
 
-**Live FILES desk** currently mounts **IO only** (`SDK_PAPER_ROOT` = `paper/io`). Other colors sit on disk until IOX switch.
+**Live FILES library** is `library/` (markdown). The FILES desk still mounts chip paper for the toy until that room reads the vault. Other colors' chips sit on disk as archive.
 
-**Paper ≠ glass.** Life files go under `paper/{color}`. Chat mountain stays under `.glass-logs`.
+**Paper ≠ glass ≠ library.** New life files go under `library/{station}`. Chat mountain stays under `.glass-logs`. Do not dump notes into `go.terminals`.
 
 ### Ledger → paper port (2026-07-26)
 

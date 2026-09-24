@@ -39,12 +39,22 @@ $media = getenv('SDK_MEDIA_ROOT') ?: ($SDK_ROOT . '/media');
 $media = rtrim(str_replace('\\', '/', $media), '/');
 define('SDK_MEDIA_ROOT', $media);
 
+// Live FILES library (Go paper). Chip paper under paper/{station} is the old desk.
+define('SDK_LIBRARY_ROOT', $SDK_ROOT . '/library');
+
 foreach ([
     SDK_WORK_ROOT,
     SDK_GLASS_DIR,
     SDK_WIP_DIR,
     SDK_EXPORTS_DIR,
     SDK_MEDIA_ROOT,
+    SDK_LIBRARY_ROOT,
+    SDK_LIBRARY_ROOT . '/io',
+    SDK_LIBRARY_ROOT . '/ab',
+    SDK_LIBRARY_ROOT . '/cu',
+    SDK_LIBRARY_ROOT . '/osx',
+    SDK_LIBRARY_ROOT . '/dr',
+    SDK_LIBRARY_ROOT . '/dc',
     SDK_PAPER_BASE . '/io',
     SDK_PAPER_BASE . '/io/_root',
     SDK_PAPER_BASE . '/ab',
