@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Memory Deck Builder</title>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <header class="chrome" data-deck-chrome>
+    <span class="sku" data-deck-menu title="Memory Deck Builder">CO.KDE-003-MDB</span>
+    <span class="drag" data-deck-drag>Memory Deck Builder</span>
+    <div data-deck-window-controls></div>
+  </header>
+  <div class="libbar">
+    <label class="path">
+      <span>library</span>
+      <input id="library" spellcheck="false" />
+    </label>
+    <button id="use-library" type="button">Use this folder</button>
+    <button id="show-trays" type="button">Bring cards from the trays</button>
+    <div id="tray-pick" hidden>
+      <p class="hint">Copies into this deck. The parked trays stay as they are.</p>
+      <ul id="tray-list"></ul>
+      <button id="bring-trays" type="button">Bring checked</button>
+    </div>
+  </div>
+  <div class="work">
+    <aside class="rail">
+      <form id="make" class="make">
+        <p class="rail-h">Make a card</p>
+        <label>Title <input name="title" required /></label>
+        <label>Class <input name="class" list="class-list" /></label>
+        <datalist id="class-list"></datalist>
+        <label>The card says <textarea name="line" rows="2" maxlength="255"></textarea></label>
+        <label>House <input name="house" list="house-list" required /></label>
+        <datalist id="house-list"></datalist>
+        <div class="edge-pick">
+          <span>Edge</span>
+          <input id="make-color" type="color" value="#8d5a48" />
+          <div id="make-swatches" class="swatches"></div>
+        </div>
+        <button type="submit">Make card</button>
+      </form>
+      <input id="q" placeholder="look through titles and lines" />
+      <div class="filters">
+        <select id="by-class"><option value="">all classes</option></select>
+        <select id="by-house"><option value="">all houses</option></select>
+        <select id="by-pile"><option value="">all piles</option></select>
+      </div>
+      <ol id="list"></ol>
+    </aside>
+    <main id="board" tabindex="0">
+      <svg id="lines"></svg>
+      <div id="cards"></div>
+    </main>
+    <aside id="inspect" class="inspect" hidden>
+      <p class="kicker" id="ins-class"></p>
+      <h2 id="ins-title"></h2>
+      <label>the card says
+        <textarea id="ins-line" maxlength="255" rows="4"></textarea>
+      </label>
+      <label>class <input id="ins-klass" list="class-list" /></label>
+      <label>house <input id="ins-house" list="house-list" required /></label>
+      <div class="edge-pick">
+        <span>Edge</span>
+        <input id="ins-color" type="color" value="#8d5a48" />
+        <div id="ins-swatches" class="swatches"></div>
+      </div>
+      <label>pile <input id="ins-pile" placeholder="type a name several cards can share" /></label>
+      <p class="hint">Same name on more than one card. The pile filter shows only those.</p>
+      <p class="birth" id="ins-birth"></p>
+      <button id="clear-birth" type="button">Clear the birth stamp</button>
+      <h3>Found in these rooms</h3>
+      <ul id="found"></ul>
+      <form id="add-found">
+        <input name="crate" placeholder="paste crate.XXXXXXXXXXXXXXXX" spellcheck="false" />
+        <button type="submit">Attach</button>
+      </form>
+      <h3>Touches</h3>
+      <ul id="touches"></ul>
+      <button id="save-card" type="button">Keep</button>
+    </aside>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
