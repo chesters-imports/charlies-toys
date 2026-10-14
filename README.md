@@ -9,6 +9,7 @@ Personal objects (charlie-toys), not DATBOX product SKUs.
 | **[eddies-encoder](./eddies-encoder/)** | **Eddy's Encoder** — dirty **KVEN** mint · strange pull · `eddie.teehee` / `eddylinks.teehee` · Deck Host 43145 |
 | **[meta-time-machine](./meta-time-machine/)** | TPS / Time Machina rail |
 | **[kde-notes-chords](./kde-notes-chords/)** | Pocket strip · 15 keys · cases · **itch pack** via Deck Host |
+| **[memory-deck-builder](./memory-deck-builder/)** | **KDE Fugue Inc.** · CO.KDE-003-MDB · make lore cards, sort them, drag edges, paste room crates |
 
 Empty slots stay empty until named.  
 **Not this season’s center:** DATBOX migration, alphabet OS, chat-log religion.

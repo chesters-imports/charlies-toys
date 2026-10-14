@@ -1,0 +1,19 @@
+# consider A with B — both must be in memory
+# pair order does not matter
+
+- pair: [where, nothing]
+  text: |
+    YOU CONSIDER WHERE WITH NOTHING.
+
+      Absence and location press together.
+      The void is not only empty — it is a *here* that can be named.
+  echo: Oh. You braided them.
+  unlock_space: somewhere
+  echo_unlock: Somewhere is not nothing.
+
+- pair: [who, what]
+  text: |
+    YOU CONSIDER WHO WITH WHAT.
+
+      Self and other-than-self scrape.
+  echo: Identity and object. Classic.

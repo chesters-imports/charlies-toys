@@ -1,0 +1,7 @@
+# Station FILES vault. Pocket Go connects this folder as roam.files.
+# Complete markdown library, only inside sdk-import-station.
+# Chip paper under paper/{station} is the old desk. Mail and glass stay toy rooms.
+# go.terminals is a native coat, not this store. Do not dump notes there.
+kind: roam
+slug: files
+app: sdk-import-station

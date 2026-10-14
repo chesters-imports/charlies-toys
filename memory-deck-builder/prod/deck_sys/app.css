@@ -1,0 +1,183 @@
+:root {
+  --felt: #1a2420;
+  --felt-2: #24302a;
+  --ink: #241c14;
+  --paper: #f4ecdc;
+  --rule: #c4b49a;
+  --cream: #f7f1e6;
+  --muted: #8ea396;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--felt);
+  color: var(--cream);
+  font: 15px/1.4 "Segoe UI", sans-serif;
+}
+body { padding-top: var(--deck-caption-h, 0px); }
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 8px 0 12px;
+  background: #101614;
+  border-bottom: 1px solid #31443b;
+}
+.sku { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; cursor: pointer; }
+.drag { flex: 1; font: 600 14px/1 Georgia, serif; }
+.libbar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: end;
+  padding: 8px 12px;
+  background: #24302a;
+  border-bottom: 1px solid #31443b;
+}
+.libbar .path { min-width: 0; }
+.libbar .path input { width: 100%; }
+#tray-pick { grid-column: 1 / -1; }
+.make {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #31443b;
+  background: transparent;
+}
+.make label, .rail-h { font-size: 11px; color: var(--muted); }
+.rail-h { margin: 0 0 2px; letter-spacing: 0.08em; text-transform: uppercase; }
+.make input, .make textarea, .make button { width: 100%; }
+.make textarea { resize: vertical; min-height: 2.6em; }
+.edge-pick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+.edge-pick input[type="color"] { width: 42px; height: 28px; padding: 2px; background: #101614; }
+.swatches { display: flex; flex-wrap: wrap; gap: 4px; }
+.swatches button { width: 18px; height: 18px; padding: 0; border-radius: 50%; border: 1px solid #241c14; }
+.hint { margin: 6px 0; color: var(--muted); font-size: 12px; }
+#tray-list { list-style: none; padding: 0; margin: 0; max-height: 180px; overflow: auto; }
+#tray-list li { display: flex; gap: 6px; align-items: baseline; font-size: 13px; padding: 2px 0; }
+#bring-trays { margin-top: 8px; }
+input, textarea, select, button {
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 6px 8px;
+}
+button { cursor: pointer; background: #efe2c6; }
+button:hover { background: #fff8ea; }
+.work { flex: 1; min-height: 0; display: grid; grid-template-columns: 280px 1fr 300px; }
+.rail, .inspect {
+  padding: 10px;
+  overflow: auto;
+  background: #141c19;
+  border-right: 1px solid #31443b;
+}
+.inspect { border-right: 0; border-left: 1px solid #31443b; }
+.inspect[hidden] { display: none; }
+.path { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+#library { width: 100%; font-family: Consolas, monospace; font-size: 11px; }
+#q, .filters select { width: 100%; margin-top: 8px; }
+.filters { display: flex; flex-direction: column; }
+#list { list-style: none; padding: 0; margin: 10px 0 0; }
+#list li {
+  padding: 7px 8px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #1e2b26;
+}
+#list li.on { outline: 1px solid #e7d7b0; }
+#list small { display: block; color: var(--muted); }
+#board {
+  position: relative;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 20% 0%, #2a3b33, transparent 40%),
+    var(--felt-2);
+  min-height: 0;
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: #3d5248 #16211c;
+}
+#board::-webkit-scrollbar { width: 12px; height: 12px; }
+#board::-webkit-scrollbar-track { background: #16211c; }
+#board::-webkit-scrollbar-thumb {
+  background: #3d5248;
+  border: 3px solid #16211c;
+  border-radius: 8px;
+}
+#board::-webkit-scrollbar-thumb:hover { background: #547266; }
+#board::-webkit-scrollbar-corner { background: #16211c; }
+#lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#cards { position: absolute; inset: 0; min-width: 1600px; min-height: 1000px; }
+.card {
+  position: absolute;
+  width: 180px;
+  min-height: 96px;
+  padding: 8px 10px 8px 14px;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 3px 8px 8px 3px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.28);
+  cursor: grab;
+  user-select: none;
+}
+.card:before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 7px;
+  background: var(--strip, #8d5a48);
+  border-radius: 3px 0 0 3px;
+}
+.card.on { outline: 2px solid #f2e2bc; }
+.card .marks { display: flex; justify-content: space-between; gap: 8px; }
+.card .cls, .card .house { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a6552; }
+.card .house { text-align: right; }
+.card h3 { margin: 2px 0 4px; font: 600 15px/1.2 Georgia, serif; }
+.card p { margin: 0; font-size: 12px; color: #4d4034; }
+.nib {
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #241c14;
+  border: 2px solid #f4ecdc;
+  cursor: crosshair;
+  z-index: 2;
+}
+.inspect h2 { margin: 4px 0 8px; font: 600 22px/1.15 Georgia, serif; }
+.inspect h3 { margin: 14px 0 6px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.inspect label { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.inspect input, .inspect textarea { width: 100%; }
+.kicker { margin: 0; letter-spacing: 0.08em; text-transform: uppercase; color: #d7c4a2; font-size: 11px; }
+.birth { color: #d7c4a2; font-size: 13px; }
+#found, #touches { list-style: none; padding: 0; margin: 0; }
+#found li, #touches li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid #31443b;
+  font-family: Consolas, monospace;
+  font-size: 11px;
+}
+#add-found { display: flex; gap: 6px; margin-top: 6px; }
+#add-found input { flex: 1; }
+#save-card, #clear-birth, #use-library { margin-top: 8px; }
+.ghost {
+  position: absolute;
+  border-top: 2px dashed #f2e2bc;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
